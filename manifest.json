@@ -1,0 +1,23 @@
+{
+  "name": "KI‑Stammtisch – Multi‑Modell‑Diskussionsplattform",
+  "short_name": "KI‑Stammtisch",
+  "description": "PWA für moderierte KI‑Diskussionen mit bis zu fünf LLM‑Modellen in zwei Runden, inkl. lokaler Speicherung und Export.",
+  "start_url": "/index.html",
+  "scope": "/",
+  "display": "standalone",
+  "orientation": "portrait",
+  "background_color": "#020617",
+  "theme_color": "#0f172a",
+  "icons": [
+    {
+      "src": "icons/icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png"
+    },
+    {
+      "src": "icons/icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png"
+    }
+  ]
+}
