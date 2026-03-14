@@ -3,298 +3,817 @@
 <head>
   <meta charset="UTF-8" />
   <title>KI-Stammtisch PWA</title>
-  <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover" />
-  <meta name="theme-color" content="#020617" />
-  <meta name="description" content="KI-Stammtisch – Orchestrierte Multi-Modell-Diskussionsplattform (PWA) mit PWA-Fähigkeit, OpenRouter-API und intelligenter Synthese." />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <meta name="theme-color" content="#0f172a" />
+  <meta name="description" content="KI-Stammtisch – Multi-Modell-Diskussionsplattform als PWA mit zwei Runden, lokaler Speicherung und OpenRouter-Anbindung." />
   <link rel="manifest" href="manifest.webmanifest" />
   <link rel="icon" href="icons/icon-192.png" type="image/png" />
   <link rel="apple-touch-icon" href="icons/icon-192.png" />
   <style>
-    /* ======================================================================
-       CSS VARIABLES & BASE STYLES
-       ====================================================================== */
     :root {
       --bg: #020617;
       --bg-elevated: #0f172a;
-      --bg-card: rgba(15, 23, 42, 0.96);
-      --fg: #f8fafc;
-      --fg-muted: #94a3b8;
-      --accent: #3b82f6;
-      --accent-hover: #60a5fa;
-      --accent-soft: rgba(59, 130, 246, 0.15);
-      --danger: #ef4444;
-      --danger-soft: rgba(239, 68, 68, 0.15);
-      --warn: #eab308;
-      --warn-soft: rgba(234, 179, 8, 0.15);
-      --success: #10b981;
-      --success-soft: rgba(16, 185, 129, 0.15);
-      --border: rgba(51, 65, 85, 0.6);
-      --border-focus: #3b82f6;
-      --radius-sm: 0.375rem;
-      --radius-md: 0.5rem;
-      --radius-lg: 0.75rem;
-      --shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.5);
+      --bg-card: rgba(15,23,42,0.96);
+      --fg: #e5e7eb;
+      --fg-muted: #9ca3af;
+      --accent: #60a5fa;
+      --accent-soft: rgba(96,165,250,0.2);
+      --accent-glow: rgba(96,165,250,0.4);
+      --danger: #f97373;
+      --danger-soft: rgba(248,113,113,0.18);
+      --warn: #facc15;
+      --warn-soft: rgba(250,204,21,0.18);
+      --success: #22c55e;
+      --success-soft: rgba(34,197,94,0.18);
+      --border: rgba(148,163,184,0.35);
+      --border-focus: rgba(96,165,250,0.6);
+      --radius-sm: 0.5rem;
+      --radius-md: 0.75rem;
+      --radius-lg: 1rem;
+      --shadow: 0 18px 45px rgba(15,23,42,0.9);
     }
 
     *, *::before, *::after { box-sizing: border-box; }
 
     html, body {
-      margin: 0; padding: 0; height: 100%;
-      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
-      background: radial-gradient(ellipse at top, var(--bg-elevated) 0%, var(--bg) 60%, #000 100%);
+      margin: 0;
+      padding: 0;
+      height: 100%;
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, "SF Pro Text", "Segoe UI", sans-serif;
+      background: radial-gradient(ellipse at top, #0f172a 0%, #020617 50%, #000 100%);
       color: var(--fg);
       line-height: 1.5;
-      -webkit-font-smoothing: antialiased;
     }
 
-    body { display: flex; flex-direction: column; min-height: 100vh; }
+    body {
+      display: flex;
+      flex-direction: column;
+      min-height: 100vh;
+    }
 
     #app {
-      display: flex; flex-direction: column; flex: 1;
-      max-width: 1500px; width: 100%; margin: 0 auto;
-      padding: 1rem; gap: 1rem;
+      display: flex;
+      flex-direction: column;
+      flex: 1;
+      max-width: 1400px;
+      width: 100%;
+      margin: 0 auto;
+      padding: 0.75rem;
+      gap: 0.75rem;
     }
 
-    /* ======================================================================
-       HEADER & BADGES
-       ====================================================================== */
+    /* Header */
     header {
-      display: flex; align-items: center; justify-content: space-between;
-      gap: 1rem; padding: 1rem 1.25rem;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 1rem;
+      padding: 0.75rem 1rem;
       border-radius: var(--radius-lg);
-      background: rgba(15, 23, 42, 0.6);
-      backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px);
+      background: linear-gradient(135deg, rgba(15,23,42,0.98), rgba(2,6,23,0.98));
       border: 1px solid var(--border);
       box-shadow: var(--shadow);
       flex-wrap: wrap;
     }
 
-    .title-block h1 {
-      margin: 0; font-size: 1.25rem; font-weight: 700;
-      letter-spacing: 0.05em; text-transform: uppercase;
-      background: linear-gradient(135deg, #fff, #93c5fd);
-      -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+    .title-block {
+      display: flex;
+      flex-direction: column;
+      gap: 0.15rem;
     }
 
-    .subtitle { font-size: 0.8rem; color: var(--fg-muted); margin-top: 0.2rem; }
+    header h1 {
+      margin: 0;
+      font-size: 1.15rem;
+      font-weight: 600;
+      letter-spacing: 0.04em;
+      text-transform: uppercase;
+      background: linear-gradient(135deg, #e5e7eb, #60a5fa);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
 
-    .status-block { display: flex; flex-direction: column; gap: 0.4rem; align-items: flex-end; }
+    .subtitle {
+      font-size: 0.75rem;
+      color: var(--fg-muted);
+    }
 
+    .status-block {
+      display: flex;
+      flex-direction: column;
+      gap: 0.35rem;
+      align-items: flex-end;
+    }
+
+    /* Badges */
     .badge {
-      display: inline-flex; align-items: center; gap: 0.4rem;
-      font-size: 0.7rem; font-weight: 600; text-transform: uppercase; letter-spacing: 0.05em;
-      border-radius: 999px; padding: 0.25rem 0.75rem;
-      border: 1px solid var(--border); background: var(--bg);
+      display: inline-flex;
+      align-items: center;
+      gap: 0.35rem;
+      font-size: 0.7rem;
+      border-radius: 999px;
+      padding: 0.2rem 0.6rem;
+      border: 1px solid var(--border);
+      background: rgba(15,23,42,0.9);
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      font-weight: 500;
     }
 
     .badge-dot {
-      width: 0.5rem; height: 0.5rem; border-radius: 50%;
-      background: var(--fg-muted); transition: all 0.3s ease;
+      width: 0.55rem;
+      height: 0.55rem;
+      border-radius: 999px;
+      background: var(--fg-muted);
+      transition: all 0.3s ease;
     }
 
     .badge-dot.state-idle { background: var(--fg-muted); }
-    .badge-dot.state-validating { background: var(--warn); animation: pulse 1s infinite; }
-    .badge-dot.state-running { background: var(--accent); animation: pulse 0.8s infinite; box-shadow: 0 0 10px var(--accent); }
+    .badge-dot.state-validating { background: var(--warn); box-shadow: 0 0 10px var(--warn); animation: pulse 1s infinite; }
+    .badge-dot.state-running { background: var(--accent); box-shadow: 0 0 10px var(--accent); animation: pulse 0.8s infinite; }
     .badge-dot.state-done { background: var(--success); box-shadow: 0 0 10px var(--success); }
-    .badge-dot.state-partial { background: #f97316; box-shadow: 0 0 10px #f97316; }
+    .badge-dot.state-partial { background: #fb923c; box-shadow: 0 0 10px #fb923c; }
     .badge-dot.state-failed, .badge-dot.state-aborted { background: var(--danger); box-shadow: 0 0 10px var(--danger); }
-    .badge-dot.state-digest { background: #a855f7; animation: pulse 1.2s infinite; box-shadow: 0 0 10px #a855f7; }
-    .badge-dot.state-synthesis { background: #14b8a6; animation: pulse 1s infinite; box-shadow: 0 0 10px #14b8a6; }
+    .badge-dot.state-digest { background: #a78bfa; box-shadow: 0 0 10px #a78bfa; animation: pulse 1.2s infinite; }
+    .badge-dot.state-synthesis { background: #34d399; box-shadow: 0 0 10px #34d399; animation: pulse 1s infinite; }
 
     @keyframes pulse {
-      0%, 100% { transform: scale(1); opacity: 1; }
-      50% { transform: scale(1.2); opacity: 0.7; }
+      0%, 100% { opacity: 1; transform: scale(1); }
+      50% { opacity: 0.7; transform: scale(1.1); }
     }
 
-    /* ======================================================================
-       MAIN LAYOUT & PANELS
-       ====================================================================== */
+    /* Main Layout */
     main {
-      display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
-      gap: 1rem; flex: 1; min-height: 0;
+      display: grid;
+      grid-template-columns: minmax(0, 1.2fr) minmax(0, 0.8fr);
+      gap: 0.75rem;
+      flex: 1;
+      min-height: 0;
     }
-    @media (max-width: 1024px) { main { grid-template-columns: 1fr; grid-template-rows: auto auto; } }
 
+    @media (max-width: 950px) {
+      main {
+        grid-template-columns: minmax(0, 1fr);
+        grid-template-rows: auto auto;
+      }
+    }
+
+    /* Panels */
     .panel {
-      border-radius: var(--radius-lg); background: var(--bg-card);
-      border: 1px solid var(--border); box-shadow: var(--shadow);
-      padding: 1rem; display: flex; flex-direction: column; gap: 0.75rem; min-height: 0;
+      border-radius: var(--radius-lg);
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      box-shadow: var(--shadow);
+      padding: 0.85rem;
+      display: flex;
+      flex-direction: column;
+      gap: 0.65rem;
+      min-height: 0;
+      overflow: hidden;
     }
 
-    .panel-header { display: flex; align-items: center; justify-content: space-between; gap: 0.5rem; flex-wrap: wrap; }
-    .panel-title { font-size: 0.95rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.08em; color: #fff; }
-    .panel-subtitle { font-size: 0.75rem; color: var(--fg-muted); }
+    .panel-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 0.5rem;
+      flex-wrap: wrap;
+    }
+
+    .panel-title {
+      font-size: 0.85rem;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      color: #cbd5f5;
+    }
+
+    .panel-subtitle {
+      font-size: 0.72rem;
+      color: var(--fg-muted);
+    }
 
     /* Tabs */
-    .tabs { display: flex; gap: 0.4rem; flex-wrap: wrap; }
-    .tab-btn {
-      border-radius: 999px; padding: 0.35rem 0.8rem; background: var(--bg);
-      border: 1px solid var(--border); color: var(--fg-muted);
-      cursor: pointer; transition: all 0.2s ease; font-size: 0.75rem; font-weight: 500;
+    .tabs {
+      display: flex;
+      gap: 0.35rem;
+      flex-wrap: wrap;
+      font-size: 0.72rem;
     }
-    .tab-btn:hover:not(:disabled) { border-color: var(--accent); color: var(--fg); }
-    .tab-btn.active { background: var(--accent-soft); border-color: var(--accent); color: var(--accent-hover); }
 
-    .panel-body { flex: 1; display: flex; flex-direction: column; gap: 0.75rem; min-height: 0; }
-    .panel-section { display: none; flex-direction: column; gap: 0.75rem; min-height: 0; flex: 1; }
-    .panel-section.active { display: flex; }
+    .tab-btn {
+      border-radius: 999px;
+      padding: 0.28rem 0.65rem;
+      background: rgba(15,23,42,0.9);
+      border: 1px solid var(--border);
+      color: var(--fg-muted);
+      cursor: pointer;
+      transition: all 0.2s ease;
+      font-size: 0.72rem;
+    }
 
-    /* ======================================================================
-       SEATS GRID (Der Stammtisch)
-       ====================================================================== */
-    .seats-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 0.75rem; }
+    .tab-btn:hover:not(:disabled) {
+      border-color: var(--accent);
+      color: var(--fg);
+    }
+
+    .tab-btn.active {
+      background: var(--accent-soft);
+      border-color: var(--accent);
+      color: #dbeafe;
+    }
+
+    .tab-btn:disabled {
+      opacity: 0.4;
+      cursor: default;
+    }
+
+    .panel-body {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      gap: 0.55rem;
+      min-height: 0;
+      overflow: hidden;
+    }
+
+    .panel-section {
+      display: none;
+      flex-direction: column;
+      gap: 0.55rem;
+      min-height: 0;
+      flex: 1;
+      overflow: hidden;
+    }
+
+    .panel-section.active {
+      display: flex;
+    }
+
+    /* Seats Grid */
+    .seats-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 0.5rem;
+    }
 
     .seat-card {
-      border-radius: var(--radius-md); padding: 0.75rem;
-      background: rgba(0, 0, 0, 0.4); border: 1px solid var(--border);
-      display: flex; flex-direction: column; gap: 0.5rem; transition: all 0.2s ease;
-    }
-    .seat-card:hover { border-color: var(--fg-muted); }
-    .seat-card.running { border-color: var(--accent); box-shadow: 0 0 15px var(--accent-soft); }
-    .seat-card.error { border-color: var(--danger); background: var(--danger-soft); }
-    .seat-card.done { border-color: var(--success); }
-
-    .seat-header { display: flex; justify-content: space-between; align-items: center; }
-    .seat-title { font-size: 0.85rem; font-weight: 600; color: var(--fg); }
-
-    .seat-status {
-      font-size: 0.65rem; border-radius: 999px; padding: 0.2rem 0.5rem;
-      border: 1px solid var(--border); color: var(--fg-muted); font-weight: 600; text-transform: uppercase;
-    }
-    .seat-status.running { border-color: var(--accent); color: var(--accent-hover); background: var(--accent-soft); }
-    .seat-status.error { border-color: var(--danger); color: #fca5a5; background: var(--danger-soft); }
-    .seat-status.done { border-color: var(--success); color: #86efac; background: var(--success-soft); }
-    .seat-status.fallback { border-color: var(--warn); color: #fde047; background: var(--warn-soft); }
-
-    .seat-config-row { display: flex; gap: 0.4rem; }
-    .seat-config-row select {
-      flex: 1; font-size: 0.75rem; padding: 0.3rem; border-radius: var(--radius-sm);
-      border: 1px solid var(--border); background: var(--bg-elevated); color: var(--fg);
-      outline: none; transition: border-color 0.2s;
-    }
-    .seat-config-row select:focus { border-color: var(--accent); }
-    .seat-config-row select:disabled { opacity: 0.5; cursor: not-allowed; }
-
-    .seat-enable-toggle { display: flex; align-items: center; gap: 0.4rem; font-size: 0.75rem; color: var(--fg-muted); }
-    .seat-enable-toggle input { cursor: pointer; }
-
-    .seat-stats { font-size: 0.65rem; color: var(--accent-hover); text-align: right; min-height: 1rem;}
-
-    .seat-last {
-      font-size: 0.7rem; color: var(--fg-muted); max-height: 4rem; overflow: hidden;
-      text-overflow: ellipsis; white-space: pre-line; background: rgba(0,0,0,0.3);
-      padding: 0.4rem; border-radius: var(--radius-sm); border: 1px solid transparent;
-    }
-
-    /* ======================================================================
-       FORMS & BUTTONS
-       ====================================================================== */
-    .prompt-row { display: flex; flex-direction: column; gap: 0.4rem; }
-    textarea {
-      width: 100%; min-height: 5rem; resize: vertical; border-radius: var(--radius-md);
-      padding: 0.75rem; background: var(--bg-elevated); border: 1px solid var(--border);
-      color: var(--fg); font-family: inherit; font-size: 0.85rem; line-height: 1.5; outline: none;
-    }
-    textarea:focus { border-color: var(--accent); }
-    textarea:disabled { opacity: 0.6; cursor: not-allowed; }
-
-    .btn-row { display: flex; flex-wrap: wrap; gap: 0.5rem; justify-content: flex-end; }
-
-    button {
-      font-size: 0.8rem; font-weight: 600; border-radius: 999px;
-      padding: 0.4rem 1rem; border: 1px solid var(--border);
-      background: var(--bg-elevated); color: var(--fg); cursor: pointer;
+      border-radius: var(--radius-md);
+      padding: 0.6rem;
+      background: rgba(15,23,42,0.98);
+      border: 1px solid var(--border);
+      display: flex;
+      flex-direction: column;
+      gap: 0.4rem;
+      font-size: 0.75rem;
       transition: all 0.2s ease;
     }
-    button:hover:not(:disabled) { border-color: var(--accent); background: var(--bg-card); }
-    button.primary { background: var(--accent); border-color: var(--accent); color: #fff; }
-    button.primary:hover:not(:disabled) { background: var(--accent-hover); box-shadow: 0 0 10px var(--accent-soft); }
-    button.danger { background: var(--danger); border-color: var(--danger); color: #fff; }
-    button.danger:hover:not(:disabled) { background: #dc2626; box-shadow: 0 0 10px var(--danger-soft); }
-    button:disabled { opacity: 0.4; cursor: not-allowed; }
 
-    /* ======================================================================
-       STREAM & RESULTS
-       ====================================================================== */
+    .seat-card:hover {
+      border-color: var(--border-focus);
+    }
+
+    .seat-card.running {
+      border-color: var(--accent);
+      box-shadow: 0 0 15px var(--accent-soft);
+    }
+
+    .seat-card.error {
+      border-color: var(--danger);
+      background: var(--danger-soft);
+    }
+
+    .seat-card.done {
+      border-color: var(--success);
+    }
+
+    .seat-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 0.3rem;
+    }
+
+    .seat-title {
+      font-size: 0.78rem;
+      font-weight: 600;
+      color: var(--fg);
+    }
+
+    .seat-status {
+      font-size: 0.62rem;
+      border-radius: 999px;
+      padding: 0.15rem 0.45rem;
+      border: 1px solid var(--border);
+      color: var(--fg-muted);
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+      font-weight: 500;
+    }
+
+    .seat-status.running {
+      border-color: var(--accent);
+      color: #bfdbfe;
+      background: rgba(37,99,235,0.15);
+      animation: pulse 1s infinite;
+    }
+
+    .seat-status.error {
+      border-color: var(--danger);
+      color: #fecaca;
+      background: var(--danger-soft);
+    }
+
+    .seat-status.done {
+      border-color: var(--success);
+      color: #bbf7d0;
+      background: var(--success-soft);
+    }
+
+    .seat-status.fallback {
+      border-color: var(--warn);
+      color: #fef08a;
+      background: var(--warn-soft);
+    }
+
+    .seat-config-row {
+      display: flex;
+      gap: 0.35rem;
+    }
+
+    .seat-config-row select {
+      flex: 1;
+      font-size: 0.7rem;
+      padding: 0.22rem 0.3rem;
+      border-radius: var(--radius-sm);
+      border: 1px solid var(--border);
+      background: var(--bg);
+      color: var(--fg);
+      cursor: pointer;
+      transition: border-color 0.2s ease;
+    }
+
+    .seat-config-row select:focus {
+      outline: none;
+      border-color: var(--accent);
+    }
+
+    .seat-config-row select:disabled {
+      opacity: 0.5;
+      cursor: default;
+    }
+
+    .seat-last {
+      font-size: 0.68rem;
+      color: var(--fg-muted);
+      max-height: 3.5rem;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: pre-line;
+      line-height: 1.35;
+      background: rgba(0,0,0,0.2);
+      padding: 0.3rem;
+      border-radius: var(--radius-sm);
+    }
+
+    .seat-enable-toggle {
+      display: flex;
+      align-items: center;
+      gap: 0.35rem;
+      font-size: 0.68rem;
+    }
+
+    .seat-enable-toggle input[type="checkbox"] {
+      width: 1rem;
+      height: 1rem;
+      cursor: pointer;
+    }
+
+    /* Prompt Area */
+    .prompt-row {
+      display: flex;
+      flex-direction: column;
+      gap: 0.4rem;
+    }
+
+    textarea {
+      width: 100%;
+      min-height: 5rem;
+      resize: vertical;
+      border-radius: var(--radius-md);
+      padding: 0.5rem 0.6rem;
+      background: var(--bg);
+      border: 1px solid var(--border);
+      color: var(--fg);
+      font-size: 0.8rem;
+      font-family: inherit;
+      line-height: 1.45;
+      transition: border-color 0.2s ease;
+    }
+
+    textarea:focus {
+      outline: none;
+      border-color: var(--accent);
+    }
+
+    textarea:disabled {
+      opacity: 0.6;
+      cursor: default;
+    }
+
+    /* Buttons */
+    .btn-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.45rem;
+      align-items: center;
+      justify-content: flex-end;
+    }
+
+    button {
+      font-size: 0.76rem;
+      border-radius: 999px;
+      padding: 0.35rem 0.9rem;
+      border: 1px solid var(--border);
+      background: rgba(15,23,42,0.95);
+      color: var(--fg);
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 0.4rem;
+      transition: all 0.2s ease;
+      font-weight: 500;
+    }
+
+    button:hover:not(:disabled) {
+      border-color: var(--accent);
+      transform: translateY(-1px);
+    }
+
+    button.primary {
+      background: linear-gradient(135deg, #1d4ed8, #2563eb);
+      border-color: var(--accent);
+    }
+
+    button.primary:hover:not(:disabled) {
+      background: linear-gradient(135deg, #2563eb, #3b82f6);
+      box-shadow: 0 4px 15px rgba(37,99,235,0.4);
+    }
+
+    button.danger {
+      background: linear-gradient(135deg, #991b1b, #dc2626);
+      border-color: var(--danger);
+    }
+
+    button.danger:hover:not(:disabled) {
+      background: linear-gradient(135deg, #dc2626, #ef4444);
+      box-shadow: 0 4px 15px rgba(239,68,68,0.4);
+    }
+
+    button:disabled {
+      opacity: 0.45;
+      cursor: default;
+      transform: none !important;
+      box-shadow: none !important;
+    }
+
+    /* Stream Container */
     .stream-container {
-      flex: 1; min-height: 0; border-radius: var(--radius-md); border: 1px solid var(--border);
-      background: #000; padding: 0.75rem; font-size: 0.75rem; font-family: ui-monospace, monospace;
-      overflow-y: auto; white-space: pre-wrap; color: #d1d5db;
+      flex: 1;
+      min-height: 0;
+      border-radius: var(--radius-md);
+      border: 1px solid var(--border);
+      background: rgba(0,0,0,0.25);
+      padding: 0.6rem;
+      font-size: 0.72rem;
+      overflow-y: auto;
+      white-space: pre-wrap;
+      line-height: 1.4;
     }
-    .stream-entry { margin-bottom: 0.5rem; padding-bottom: 0.5rem; border-bottom: 1px solid #1f2937; }
-    .stream-entry:last-child { border-bottom: none; }
-    .stream-meta { font-size: 0.65rem; color: var(--fg-muted); margin-bottom: 0.2rem; display: flex; gap: 0.4rem; }
-    .stream-meta .tag { background: #1e293b; padding: 0.1rem 0.4rem; border-radius: 4px; color: #94a3b8; }
-    .stream-meta .tag.sys { background: var(--accent-soft); color: var(--accent-hover); }
-    .stream-meta .tag.err { background: var(--danger-soft); color: #fca5a5; }
 
-    .summary-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 0.75rem; flex: 1; overflow-y: auto; }
+    .stream-entry {
+      margin-bottom: 0.45rem;
+      padding-bottom: 0.35rem;
+      border-bottom: 1px dashed var(--border);
+    }
+
+    .stream-entry:last-child {
+      border-bottom: none;
+    }
+
+    .stream-meta {
+      font-size: 0.64rem;
+      color: var(--fg-muted);
+      margin-bottom: 0.15rem;
+      display: flex;
+      gap: 0.4rem;
+      flex-wrap: wrap;
+    }
+
+    .stream-meta .tag {
+      background: var(--accent-soft);
+      padding: 0.1rem 0.35rem;
+      border-radius: 999px;
+      font-size: 0.6rem;
+    }
+
+    .stream-meta .tag.error {
+      background: var(--danger-soft);
+      color: #fecaca;
+    }
+
+    .stream-meta .tag.success {
+      background: var(--success-soft);
+      color: #bbf7d0;
+    }
+
+    .stream-text {
+      color: var(--fg);
+    }
+
+    /* Summary Sections */
+    .summary-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+      gap: 0.5rem;
+      flex: 1;
+      min-height: 0;
+      overflow: hidden;
+    }
+
     .summary-section {
-      border-radius: var(--radius-md); border: 1px solid var(--border); padding: 0.75rem;
-      background: rgba(0,0,0,0.2); display: flex; flex-direction: column;
+      border-radius: var(--radius-md);
+      border: 1px solid var(--border);
+      padding: 0.5rem;
+      font-size: 0.72rem;
+      background: rgba(0,0,0,0.2);
+      display: flex;
+      flex-direction: column;
+      min-height: 0;
+      overflow: hidden;
     }
-    .summary-section h4 { margin: 0 0 0.5rem 0; font-size: 0.8rem; color: var(--accent-hover); text-transform: uppercase; }
-    .summary-body { color: var(--fg); font-size: 0.8rem; white-space: pre-wrap; line-height: 1.6; }
-    .meta-analysis-box { border: 1px solid #14b8a6; background: rgba(20, 184, 166, 0.05); }
-    .meta-analysis-box h4 { color: #2dd4bf; }
 
-    /* ======================================================================
-       SETTINGS & DEBUG
-       ====================================================================== */
-    .settings-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 1rem; }
-    .field { display: flex; flex-direction: column; gap: 0.25rem; }
-    .field label { font-size: 0.8rem; font-weight: 600; color: var(--fg); }
-    .field small { font-size: 0.7rem; color: var(--fg-muted); }
+    .summary-section h4 {
+      margin: 0 0 0.3rem 0;
+      font-size: 0.72rem;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      color: #cbd5f5;
+      font-weight: 600;
+    }
+
+    .summary-body {
+      color: var(--fg-muted);
+      white-space: pre-wrap;
+      flex: 1;
+      overflow-y: auto;
+      line-height: 1.4;
+    }
+
+    /* Settings */
+    .settings-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+      gap: 0.6rem;
+      font-size: 0.75rem;
+    }
+
+    .field {
+      display: flex;
+      flex-direction: column;
+      gap: 0.2rem;
+    }
+
+    .field label {
+      font-size: 0.72rem;
+      color: var(--fg);
+      font-weight: 500;
+    }
+
+    .field small {
+      font-size: 0.64rem;
+      color: var(--fg-muted);
+    }
+
     .field input, .field select {
-      border-radius: var(--radius-sm); padding: 0.4rem 0.5rem; border: 1px solid var(--border);
-      background: var(--bg); color: var(--fg); font-size: 0.85rem; outline: none;
+      border-radius: var(--radius-sm);
+      padding: 0.28rem 0.4rem;
+      border: 1px solid var(--border);
+      background: var(--bg);
+      color: var(--fg);
+      font-size: 0.75rem;
+      transition: border-color 0.2s ease;
     }
-    .field input:focus, .field select:focus { border-color: var(--accent); }
 
-    .debug-panel { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 0.75rem; flex: 1; min-height: 0; overflow: hidden; }
-    .debug-block { border-radius: var(--radius-md); border: 1px dashed var(--border); padding: 0.5rem; background: #000; overflow: auto; }
-    .debug-block h4 { margin: 0 0 0.3rem 0; font-size: 0.75rem; color: var(--warn); }
-    .debug-block pre { margin: 0; font-family: monospace; font-size: 0.7rem; color: var(--fg-muted); }
+    .field input:focus, .field select:focus {
+      outline: none;
+      border-color: var(--accent);
+    }
 
-    /* ======================================================================
-       FOOTER & UTILS
-       ====================================================================== */
+    .toggle-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 0.4rem;
+      padding: 0.3rem 0;
+    }
+
+    .toggle-row label {
+      font-size: 0.74rem;
+      color: var(--fg);
+    }
+
+    .toggle-row input[type="checkbox"] {
+      width: 1.2rem;
+      height: 1.2rem;
+      cursor: pointer;
+    }
+
+    /* Debug Panel */
+    .debug-panel {
+      font-size: 0.68rem;
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 0.45rem;
+      flex: 1;
+      min-height: 0;
+      overflow: hidden;
+    }
+
+    .debug-block {
+      border-radius: var(--radius-md);
+      border: 1px dashed var(--border);
+      padding: 0.4rem;
+      background: rgba(0,0,0,0.3);
+      overflow: auto;
+      min-height: 0;
+    }
+
+    .debug-block h4 {
+      margin: 0 0 0.2rem 0;
+      font-size: 0.7rem;
+      color: var(--fg);
+      font-weight: 600;
+    }
+
+    .debug-block pre {
+      margin: 0;
+      white-space: pre-wrap;
+      word-break: break-word;
+      color: var(--fg-muted);
+      font-size: 0.64rem;
+      line-height: 1.35;
+    }
+
+    /* Footer */
     footer {
-      font-size: 0.75rem; color: var(--fg-muted); padding: 0.5rem;
-      display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 0.5rem;
-      border-top: 1px solid var(--border); background: rgba(15,23,42,0.8); border-radius: var(--radius-md);
+      font-size: 0.68rem;
+      color: var(--fg-muted);
+      padding: 0.35rem 0.5rem;
+      display: flex;
+      justify-content: space-between;
+      gap: 0.5rem;
+      align-items: center;
+      flex-wrap: wrap;
+      border-top: 1px solid var(--border);
+      background: rgba(15,23,42,0.5);
+      border-radius: var(--radius-md);
     }
-    .footer-stat .value { color: var(--accent-hover); font-weight: 600; margin-left: 0.2rem; }
 
-    .progress-bar { height: 4px; background: var(--border); border-radius: 999px; overflow: hidden; margin-top: 0.5rem; display: none; }
-    .progress-fill { height: 100%; background: linear-gradient(90deg, var(--accent), #10b981); transition: width 0.3s ease; }
-
-    .offline-indicator {
-      background: var(--danger); color: white; text-align: center; padding: 0.4rem;
-      font-size: 0.8rem; font-weight: 600; display: none;
+    .footer-col {
+      display: flex;
+      gap: 0.5rem;
+      flex-wrap: wrap;
+      align-items: center;
     }
-    .offline-indicator.visible { display: block; }
 
-    .toast-container { position: fixed; bottom: 1rem; right: 1rem; z-index: 9999; display: flex; flex-direction: column; gap: 0.5rem; }
+    .footer-stat {
+      display: flex;
+      align-items: center;
+      gap: 0.25rem;
+    }
+
+    .footer-stat .value {
+      color: var(--accent);
+      font-weight: 500;
+    }
+
+    /* Toast Notifications */
+    .toast-container {
+      position: fixed;
+      bottom: 1rem;
+      right: 1rem;
+      z-index: 1000;
+      display: flex;
+      flex-direction: column;
+      gap: 0.4rem;
+      max-width: 350px;
+    }
+
     .toast {
-      padding: 0.75rem 1rem; border-radius: var(--radius-md); background: var(--bg-card);
-      border: 1px solid var(--border); box-shadow: var(--shadow); font-size: 0.8rem; font-weight: 500;
-      animation: slideIn 0.3s forwards; display: flex; align-items: center; gap: 0.5rem;
+      padding: 0.6rem 0.9rem;
+      border-radius: var(--radius-md);
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      box-shadow: var(--shadow);
+      font-size: 0.75rem;
+      animation: slideIn 0.3s ease;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
     }
-    .toast.success { border-left: 4px solid var(--success); }
-    .toast.error { border-left: 4px solid var(--danger); }
-    .toast.info { border-left: 4px solid var(--accent); }
-    @keyframes slideIn { from { transform: translateX(100%); opacity: 0; } to { transform: translateX(0); opacity: 1; } }
+
+    .toast.error {
+      border-color: var(--danger);
+      background: var(--danger-soft);
+    }
+
+    .toast.success {
+      border-color: var(--success);
+      background: var(--success-soft);
+    }
+
+    .toast.warn {
+      border-color: var(--warn);
+      background: var(--warn-soft);
+    }
+
+    @keyframes slideIn {
+      from { transform: translateX(100%); opacity: 0; }
+      to { transform: translateX(0); opacity: 1; }
+    }
+
+    /* Progress Indicator */
+    .progress-bar {
+      height: 4px;
+      background: var(--border);
+      border-radius: 999px;
+      overflow: hidden;
+    }
+
+    .progress-fill {
+      height: 100%;
+      background: linear-gradient(90deg, var(--accent), #34d399);
+      transition: width 0.3s ease;
+      border-radius: 999px;
+    }
+
+    /* Loading Spinner */
+    .spinner {
+      width: 1rem;
+      height: 1rem;
+      border: 2px solid var(--border);
+      border-top-color: var(--accent);
+      border-radius: 50%;
+      animation: spin 0.8s linear infinite;
+    }
+
+    @keyframes spin {
+      to { transform: rotate(360deg); }
+    }
+
+    /* Offline Indicator */
+    .offline-indicator {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      background: var(--danger);
+      color: white;
+      text-align: center;
+      padding: 0.3rem;
+      font-size: 0.72rem;
+      font-weight: 500;
+      z-index: 9999;
+      display: none;
+    }
+
+    .offline-indicator.visible {
+      display: block;
+    }
+
+    /* Responsive adjustments */
+    @media (max-width: 600px) {
+      #app { padding: 0.5rem; gap: 0.5rem; }
+      header { padding: 0.6rem; }
+      .panel { padding: 0.65rem; }
+      .seats-grid { grid-template-columns: 1fr; }
+      .summary-grid { grid-template-columns: 1fr; }
+      .settings-grid { grid-template-columns: 1fr; }
+    }
   </style>
 </head>
 <body>
-  <div class="offline-indicator" id="offlineIndicator">⚠️ Offline-Modus aktiv – Neue KI-Läufe erfordern eine Internetverbindung.</div>
+  <div class="offline-indicator" id="offlineIndicator">
+    Offline-Modus – Neue Läufe benötigen eine Internetverbindung
+  </div>
 
   <div id="app">
     <header>
       <div class="title-block">
         <h1>KI-Stammtisch</h1>
-        <div class="subtitle">PWA Multi-Agenten Orchestrator · OpenRouter</div>
+        <div class="subtitle">Multi-Modell-Diskussionsplattform · 2 Runden · OpenRouter PWA</div>
       </div>
       <div class="status-block">
         <div class="badge" id="runStateBadge">
@@ -309,73 +828,72 @@
     </header>
 
     <main>
-      <!-- LINKE SPALTE: Konfiguration & Start -->
       <section class="panel">
         <div class="panel-header">
           <div>
-            <div class="panel-title">Tisch-Konfiguration</div>
-            <div class="panel-subtitle">Agenten besetzen und Diskussionsthema festlegen</div>
+            <div class="panel-title">Stammtisch & Frage</div>
+            <div class="panel-subtitle">Sitze konfigurieren · Frage eingeben · Lauf starten</div>
           </div>
         </div>
         <div class="panel-body">
-          <div class="seats-grid" id="seatsGrid">
-            <!-- Dynamically populated via JS -->
-          </div>
-          <div class="prompt-row">
-            <label for="userPrompt" class="panel-subtitle">Problemstellung / Fragestellung</label>
-            <textarea id="userPrompt" placeholder="Beispiel: Wie können wir KI ethisch und sicher im Unternehmen integrieren, ohne die Produktivität zu bremsen?"></textarea>
-          </div>
-          <div class="progress-bar" id="progressBar"><div class="progress-fill" id="progressFill" style="width: 0%;"></div></div>
-          <div class="btn-row">
-            <button id="startRunBtn" class="primary">Lauf starten</button>
-            <button id="abortRunBtn" class="danger" disabled>Abbruch</button>
+          <div class="panel-section active" id="section-stammtisch">
+            <div class="seats-grid" id="seatsGrid"></div>
+            <div class="prompt-row">
+              <label for="userPrompt" class="panel-subtitle">Diskussionsfrage / Problemstellung</label>
+              <textarea id="userPrompt" placeholder="Formuliere hier deine Frage oder dein Problem für den KI-Stammtisch..."></textarea>
+            </div>
+            <div class="progress-bar" id="progressBar" style="display: none;">
+              <div class="progress-fill" id="progressFill" style="width: 0%;"></div>
+            </div>
+            <div class="btn-row">
+              <button id="startRunBtn" class="primary">
+                <span>Lauf starten</span>
+              </button>
+              <button id="abortRunBtn" class="danger" disabled>
+                <span>Abbrechen</span>
+              </button>
+            </div>
           </div>
         </div>
       </section>
 
-      <!-- RECHTE SPALTE: Ergebnisse & Settings -->
       <section class="panel">
         <div class="panel-header">
           <div>
-            <div class="panel-title">Protokoll & Auswertung</div>
-            <div class="panel-subtitle">Live-Stream, Synthese und System-Einstellungen</div>
+            <div class="panel-title">Ablauf & Ergebnisse</div>
+            <div class="panel-subtitle">Runden beobachten · Ergebnisse analysieren · Exporte</div>
           </div>
           <div class="tabs">
-            <button class="tab-btn active" data-tab="run">Live Stream</button>
+            <button class="tab-btn active" data-tab="run">Lauf & Stream</button>
             <button class="tab-btn" data-tab="results">Ergebnisse</button>
             <button class="tab-btn" data-tab="settings">Einstellungen</button>
             <button class="tab-btn" data-tab="debug">Debug</button>
           </div>
         </div>
         <div class="panel-body">
-
-          <!-- TAB: STREAM -->
           <div class="panel-section active" id="tab-run">
+            <div class="panel-subtitle">Lauf-Status & Stream-Ausgaben</div>
             <div class="stream-container" id="streamLog">
               <div class="stream-entry">
-                <div class="stream-meta"><span class="tag sys">System</span></div>
-                Warte auf Konfiguration und Start...
+                <div class="stream-meta">System bereit</div>
+                <div class="stream-text">Warte auf Start eines neuen Laufs...</div>
               </div>
             </div>
           </div>
 
-          <!-- TAB: RESULTS -->
           <div class="panel-section" id="tab-results">
+            <div class="panel-subtitle">Verdichtete Ergebnisse dieses Laufs</div>
             <div class="summary-grid">
-              <div class="summary-section meta-analysis-box" id="metaAnalysisBox" style="display: none;">
-                <h4>KI Meta-Synthese</h4>
-                <div class="summary-body" id="summaryMeta">Wird berechnet...</div>
-              </div>
               <div class="summary-section">
-                <h4>Gesamtübersicht (Lokal)</h4>
+                <h4>Gesamtübersicht</h4>
                 <div class="summary-body" id="summaryOverall">Noch keine Ergebnisse.</div>
               </div>
               <div class="summary-section">
-                <h4>Konsenspunkte</h4>
+                <h4>Konsens</h4>
                 <div class="summary-body" id="summaryConsensus">Noch keine Ergebnisse.</div>
               </div>
               <div class="summary-section">
-                <h4>Konflikte & Kritik</h4>
+                <h4>Konflikte</h4>
                 <div class="summary-body" id="summaryConflicts">Noch keine Ergebnisse.</div>
               </div>
               <div class="summary-section">
@@ -383,771 +901,2489 @@
                 <div class="summary-body" id="summaryOpenQuestions">Noch keine Ergebnisse.</div>
               </div>
             </div>
-            <div class="btn-row" style="margin-top: auto;">
+            <div class="btn-row" style="margin-top: 0.5rem;">
               <button id="exportJsonBtn">Export (JSON)</button>
               <button id="exportMdBtn">Export (Markdown)</button>
             </div>
           </div>
 
-          <!-- TAB: SETTINGS -->
           <div class="panel-section" id="tab-settings">
             <div class="settings-grid">
               <div class="field">
                 <label for="apiKeyInput">OpenRouter API-Key</label>
-                <input type="password" id="apiKeyInput" placeholder="sk-or-v1-..." autocomplete="off" />
-                <small>Wird nur lokal gespeichert. Obligatorisch.</small>
-              </div>
-              <div class="field">
-                <label for="synthesisModel">Modell für Meta-Synthese (Optional)</label>
-                <select id="synthesisModel">
-                  <option value="">-- Keine (Nur lokale Zusammenfassung) --</option>
-                </select>
-                <small>Erzeugt am Ende ein finales Fazit über alle Antworten.</small>
+                <input type="password" id="apiKeyInput" placeholder="sk-or-..." autocomplete="off" />
+                <small>Wird nur lokal gespeichert. Pflicht für neue Läufe.</small>
               </div>
               <div class="field">
                 <label for="defaultTimeoutMs">Timeout pro Turn (ms)</label>
-                <input type="number" id="defaultTimeoutMs" min="10000" step="5000" value="60000" />
-                <small>Wartezeit bis Abbruch/Fallback.</small>
+                <input type="number" id="defaultTimeoutMs" min="5000" step="1000" value="60000" />
+                <small>Maximale Wartezeit je Modellaufruf.</small>
               </div>
               <div class="field">
-                <div class="toggle-row">
-                  <label for="autoScrollToggle">Auto-Scroll im Stream</label>
-                  <input type="checkbox" id="autoScrollToggle" checked />
-                </div>
-                <small>Springt bei neuen Token automatisch nach unten.</small>
+                <label for="maxRetries">Max. Wiederholungen</label>
+                <input type="number" id="maxRetries" min="0" max="5" step="1" value="2" />
+                <small>Bei retrybaren Fehlern (429, 5xx).</small>
+              </div>
+              <div class="field">
+                <label for="tokenBudget">Token-Budget (Richtwert)</label>
+                <input type="number" id="tokenBudget" min="0" step="1000" value="100000" />
+                <small>Monitoring, keine harte Begrenzung.</small>
+              </div>
+              <div class="field">
+                <label for="costBudget">Kosten-Budget ($)</label>
+                <input type="number" id="costBudget" min="0" step="0.1" value="5" />
+                <small>Monitoring für Kosten-Schätzung.</small>
+              </div>
+              <div class="field">
+                <label for="synthesisModel">Synthese-Modell</label>
+                <select id="synthesisModel"></select>
+                <small>Modell für finale Zusammenfassung.</small>
               </div>
               <div class="field">
                 <div class="toggle-row">
                   <label for="debugModeToggle">Debug-Modus</label>
                   <input type="checkbox" id="debugModeToggle" />
                 </div>
-                <small>Aktiviert tiefes Logging und JSON-Ansichten.</small>
+                <small>Zeigt interne Kontexte & Zustände.</small>
+              </div>
+              <div class="field">
+                <div class="toggle-row">
+                  <label for="autoScrollToggle">Auto-Scroll Stream</label>
+                  <input type="checkbox" id="autoScrollToggle" checked />
+                </div>
+                <small>Automatisch zu neuen Einträgen scrollen.</small>
               </div>
             </div>
-            <div class="btn-row" style="margin-top: auto;">
-              <button id="clearDataBtn" class="danger">Daten löschen</button>
-              <button id="saveSettingsBtn" class="primary">Speichern</button>
+            <div class="btn-row" style="margin-top: 0.5rem;">
+              <button id="saveSettingsBtn" class="primary">Einstellungen speichern</button>
+              <button id="clearDataBtn" class="danger">Alle Daten löschen</button>
             </div>
           </div>
 
-          <!-- TAB: DEBUG -->
           <div class="panel-section" id="tab-debug">
+            <div class="panel-subtitle">Interne Zustände (nur im Debug-Modus)</div>
             <div class="debug-panel">
-              <div class="debug-block"><h4>State</h4><pre id="debugStateView">–</pre></div>
-              <div class="debug-block"><h4>Context</h4><pre id="debugContextView">–</pre></div>
-              <div class="debug-block"><h4>Errors</h4><pre id="debugErrorView">–</pre></div>
+              <div class="debug-block">
+                <h4>Kontext</h4>
+                <pre id="debugContextView">Debug-Modus deaktiviert.</pre>
+              </div>
+              <div class="debug-block">
+                <h4>Zustand</h4>
+                <pre id="debugStateView">–</pre>
+              </div>
+              <div class="debug-block">
+                <h4>Fehler-Log</h4>
+                <pre id="debugErrorView">Keine Fehler.</pre>
+              </div>
             </div>
           </div>
-
         </div>
       </section>
     </main>
 
     <footer>
-      <div class="footer-col" id="footerRunInfo">Bereit.</div>
       <div class="footer-col">
-        <span class="footer-stat">Tokens: <span class="value" id="footerTokens">0</span></span>
-        <span class="footer-stat">Kosten: <span class="value" id="footerCost">$0.0000</span></span>
+        <span id="footerRunInfo">Kein aktiver Lauf.</span>
+      </div>
+      <div class="footer-col">
+        <div class="footer-stat">
+          <span>Tokens:</span>
+          <span class="value" id="footerTokens">–</span>
+        </div>
+        <div class="footer-stat">
+          <span>Kosten:</span>
+          <span class="value" id="footerCost">–</span>
+        </div>
+        <div class="footer-stat">
+          <span>Dauer:</span>
+          <span class="value" id="footerDuration">–</span>
+        </div>
       </div>
     </footer>
   </div>
 
   <div class="toast-container" id="toastContainer"></div>
 
-  <!-- ======================================================================
-       JAVASCRIPT ARCHITEKTUR
-       ====================================================================== -->
   <script>
-    /**
-     * KI-Stammtisch PWA - Core Engine
-     * Strikt modular aufgebaut gemäß Lastenheft-Spezifikation.
-     */
+/**
+ * KI-Stammtisch PWA - Vollständig überarbeitete und robuste Implementierung
+ * 
+ * Module:
+ * - Constants: Zentrale Konstanten und Konfiguration
+ * - Utils: Hilfsfunktionen
+ * - AppState: Zentraler Anwendungszustand
+ * - StateMachine: Deterministische Zustandsmaschine
+ * - ConfigManager: Einstellungsverwaltung
+ * - ModelRegistry: Verfügbare Modelle
+ * - SeatManager: Sitzplatzverwaltung
+ * - StorageLayer: IndexedDB-Persistenz
+ * - ApiAdapter: OpenRouter-API-Kommunikation
+ * - DigestEngine: Antwort-Normalisierung
+ * - SummaryEngine: Ergebnis-Synthese
+ * - RunEngine: Lauf-Orchestrierung
+ * - UiController: UI-Steuerung
+ * - ToastManager: Benachrichtigungen
+ */
 
-    const CONSTANTS = {
-      DB_NAME: 'ki_stammtisch_db',
-      DB_VERSION: 1,
-      API_URL: 'https://openrouter.ai/api/v1/chat/completions',
-      ROLES: [
-        { id: 'analyst', label: 'Analyst', desc: 'Analysiert objektiv und legt den Lösungsrahmen fest.' },
-        { id: 'critic', label: 'Kritiker', desc: 'Hinterfragt Annahmen scharf und sucht Logikfehler.' },
-        { id: 'implementer', label: 'Umsetzer', desc: 'Fokus auf Machbarkeit, nächste Schritte und Praxis.' },
-        { id: 'risk', label: 'Risiko-Prüfer', desc: 'Identifiziert Gefahren, Compliance und Worst-Case-Szenarien.' },
-        { id: 'moderator', label: 'Moderator', desc: 'Konsolidiert und führt Perspektiven diplomatisch zusammen.' }
-      ],
-      DIGEST_MAX_LENGTH: 2500 // Max chars für Context-Rotation (verhindert Context Rot)
+// ============================================================================
+// CONSTANTS
+// ============================================================================
+const CONSTANTS = Object.freeze({
+  DB_NAME: 'ki_stammtisch_db',
+  DB_VERSION: 2,
+  API_BASE_URL: 'https://openrouter.ai/api/v1/chat/completions',
+  SETTINGS_KEY: 'kiStammtischSettings',
+  
+  STATES: Object.freeze({
+    IDLE: 'IDLE',
+    VALIDATING: 'VALIDATING',
+    ROUND1: 'ROUND1',
+    DIGEST1: 'DIGEST1',
+    ROUND2: 'ROUND2',
+    DIGEST2: 'DIGEST2',
+    SYNTHESIS: 'SYNTHESIS',
+    DONE: 'DONE',
+    PARTIAL: 'PARTIAL',
+    FAILED: 'FAILED',
+    ABORTED: 'ABORTED'
+  }),
+  
+  ROLES: Object.freeze([
+    { id: 'analyst', label: 'Analyst', description: 'Primäranalyse und Lösungsrahmen' },
+    { id: 'critic', label: 'Kritiker', description: 'Schwächen und Fehlannahmen prüfen' },
+    { id: 'implementer', label: 'Umsetzer', description: 'Konkrete Vorschläge und Maßnahmen' },
+    { id: 'risk', label: 'Risiko-Prüfer', description: 'Unsicherheiten und Risiken bewerten' },
+    { id: 'moderator', label: 'Moderator', description: 'Konsolidierung und Rückfragen' }
+  ]),
+  
+  RETRYABLE_STATUS_CODES: [408, 429, 500, 502, 503, 504],
+  MAX_CONTENT_LENGTH: 8000,
+  DIGEST_MAX_LENGTH: 3000,
+  
+  DEFAULT_SETTINGS: Object.freeze({
+    apiKey: '',
+    defaultTimeoutMs: 60000,
+    maxRetries: 2,
+    tokenBudget: 100000,
+    costBudget: 5,
+    debugMode: false,
+    autoScroll: true,
+    synthesisModelId: null
+  })
+});
+
+// ============================================================================
+// UTILITY FUNCTIONS
+// ============================================================================
+const Utils = {
+  generateId(prefix = 'id') {
+    return `${prefix}_${Date.now().toString(36)}_${Math.random().toString(36).slice(2, 11)}`;
+  },
+
+  clamp(value, min, max) {
+    return Math.max(min, Math.min(max, value));
+  },
+
+  debounce(fn, delay) {
+    let timeoutId;
+    return (...args) => {
+      clearTimeout(timeoutId);
+      timeoutId = setTimeout(() => fn.apply(this, args), delay);
+    };
+  },
+
+  truncate(str, maxLength) {
+    if (!str) return '';
+    return str.length > maxLength ? str.slice(0, maxLength - 3) + '...' : str;
+  },
+
+  formatDuration(ms) {
+    if (ms == null) return '–';
+    const seconds = Math.floor(ms / 1000);
+    const minutes = Math.floor(seconds / 60);
+    if (minutes > 0) {
+      return `${minutes}m ${seconds % 60}s`;
+    }
+    return `${seconds}s`;
+  },
+
+  formatCost(cost) {
+    if (cost == null) return '–';
+    return `$${cost.toFixed(4)}`;
+  },
+
+  formatTokens(tokens) {
+    if (tokens == null) return '–';
+    return tokens.toLocaleString('de-DE');
+  },
+
+  sleep(ms) {
+    return new Promise(resolve => setTimeout(resolve, ms));
+  },
+
+  calculateExponentialBackoff(attempt, baseDelay = 1000, maxDelay = 30000) {
+    const delay = Math.min(baseDelay * Math.pow(2, attempt), maxDelay);
+    return delay + Math.random() * 1000; // Jitter
+  },
+
+  safeJsonParse(str, fallback = null) {
+    try {
+      return JSON.parse(str);
+    } catch {
+      return fallback;
+    }
+  },
+
+  deepClone(obj) {
+    return JSON.parse(JSON.stringify(obj));
+  },
+
+  escapeHtml(str) {
+    const div = document.createElement('div');
+    div.textContent = str;
+    return div.innerHTML;
+  }
+};
+
+// ============================================================================
+// APP STATE
+// ============================================================================
+const AppState = {
+  currentState: CONSTANTS.STATES.IDLE,
+  currentRun: null,
+  seats: [],
+  settings: { ...CONSTANTS.DEFAULT_SETTINGS },
+  db: null,
+  sharedDigest: null,
+  streamAbortControllers: new Map(),
+  turnResults: new Map(),
+  errorLog: [],
+  isOnline: navigator.onLine,
+  
+  // Usage tracking
+  totalUsage: {
+    promptTokens: 0,
+    completionTokens: 0,
+    totalTokens: 0,
+    estimatedCost: 0
+  }
+};
+
+// ============================================================================
+// STATE MACHINE
+// ============================================================================
+const StateMachine = (() => {
+  // Definiere erlaubte Übergänge
+  const transitions = new Map([
+    [CONSTANTS.STATES.IDLE, [CONSTANTS.STATES.VALIDATING]],
+    [CONSTANTS.STATES.VALIDATING, [CONSTANTS.STATES.ROUND1, CONSTANTS.STATES.FAILED]],
+    [CONSTANTS.STATES.ROUND1, [CONSTANTS.STATES.DIGEST1, CONSTANTS.STATES.FAILED, CONSTANTS.STATES.ABORTED]],
+    [CONSTANTS.STATES.DIGEST1, [CONSTANTS.STATES.ROUND2, CONSTANTS.STATES.PARTIAL]],
+    [CONSTANTS.STATES.ROUND2, [CONSTANTS.STATES.DIGEST2, CONSTANTS.STATES.PARTIAL, CONSTANTS.STATES.ABORTED]],
+    [CONSTANTS.STATES.DIGEST2, [CONSTANTS.STATES.SYNTHESIS, CONSTANTS.STATES.PARTIAL]],
+    [CONSTANTS.STATES.SYNTHESIS, [CONSTANTS.STATES.DONE, CONSTANTS.STATES.PARTIAL, CONSTANTS.STATES.FAILED]],
+    [CONSTANTS.STATES.DONE, [CONSTANTS.STATES.IDLE, CONSTANTS.STATES.VALIDATING]],
+    [CONSTANTS.STATES.PARTIAL, [CONSTANTS.STATES.IDLE, CONSTANTS.STATES.VALIDATING]],
+    [CONSTANTS.STATES.FAILED, [CONSTANTS.STATES.IDLE, CONSTANTS.STATES.VALIDATING]],
+    [CONSTANTS.STATES.ABORTED, [CONSTANTS.STATES.IDLE, CONSTANTS.STATES.VALIDATING]]
+  ]);
+
+  const listeners = new Set();
+
+  function canTransition(from, to) {
+    const allowed = transitions.get(from);
+    return allowed ? allowed.includes(to) : false;
+  }
+
+  function transitionTo(newState, metadata = {}) {
+    const currentState = AppState.currentState;
+    
+    if (!canTransition(currentState, newState)) {
+      console.warn(`Invalid state transition: ${currentState} -> ${newState}`);
+      return false;
+    }
+
+    const previousState = currentState;
+    AppState.currentState = newState;
+    
+    const event = {
+      previousState,
+      newState,
+      metadata,
+      timestamp: Date.now()
     };
 
-    // --- 1. Utility & Toasts ---
-    const Utils = {
-      generateId: (prefix) => `${prefix}_${Math.random().toString(36).substr(2,9)}_${Date.now().toString(36)}`,
-      sleep: (ms) => new Promise(r => setTimeout(r, ms)),
-      formatMoney: (num) => `$${num.toFixed(4)}`,
-      escapeHtml: (str) => {
-        const div = document.createElement('div');
-        div.textContent = str;
-        return div.innerHTML;
-      }
-    };
-
-    const Toast = {
-      show: (msg, type='info') => {
-        const c = document.getElementById('toastContainer');
-        const t = document.createElement('div');
-        t.className = `toast ${type}`;
-        t.textContent = msg;
-        c.appendChild(t);
-        setTimeout(() => { t.style.opacity = '0'; setTimeout(()=>t.remove(), 300); }, 4000);
-      },
-      success: (m) => Toast.show(m, 'success'),
-      error: (m) => Toast.show(m, 'error'),
-      info: (m) => Toast.show(m, 'info')
-    };
-
-    // --- 2. App State & State Machine ---
-    const AppState = {
-      currentRun: null,
-      currentState: 'IDLE',
-      seats: [],
-      settings: { apiKey: '', defaultTimeoutMs: 60000, autoScroll: true, debugMode: false, synthesisModelId: '' },
-      streamAbortControllers: new Map(),
-      turnResults: new Map(),
-      sharedDigest: null,
-      totalUsage: { tokens: 0, cost: 0 },
-      errorLog: []
-    };
-
-    const StateMachine = (() => {
-      const transitions = {
-        IDLE: ['VALIDATING'],
-        VALIDATING: ['ROUND1', 'FAILED'],
-        ROUND1: ['DIGEST1', 'FAILED', 'ABORTED'],
-        DIGEST1: ['ROUND2', 'PARTIAL'],
-        ROUND2: ['DIGEST2', 'FAILED', 'ABORTED'],
-        DIGEST2: ['SYNTHESIS', 'PARTIAL'],
-        SYNTHESIS: ['DONE', 'PARTIAL', 'FAILED'],
-        DONE: ['IDLE', 'VALIDATING'],
-        PARTIAL: ['IDLE', 'VALIDATING'],
-        FAILED: ['IDLE', 'VALIDATING'],
-        ABORTED: ['IDLE', 'VALIDATING']
-      };
-
-      function transitionTo(newState) {
-        if (!transitions[AppState.currentState].includes(newState)) {
-          console.warn(`Invalid transition: ${AppState.currentState} -> ${newState}`);
-          return false;
-        }
-        AppState.currentState = newState;
-        UiController.updateStateIndicators();
-        UiController.updateDebug();
-        return true;
-      }
-      return { transitionTo, getState: () => AppState.currentState };
-    })();
-
-    // --- 3. Config & Models ---
-    const ConfigManager = {
-      load: () => {
-        try {
-          const raw = localStorage.getItem('kiStammtischSettings');
-          if (raw) AppState.settings = { ...AppState.settings, ...JSON.parse(raw) };
-        } catch (e) {}
-      },
-      save: () => localStorage.setItem('kiStammtischSettings', JSON.stringify(AppState.settings))
-    };
-
-    const ModelRegistry = {
-      models: [
-        { id: 'openai/gpt-4o-mini', label: 'GPT-4o Mini (Schnell/Günstig)', cost: { in: 0.15, out: 0.60 }, fallback: 'google/gemini-2.0-flash-001' },
-        { id: 'google/gemini-2.0-flash-001', label: 'Gemini 2.0 Flash', cost: { in: 0.10, out: 0.40 }, fallback: 'openai/gpt-4o-mini' },
-        { id: 'anthropic/claude-3.5-haiku', label: 'Claude 3.5 Haiku', cost: { in: 0.80, out: 4.00 }, fallback: 'openai/gpt-4o-mini' },
-        { id: 'anthropic/claude-3.5-sonnet', label: 'Claude 3.5 Sonnet (Präzise)', cost: { in: 3.00, out: 15.00 }, fallback: 'openai/gpt-4o-mini' },
-        { id: 'deepseek/deepseek-r1', label: 'DeepSeek R1 (Reasoning)', cost: { in: 0.55, out: 2.19 }, fallback: 'openai/gpt-4o-mini' },
-        { id: 'meta-llama/llama-3.3-70b-instruct', label: 'Llama 3.3 70B', cost: { in: 0.35, out: 0.40 }, fallback: 'openai/gpt-4o-mini' }
-      ],
-      getAll: () => ModelRegistry.models,
-      getById: (id) => ModelRegistry.models.find(m => m.id === id) || ModelRegistry.models[0],
-      estimateCost: (id, promptTokens, completionTokens) => {
-        const m = ModelRegistry.getById(id);
-        return ((promptTokens / 1000000) * m.cost.in) + ((completionTokens / 1000000) * m.cost.out);
-      }
-    };
-
-    // --- 4. Seat Management ---
-    const SeatManager = {
-      init: () => {
-        const defaultModels = ['openai/gpt-4o-mini', 'anthropic/claude-3.5-haiku', 'google/gemini-2.0-flash-001', 'deepseek/deepseek-r1', 'meta-llama/llama-3.3-70b-instruct'];
-        AppState.seats = CONSTANTS.ROLES.map((role, i) => ({
-          seatId: i + 1,
-          seatName: `${role.label} (Sitz ${i+1})`,
-          role: role.id,
-          modelId: defaultModels[i % defaultModels.length],
-          enabled: true,
-          status: 'idle', // idle, running, done, error, fallback
-          stats: { tokens: 0, cost: 0 },
-          lastSummary: ''
-        }));
-      },
-      getActive: () => AppState.seats.filter(s => s.enabled)
-    };
-
-    // --- 5. Storage Layer (IndexedDB) ---
-    const StorageLayer = (() => {
-      let db = null;
-      function init() {
-        return new Promise((resolve, reject) => {
-          const req = indexedDB.open(CONSTANTS.DB_NAME, CONSTANTS.DB_VERSION);
-          req.onupgradeneeded = (e) => {
-            const d = e.target.result;
-            if (!d.objectStoreNames.contains('runs')) d.createObjectStore('runs', { keyPath: 'runId' });
-            if (!d.objectStoreNames.contains('turns')) {
-              const turns = d.createObjectStore('turns', { keyPath: 'turnId' });
-              turns.createIndex('runId', 'runId', { unique: false });
-            }
-          };
-          req.onsuccess = (e) => { db = e.target.result; resolve(); };
-          req.onerror = () => reject(req.error);
-        });
-      }
-      function save(storeName, data) {
-        return new Promise((resolve) => {
-          if(!db) return resolve();
-          const tx = db.transaction([storeName], 'readwrite');
-          tx.objectStore(storeName).put(data);
-          tx.oncomplete = () => resolve();
-        });
-      }
-      function getTurns(runId) {
-        return new Promise((resolve) => {
-          if(!db) return resolve([]);
-          const tx = db.transaction(['turns'], 'readonly');
-          const idx = tx.objectStore('turns').index('runId');
-          const res = [];
-          idx.openCursor(IDBKeyRange.only(runId)).onsuccess = (e) => {
-            const cursor = e.target.result;
-            if (cursor) { res.push(cursor.value); cursor.continue(); }
-            else resolve(res);
-          };
-        });
-      }
-      function clearAll() {
-        return new Promise(resolve => {
-          if(!db) return resolve();
-          const tx = db.transaction(['runs', 'turns'], 'readwrite');
-          tx.objectStore('runs').clear();
-          tx.objectStore('turns').clear();
-          tx.oncomplete = resolve;
-        });
-      }
-      return { init, save, getTurns, clearAll };
-    })();
-
-    // --- 6. API Adapter ---
-    const ApiAdapter = {
-      call: async ({ modelId, messages, sessionId, signal, onChunk }) => {
-        const apiKey = AppState.settings.apiKey;
-        if (!apiKey) throw new Error("Kein API-Key konfiguriert.");
-
-        const body = {
-          model: modelId,
-          messages: messages,
-          stream: true,
-          temperature: 0.7,
-          max_tokens: 1500
-        };
-
-        const res = await fetch(CONSTANTS.API_URL, {
-          method: 'POST',
-          headers: { 'Authorization': `Bearer ${apiKey}`, 'Content-Type': 'application/json', 'HTTP-Referer': window.location.origin, 'X-Title': 'KI-Stammtisch PWA' },
-          body: JSON.stringify(body),
-          signal
-        });
-
-        if (!res.ok) throw new Error(`HTTP ${res.status}: ${await res.text()}`);
-
-        const reader = res.body.getReader();
-        const decoder = new TextDecoder();
-        let fullText = "";
-        let usage = null;
-
-        while (true) {
-          const { done, value } = await reader.read();
-          if (done) break;
-          const lines = decoder.decode(value, {stream: true}).split('\n');
-          for (const line of lines) {
-            if (line.startsWith('data: ') && line !== 'data: [DONE]') {
-              try {
-                const data = JSON.parse(line.slice(6));
-                if (data.choices && data.choices[0].delta.content) {
-                  const chunk = data.choices[0].delta.content;
-                  fullText += chunk;
-                  if(onChunk) onChunk(chunk);
-                }
-                if (data.usage) usage = data.usage; // Extract usage if provided by OpenRouter
-              } catch (e) {}
-            }
-          }
-        }
-
-        // Fallback-Calculation for tokens if API didn't send usage in stream
-        if (!usage) {
-           const estPrompt = JSON.stringify(messages).length / 3.5;
-           const estCompletion = fullText.length / 3.5;
-           usage = { prompt_tokens: Math.round(estPrompt), completion_tokens: Math.round(estCompletion) };
-        }
-        usage.total_tokens = usage.prompt_tokens + usage.completion_tokens;
-
-        return { text: fullText, usage };
-      }
-    };
-
-    // --- 7. Engines (Digest & Summary) ---
-    const DigestEngine = {
-      // Normalisiert die LLM Antwort robust (ignoriert Markdown Sternchen etc.)
-      normalize: (text, role) => {
-        const cleanText = text.replace(/[*#]/g, '');
-        const lines = cleanText.split('\n').map(l => l.trim()).filter(l => l.length > 5);
-        const digest = { facts: [], questions: [], risks: [], claims: [] };
-
-        lines.forEach(line => {
-          const l = line.toLowerCase();
-          if (l.includes('risiko') || l.includes('gefahr') || l.includes('bedenken')) digest.risks.push(line);
-          else if (l.endsWith('?') || l.includes('frage')) digest.questions.push(line);
-          else if (l.includes('fazit') || l.includes('sollte') || l.includes('empfehle')) digest.claims.push(line);
-          else digest.facts.push(line);
-        });
-        return digest;
-      },
-      combine: (digests) => {
-        // Simple Konsens-Findung und Kürzung für "Context Rot" Verhinderung
-        let combined = "ERKENNTNISSE DER VORRUNDE:\n\n";
-        digests.forEach((d, i) => {
-           if(d.claims.length > 0) combined += `- Behauptung: ${d.claims[0]}\n`;
-           if(d.risks.length > 0) combined += `- Risiko: ${d.risks[0]}\n`;
-           if(d.questions.length > 0) combined += `- Offen: ${d.questions[0]}\n`;
-        });
-        // Schneide ab, falls zu lang (Context-Budgeting)
-        if (combined.length > CONSTANTS.DIGEST_MAX_LENGTH) {
-            combined = combined.substring(0, CONSTANTS.DIGEST_MAX_LENGTH) + "...\n[Gekürzt wegen Token-Budget]";
-        }
-        return combined;
-      }
-    };
-
-    const SummaryEngine = {
-      createLocalSummary: (turns) => {
-        let over = "", cons = "", conf = "", ques = "";
-        turns.forEach(t => {
-          const role = CONSTANTS.ROLES.find(r=>r.id===t.seatRole).label;
-          over += `**${role}:** ${t.rawOutput.substring(0, 150)}...\n\n`;
-          if(t.digest.risks.length) conf += `- ${role} sieht Risiko: ${t.digest.risks[0]}\n`;
-          if(t.digest.questions.length) ques += `- ${t.digest.questions[0]}\n`;
-        });
-        cons = "Eine genaue Konsens-Analyse erfordert die Meta-Synthese. Lokal wurden verschiedene Aspekte beleuchtet.";
-        return { overall: over, consensus: cons, conflicts: conf || "Keine expliziten Konflikte geparst.", openQuestions: ques || "Keine." };
-      }
-    };
-
-    // --- 8. Run Orchestrator ---
-    const RunEngine = {
-      startRun: async (userPrompt) => {
-        if (!AppState.settings.apiKey) return Toast.error("Bitte OpenRouter API-Key in den Einstellungen hinterlegen.");
-        if (!userPrompt.trim()) return Toast.error("Bitte eine Fragestellung eingeben.");
-        if (AppState.currentState !== 'IDLE' && AppState.currentState !== 'DONE' && AppState.currentState !== 'FAILED' && AppState.currentState !== 'ABORTED') return;
-
-        StateMachine.transitionTo('VALIDATING');
-        const activeSeats = SeatManager.getActive();
-        if (activeSeats.length === 0) { StateMachine.transitionTo('FAILED'); return Toast.error("Kein Agent aktiv."); }
-
-        AppState.currentRun = { runId: Utils.generateId('run'), sessionId: Utils.generateId('sess'), prompt: userPrompt, startTime: Date.now() };
-        AppState.turnResults.clear();
-        AppState.streamAbortControllers.clear();
-        AppState.sharedDigest = null;
-        AppState.totalUsage = { tokens: 0, cost: 0 };
-
-        UiController.resetRunUI();
-        UiController.setControls(true);
-        await StorageLayer.save('runs', AppState.currentRun);
-
-        try {
-          // RUNDE 1
-          StateMachine.transitionTo('ROUND1');
-          await RunEngine.executeRound(1, activeSeats, userPrompt);
-
-          // DIGEST 1
-          StateMachine.transitionTo('DIGEST1');
-          const r1Turns = Array.from(AppState.turnResults.values()).filter(t=>t.round === 1);
-          AppState.sharedDigest = DigestEngine.combine(r1Turns.map(t=>t.digest));
-          UiController.appendStream(null, 'Erstelle Zwischen-Kontext für Runde 2...', 'sys');
-
-          // RUNDE 2
-          StateMachine.transitionTo('ROUND2');
-          await RunEngine.executeRound(2, activeSeats, userPrompt);
-
-          // DIGEST 2 -> SYNTHESE
-          StateMachine.transitionTo('SYNTHESIS');
-          await RunEngine.runSynthesis();
-
-          StateMachine.transitionTo('DONE');
-          Toast.success("Stammtisch-Lauf erfolgreich beendet.");
-        } catch (e) {
-          if (e.name === 'AbortError') {
-             StateMachine.transitionTo('ABORTED');
-             Toast.info("Lauf abgebrochen.");
-          } else {
-             StateMachine.transitionTo('FAILED');
-             Toast.error("Fehler im Lauf: " + e.message);
-          }
-        } finally {
-          UiController.setControls(false);
-        }
-      },
-
-      executeRound: async (round, seats, prompt) => {
-        for (let i=0; i<seats.length; i++) {
-          const seat = seats[i];
-          if (['ABORTED','FAILED'].includes(AppState.currentState)) throw new DOMException("Aborted", "AbortError");
-
-          UiController.updateProgress(round, i, seats.length);
-          await RunEngine.executeTurn(seat, round, prompt);
-        }
-      },
-
-      executeTurn: async (seat, round, prompt) => {
-        UiController.updateSeatStatus(seat.seatId, 'running');
-        UiController.appendStream(seat.seatName, `Startet Turn (Runde ${round})...`, 'sys');
-
-        const roleDef = CONSTANTS.ROLES.find(r=>r.id === seat.role);
-        let sysMsg = `Du bist '${roleDef.label}' an einem Experten-Stammtisch.\nDeine Rolle: ${roleDef.desc}\nAntworte prägnant, strukturiert in Markdown (Fakten, Risiken, Fazit).`;
-
-        let userMsg = `Thema: ${prompt}`;
-        if (round === 2 && AppState.sharedDigest) {
-           userMsg += `\n\n${AppState.sharedDigest}\n\nAnalysiere dies nun vertiefend aus deiner Perspektive. Was fehlt? Wo widersprichst du?`;
-        }
-
-        const messages = [{ role: 'system', content: sysMsg }, { role: 'user', content: userMsg }];
-        const controller = new AbortController();
-        AppState.streamAbortControllers.set(seat.seatId, controller);
-        const timeout = setTimeout(() => controller.abort(), AppState.settings.defaultTimeoutMs);
-
-        let resultText = "";
-        let usedFallback = false;
-        let finalModel = seat.modelId;
-
-        try {
-          const res = await ApiAdapter.call({
-            modelId: finalModel, messages, sessionId: AppState.currentRun.sessionId, signal: controller.signal,
-            onChunk: (c) => { resultText += c; UiController.appendStreamChunk(c); }
-          });
-          clearTimeout(timeout);
-          await RunEngine.finalizeTurn(seat, round, res.text, res.usage, usedFallback, finalModel);
-
-        } catch (e) {
-          clearTimeout(timeout);
-          if (e.name !== 'AbortError') {
-            // FALLBACK LOGIC
-            const fallbackId = ModelRegistry.getFallback(seat.modelId).id;
-            if (fallbackId && fallbackId !== seat.modelId) {
-              UiController.appendStream(seat.seatName, `Fehler. Versuche Fallback: ${fallbackId}`, 'err');
-              usedFallback = true;
-              finalModel = fallbackId;
-              try {
-                const fbRes = await ApiAdapter.call({
-                  modelId: finalModel, messages, sessionId: AppState.currentRun.sessionId,
-                  onChunk: (c) => { resultText += c; UiController.appendStreamChunk(c); }
-                });
-                await RunEngine.finalizeTurn(seat, round, fbRes.text, fbRes.usage, usedFallback, finalModel);
-                return;
-              } catch (fallbackErr) { e = fallbackErr; }
-            }
-          }
-          if (e.name === 'AbortError') throw e; // Bubble up
-          UiController.updateSeatStatus(seat.seatId, 'error');
-          UiController.appendStream(seat.seatName, `Fehlgeschlagen: ${e.message}`, 'err');
-        } finally {
-          AppState.streamAbortControllers.delete(seat.seatId);
-          UiController.appendStreamChunk('\n\n'); // Spacing
-        }
-      },
-
-      finalizeTurn: async (seat, round, text, usage, isFallback, finalModel) => {
-        const cost = ModelRegistry.estimateCost(finalModel, usage.prompt_tokens, usage.completion_tokens);
-        AppState.totalUsage.tokens += usage.total_tokens;
-        AppState.totalUsage.cost += cost;
-        seat.stats.tokens += usage.total_tokens;
-        seat.stats.cost += cost;
-
-        const digest = DigestEngine.normalize(text, seat.role);
-        const turnData = { turnId: Utils.generateId('t'), runId: AppState.currentRun.runId, round, seatId: seat.seatId, seatRole: seat.role, rawOutput: text, digest, usage, cost };
-
-        AppState.turnResults.set(turnData.turnId, turnData);
-        await StorageLayer.save('turns', turnData);
-
-        UiController.updateSeatStatus(seat.seatId, isFallback ? 'fallback' : 'done');
-        seat.lastSummary = text.substring(0, 150) + "...";
-        UiController.updateSeatUI(seat);
-        UiController.updateFooter();
-      },
-
-      runSynthesis: async () => {
-        const turns = Array.from(AppState.turnResults.values());
-        const localSum = SummaryEngine.createLocalSummary(turns);
-        UiController.renderSummary(localSum);
-
-        const metaModel = AppState.settings.synthesisModelId;
-        if (metaModel) {
-          UiController.appendStream(null, `Starte Meta-Synthese mit ${metaModel}...`, 'sys');
-          document.getElementById('metaAnalysisBox').style.display = 'flex';
-          document.getElementById('summaryMeta').textContent = "KI analysiert...";
-
-          const messages = [
-            { role: "system", content: "Du bist der Meta-Analyst. Fasse die Resultate der Experten objektiv zusammen, nenne den Konsens und schlichte Konflikte." },
-            { role: "user", content: `Lokal extrahiert:\n${localSum.overall}\nKonflikte:\n${localSum.conflicts}` }
-          ];
-
-          try {
-            const controller = new AbortController();
-            AppState.streamAbortControllers.set('meta', controller);
-            const res = await ApiAdapter.call({
-              modelId: metaModel, messages, sessionId: AppState.currentRun.sessionId, signal: controller.signal,
-              onChunk: (c) => {
-                const el = document.getElementById('summaryMeta');
-                if(el.textContent === "KI analysiert...") el.textContent = "";
-                el.textContent += c;
-              }
-            });
-            AppState.totalUsage.cost += ModelRegistry.estimateCost(metaModel, res.usage.prompt_tokens, res.usage.completion_tokens);
-            UiController.updateFooter();
-          } catch(e) {
-            document.getElementById('summaryMeta').textContent = "Fehler bei Meta-Synthese: " + e.message;
-          }
-        }
-      },
-
-      abort: () => {
-        AppState.streamAbortControllers.forEach(c => c.abort());
-      }
-    };
-
-    // --- 9. UI Controller ---
-    const UiController = {
-      init: () => {
-        SeatManager.init();
-        UiController.renderSeats();
-        UiController.populateSelects();
-        UiController.bindEvents();
-        ConfigManager.load();
-        UiController.applySettings();
-        UiController.updateStateIndicators();
-
-        window.addEventListener('online', () => document.getElementById('offlineIndicator').classList.remove('visible'));
-        window.addEventListener('offline', () => document.getElementById('offlineIndicator').classList.add('visible'));
-        if(!navigator.onLine) document.getElementById('offlineIndicator').classList.add('visible');
-      },
-
-      renderSeats: () => {
-        const grid = document.getElementById('seatsGrid');
-        grid.innerHTML = '';
-        AppState.seats.forEach(seat => {
-          const card = document.createElement('div');
-          card.className = `seat-card ${seat.status}`;
-          card.id = `seatCard_${seat.seatId}`;
-
-          let statHtml = seat.stats.tokens > 0 ? `${seat.stats.tokens} Tk | ${Utils.formatMoney(seat.stats.cost)}` : '&nbsp;';
-
-          card.innerHTML = `
-            <div class="seat-header">
-              <span class="seat-title">${seat.seatName}</span>
-              <span class="seat-status ${seat.status}" id="seatStatus_${seat.seatId}">${seat.status}</span>
-            </div>
-            <div class="seat-config-row">
-              <select id="model_${seat.seatId}" ${AppState.currentState !== 'IDLE' ? 'disabled' : ''}>
-                ${ModelRegistry.getAll().map(m => `<option value="${m.id}" ${m.id===seat.modelId?'selected':''}>${m.label}</option>`).join('')}
-              </select>
-            </div>
-            <div class="seat-enable-toggle">
-              <input type="checkbox" id="enable_${seat.seatId}" ${seat.enabled?'checked':''} ${AppState.currentState !== 'IDLE' ? 'disabled' : ''}>
-              <label for="enable_${seat.seatId}">Aktiv</label>
-            </div>
-            <div class="seat-stats" id="seatStats_${seat.seatId}">${statHtml}</div>
-            <div class="seat-last" id="seatLast_${seat.seatId}">${Utils.escapeHtml(seat.lastSummary) || 'Wartet auf Einsatz...'}</div>
-          `;
-          grid.appendChild(card);
-
-          // Bindings
-          document.getElementById(`model_${seat.seatId}`).addEventListener('change', (e) => seat.modelId = e.target.value);
-          document.getElementById(`enable_${seat.seatId}`).addEventListener('change', (e) => seat.enabled = e.target.checked);
-        });
-      },
-
-      updateSeatUI: (seat) => {
-        document.getElementById(`seatLast_${seat.seatId}`).textContent = seat.lastSummary;
-        document.getElementById(`seatStats_${seat.seatId}`).innerHTML = `${seat.stats.tokens} Tk | ${Utils.formatMoney(seat.stats.cost)}`;
-      },
-
-      updateSeatStatus: (id, status) => {
-        const s = AppState.seats.find(s=>s.seatId === id);
-        if(s) s.status = status;
-        const el = document.getElementById(`seatStatus_${id}`);
-        const card = document.getElementById(`seatCard_${id}`);
-        if(el && card) {
-          el.className = `seat-status ${status}`;
-          el.textContent = status;
-          card.className = `seat-card ${status}`;
-        }
-      },
-
-      setControls: (isRunning) => {
-        document.getElementById('startRunBtn').disabled = isRunning;
-        document.getElementById('abortRunBtn').disabled = !isRunning;
-        document.getElementById('userPrompt').disabled = isRunning;
-        UiController.renderSeats(); // Disables dropdowns
-        document.getElementById('progressBar').style.display = isRunning ? 'block' : 'none';
-      },
-
-      updateProgress: (round, seatIndex, totalSeats) => {
-        const totalSteps = totalSeats * 2;
-        const currentStep = ((round - 1) * totalSeats) + seatIndex;
-        document.getElementById('progressFill').style.width = `${(currentStep / totalSteps) * 100}%`;
-      },
-
-      resetRunUI: () => {
-        document.getElementById('streamLog').innerHTML = '';
-        document.getElementById('progressFill').style.width = '0%';
-        document.getElementById('metaAnalysisBox').style.display = 'none';
-        document.getElementById('summaryMeta').textContent = '';
-        AppState.seats.forEach(s => { s.lastSummary = ''; s.stats = {tokens:0, cost:0}; UiController.updateSeatStatus(s.seatId, 'idle'); });
-        UiController.renderSeats();
-        UiController.updateFooter();
-      },
-
-      appendStream: (seatName, text, type='info') => {
-        const log = document.getElementById('streamLog');
-        const entry = document.createElement('div');
-        entry.className = 'stream-entry';
-        const tagHtml = seatName ? `<span class="tag">${seatName}</span>` : '';
-        const typeClass = type === 'sys' ? 'sys' : (type === 'err' ? 'err' : '');
-        entry.innerHTML = `<div class="stream-meta">${tagHtml} <span class="tag ${typeClass}">${type.toUpperCase()}</span></div><span class="stream-content"></span>`;
-
-        // Letzter Knoten für Text-Append vorbereiten
-        entry.querySelector('.stream-content').textContent = text;
-        log.appendChild(entry);
-        if(AppState.settings.autoScroll) log.scrollTop = log.scrollHeight;
-      },
-
-      appendStreamChunk: (chunk) => {
-        const log = document.getElementById('streamLog');
-        const lastEntry = log.lastElementChild;
-        if(lastEntry) {
-          lastEntry.querySelector('.stream-content').textContent += chunk;
-          if(AppState.settings.autoScroll) log.scrollTop = log.scrollHeight;
-        }
-      },
-
-      renderSummary: (summary) => {
-        document.getElementById('summaryOverall').innerHTML = Utils.escapeHtml(summary.overall).replace(/\n/g, '<br>');
-        document.getElementById('summaryConsensus').textContent = summary.consensus;
-        document.getElementById('summaryConflicts').innerHTML = Utils.escapeHtml(summary.conflicts).replace(/\n/g, '<br>');
-        document.getElementById('summaryOpenQuestions').innerHTML = Utils.escapeHtml(summary.openQuestions).replace(/\n/g, '<br>');
-      },
-
-      updateStateIndicators: () => {
-        const state = AppState.currentState;
-        document.getElementById('runStateLabel').textContent = state;
-        const dot = document.getElementById('runStateDot');
-        dot.className = `badge-dot state-${state.toLowerCase().replace(/[0-9]/g, '')}`; // map ROUND1 to state-round etc.
-        if(state.includes('ROUND')) dot.classList.add('state-running');
-        if(state.includes('DIGEST')) dot.classList.add('state-digest');
-        document.getElementById('roundPhaseLabel').textContent = state.includes('ROUND') ? 'Diskussion' : (state.includes('DIGEST') ? 'Konsolidierung' : (state==='SYNTHESIS' ? 'Synthese' : '-'));
-      },
-
-      updateFooter: () => {
-        document.getElementById('footerTokens').textContent = AppState.totalUsage.tokens.toLocaleString();
-        document.getElementById('footerCost').textContent = Utils.formatMoney(AppState.totalUsage.cost);
-        if(AppState.currentRun) document.getElementById('footerRunInfo').textContent = `Lauf-ID: ${AppState.currentRun.runId} | Sitzanzahl: ${AppState.currentRun.activeSeats.length}`;
-      },
-
-      updateDebug: () => {
-        if(!AppState.settings.debugMode) return;
-        document.getElementById('debugStateView').textContent = JSON.stringify({ state: AppState.currentState, seats: AppState.seats.map(s=>({id:s.seatId, state:s.status})) }, null, 2);
-        document.getElementById('debugContextView').textContent = AppState.sharedDigest ? AppState.sharedDigest.substring(0,200)+"..." : "Kein Shared Digest.";
-      },
-
-      populateSelects: () => {
-        const synthSel = document.getElementById('synthesisModel');
-        ModelRegistry.getAll().forEach(m => {
-          const opt = document.createElement('option');
-          opt.value = m.id; opt.textContent = m.label;
-          synthSel.appendChild(opt);
-        });
-      },
-
-      applySettings: () => {
-        document.getElementById('apiKeyInput').value = AppState.settings.apiKey;
-        document.getElementById('defaultTimeoutMs').value = AppState.settings.defaultTimeoutMs;
-        document.getElementById('synthesisModel').value = AppState.settings.synthesisModelId;
-        document.getElementById('autoScrollToggle').checked = AppState.settings.autoScroll;
-        document.getElementById('debugModeToggle').checked = AppState.settings.debugMode;
-      },
-
-      bindEvents: () => {
-        // Tabs
-        document.querySelectorAll('.tab-btn').forEach(btn => {
-          btn.addEventListener('click', (e) => {
-            document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
-            document.querySelectorAll('.panel-section').forEach(p => p.classList.remove('active'));
-            e.target.classList.add('active');
-            document.getElementById(`tab-${e.target.dataset.tab}`).classList.add('active');
-          });
-        });
-
-        // Run Controls
-        document.getElementById('startRunBtn').addEventListener('click', () => RunEngine.startRun(document.getElementById('userPrompt').value));
-        document.getElementById('abortRunBtn').addEventListener('click', () => RunEngine.abort());
-
-        // Settings
-        document.getElementById('saveSettingsBtn').addEventListener('click', () => {
-          AppState.settings.apiKey = document.getElementById('apiKeyInput').value.trim();
-          AppState.settings.synthesisModelId = document.getElementById('synthesisModel').value;
-          AppState.settings.defaultTimeoutMs = parseInt(document.getElementById('defaultTimeoutMs').value) || 60000;
-          AppState.settings.autoScroll = document.getElementById('autoScrollToggle').checked;
-          AppState.settings.debugMode = document.getElementById('debugModeToggle').checked;
-          ConfigManager.save();
-          Toast.success("Einstellungen gespeichert.");
-          UiController.updateDebug();
-        });
-
-        // Clear Data
-        document.getElementById('clearDataBtn').addEventListener('click', async () => {
-          if(confirm("Alle gespeicherten Läufe aus der Datenbank löschen?")) {
-            await StorageLayer.clearAll();
-            Toast.success("Datenbank geleert.");
-          }
-        });
-
-        // Export
-        document.getElementById('exportJsonBtn').addEventListener('click', async () => {
-          if(!AppState.currentRun) return Toast.error("Kein aktueller Lauf.");
-          const turns = await StorageLayer.getTurns(AppState.currentRun.runId);
-          const blob = new Blob([JSON.stringify({run: AppState.currentRun, turns}, null, 2)], {type: 'application/json'});
-          const url = URL.createObjectURL(blob);
-          const a = document.createElement('a'); a.href = url; a.download = `stammtisch_${AppState.currentRun.runId}.json`; a.click();
-        });
-      }
-    };
-
-    // --- 10. Initialization ---
-    window.addEventListener('DOMContentLoaded', async () => {
-      UiController.init();
+    // Benachrichtige alle Listener
+    listeners.forEach(listener => {
       try {
-        await StorageLayer.init();
-      } catch (e) {
-        Toast.error("Lokale Datenbank (IndexedDB) konnte nicht geladen werden.");
-      }
-
-      if ('serviceWorker' in navigator) {
-        navigator.serviceWorker.register('sw.js').catch(err => console.warn('SW failed:', err));
+        listener(event);
+      } catch (err) {
+        console.error('State change listener error:', err);
       }
     });
+
+    UiController.updateStateIndicators();
+    UiController.updateDebug();
+    
+    return true;
+  }
+
+  function onChange(listener) {
+    listeners.add(listener);
+    return () => listeners.delete(listener);
+  }
+
+  function getState() {
+    return AppState.currentState;
+  }
+
+  return {
+    transitionTo,
+    onChange,
+    getState,
+    canTransition
+  };
+})();
+
+// ============================================================================
+// CONFIG MANAGER
+// ============================================================================
+const ConfigManager = (() => {
+  function load() {
+    try {
+      const raw = localStorage.getItem(CONSTANTS.SETTINGS_KEY);
+      if (raw) {
+        const parsed = Utils.safeJsonParse(raw, {});
+        AppState.settings = { ...CONSTANTS.DEFAULT_SETTINGS, ...parsed };
+      }
+    } catch (err) {
+      console.error('Config load error:', err);
+      AppState.settings = { ...CONSTANTS.DEFAULT_SETTINGS };
+    }
+    
+    // Stelle sicher, dass alle Werte gültig sind
+    AppState.settings.defaultTimeoutMs = Utils.clamp(
+      AppState.settings.defaultTimeoutMs || 60000, 5000, 300000
+    );
+    AppState.settings.maxRetries = Utils.clamp(
+      AppState.settings.maxRetries || 2, 0, 5
+    );
+  }
+
+  function save() {
+    try {
+      localStorage.setItem(CONSTANTS.SETTINGS_KEY, JSON.stringify(AppState.settings));
+      return true;
+    } catch (err) {
+      console.error('Config save error:', err);
+      return false;
+    }
+  }
+
+  function getApiKey() {
+    return AppState.settings.apiKey || '';
+  }
+
+  function setApiKey(key) {
+    AppState.settings.apiKey = (key || '').trim();
+    save();
+  }
+
+  function getMaskedApiKey() {
+    const key = getApiKey();
+    if (!key || key.length < 8) return '••••••••';
+    return key.slice(0, 4) + '••••' + key.slice(-4);
+  }
+
+  function isConfigured() {
+    return !!getApiKey();
+  }
+
+  return {
+    load,
+    save,
+    getApiKey,
+    setApiKey,
+    getMaskedApiKey,
+    isConfigured
+  };
+})();
+
+// ============================================================================
+// MODEL REGISTRY
+// ============================================================================
+const ModelRegistry = (() => {
+  // Verfügbare OpenRouter-Modelle mit Metadaten
+  const models = [
+    {
+      id: 'openai/gpt-4o-mini',
+      label: 'GPT-4o mini',
+      provider: 'OpenAI',
+      supportsStructuredOutput: true,
+      supportsStreaming: true,
+      recommendedRoles: ['analyst', 'moderator'],
+      fallbackId: null,
+      priorityClass: 'balanced',
+      pricing: { input: 0.15, output: 0.60 } // per 1M tokens
+    },
+    {
+      id: 'openai/gpt-4o',
+      label: 'GPT-4o',
+      provider: 'OpenAI',
+      supportsStructuredOutput: true,
+      supportsStreaming: true,
+      recommendedRoles: ['analyst', 'critic'],
+      fallbackId: 'openai/gpt-4o-mini',
+      priorityClass: 'accurate',
+      pricing: { input: 2.50, output: 10.00 }
+    },
+    {
+      id: 'anthropic/claude-3.5-sonnet',
+      label: 'Claude 3.5 Sonnet',
+      provider: 'Anthropic',
+      supportsStructuredOutput: true,
+      supportsStreaming: true,
+      recommendedRoles: ['analyst', 'critic', 'risk'],
+      fallbackId: 'openai/gpt-4o-mini',
+      priorityClass: 'accurate',
+      pricing: { input: 3.00, output: 15.00 }
+    },
+    {
+      id: 'anthropic/claude-3.5-haiku',
+      label: 'Claude 3.5 Haiku',
+      provider: 'Anthropic',
+      supportsStructuredOutput: true,
+      supportsStreaming: true,
+      recommendedRoles: ['implementer', 'moderator'],
+      fallbackId: 'openai/gpt-4o-mini',
+      priorityClass: 'fast',
+      pricing: { input: 0.80, output: 4.00 }
+    },
+    {
+      id: 'deepseek/deepseek-chat',
+      label: 'DeepSeek Chat',
+      provider: 'DeepSeek',
+      supportsStructuredOutput: true,
+      supportsStreaming: true,
+      recommendedRoles: ['analyst', 'implementer'],
+      fallbackId: 'openai/gpt-4o-mini',
+      priorityClass: 'cheap',
+      pricing: { input: 0.14, output: 0.28 }
+    },
+    {
+      id: 'deepseek/deepseek-reasoner',
+      label: 'DeepSeek Reasoner (R1)',
+      provider: 'DeepSeek',
+      supportsStructuredOutput: false,
+      supportsStreaming: true,
+      recommendedRoles: ['critic', 'risk'],
+      fallbackId: 'openai/gpt-4o-mini',
+      priorityClass: 'accurate',
+      pricing: { input: 0.55, output: 2.19 }
+    },
+    {
+      id: 'google/gemini-2.0-flash-001',
+      label: 'Gemini 2.0 Flash',
+      provider: 'Google',
+      supportsStructuredOutput: true,
+      supportsStreaming: true,
+      recommendedRoles: ['analyst', 'implementer'],
+      fallbackId: 'openai/gpt-4o-mini',
+      priorityClass: 'fast',
+      pricing: { input: 0.10, output: 0.40 }
+    },
+    {
+      id: 'meta-llama/llama-3.3-70b-instruct',
+      label: 'Llama 3.3 70B',
+      provider: 'Meta',
+      supportsStructuredOutput: false,
+      supportsStreaming: true,
+      recommendedRoles: ['critic', 'implementer'],
+      fallbackId: 'openai/gpt-4o-mini',
+      priorityClass: 'cheap',
+      pricing: { input: 0.35, output: 0.40 }
+    }
+  ];
+
+  function getAll() {
+    return [...models];
+  }
+
+  function getById(id) {
+    return models.find(m => m.id === id) || null;
+  }
+
+  function getFallback(id) {
+    const model = getById(id);
+    if (!model || !model.fallbackId) return getById('openai/gpt-4o-mini');
+    return getById(model.fallbackId);
+  }
+
+  function estimateCost(modelId, promptTokens, completionTokens) {
+    const model = getById(modelId);
+    if (!model || !model.pricing) return 0;
+    
+    const inputCost = (promptTokens / 1000000) * model.pricing.input;
+    const outputCost = (completionTokens / 1000000) * model.pricing.output;
+    return inputCost + outputCost;
+  }
+
+  return {
+    getAll,
+    getById,
+    getFallback,
+    estimateCost
+  };
+})();
+
+// ============================================================================
+// SEAT MANAGER
+// ============================================================================
+const SeatManager = (() => {
+  function initDefaultSeats() {
+    const defaultRoles = ['analyst', 'critic', 'implementer', 'risk', 'moderator'];
+    const allModels = ModelRegistry.getAll();
+    
+    AppState.seats = defaultRoles.map((roleId, index) => {
+      const role = CONSTANTS.ROLES.find(r => r.id === roleId);
+      const recommendedModels = allModels.filter(m => 
+        m.recommendedRoles.includes(roleId)
+      );
+      
+      return {
+        seatId: index + 1,
+        seatName: `${role.label} ${String.fromCharCode(65 + index)}`,
+        role: roleId,
+        roleLabel: role.label,
+        roleDescription: role.description,
+        modelId: recommendedModels[0]?.id || allModels[0].id,
+        instructionPreset: '',
+        strictness: 0.7,
+        enabled: true,
+        frozenAtRunStart: false,
+        status: 'idle', // idle, running, done, error, fallback
+        lastSummary: '',
+        lastError: null,
+        usage: { promptTokens: 0, completionTokens: 0 }
+      };
+    });
+  }
+
+  function updateSeat(seatId, patch) {
+    const seat = AppState.seats.find(s => s.seatId === seatId);
+    if (!seat) return false;
+    
+    Object.assign(seat, patch);
+    return true;
+  }
+
+  function getSeat(seatId) {
+    return AppState.seats.find(s => s.seatId === seatId);
+  }
+
+  function getAllSeats() {
+    return [...AppState.seats];
+  }
+
+  function getActiveSeats() {
+    return AppState.seats.filter(s => s.enabled && s.frozenAtRunStart);
+  }
+
+  function freezeForRun() {
+    AppState.seats.forEach(seat => {
+      if (seat.enabled) {
+        seat.frozenAtRunStart = true;
+        seat.status = 'idle';
+        seat.lastError = null;
+      }
+    });
+  }
+
+  function resetFreeze() {
+    AppState.seats.forEach(seat => {
+      seat.frozenAtRunStart = false;
+    });
+  }
+
+  function resetStatus() {
+    AppState.seats.forEach(seat => {
+      seat.status = 'idle';
+      seat.lastError = null;
+    });
+  }
+
+  function setSeatStatus(seatId, status, error = null) {
+    const seat = getSeat(seatId);
+    if (!seat) return;
+    seat.status = status;
+    seat.lastError = error;
+  }
+
+  return {
+    initDefaultSeats,
+    updateSeat,
+    getSeat,
+    getAllSeats,
+    getActiveSeats,
+    freezeForRun,
+    resetFreeze,
+    resetStatus,
+    setSeatStatus
+  };
+})();
+
+// ============================================================================
+// STORAGE LAYER (IndexedDB)
+// ============================================================================
+const StorageLayer = (() => {
+  function initDb() {
+    return new Promise((resolve, reject) => {
+      const request = indexedDB.open(CONSTANTS.DB_NAME, CONSTANTS.DB_VERSION);
+
+      request.onerror = () => {
+        const error = new Error('IndexedDB konnte nicht geöffnet werden');
+        console.error(error);
+        reject(error);
+      };
+
+      request.onsuccess = (event) => {
+        AppState.db = event.target.result;
+        resolve();
+      };
+
+      request.onupgradeneeded = (event) => {
+        const db = event.target.result;
+        
+        // Runs Store
+        if (!db.objectStoreNames.contains('runs')) {
+          const runsStore = db.createObjectStore('runs', { keyPath: 'runId' });
+          runsStore.createIndex('createdAt', 'createdAt', { unique: false });
+          runsStore.createIndex('state', 'state', { unique: false });
+        }
+
+        // Turns Store
+        if (!db.objectStoreNames.contains('turns')) {
+          const turnsStore = db.createObjectStore('turns', { keyPath: 'turnId' });
+          turnsStore.createIndex('runId', 'runId', { unique: false });
+          turnsStore.createIndex('round', 'round', { unique: false });
+          turnsStore.createIndex('seatId', 'seatId', { unique: false });
+        }
+
+        // Digests Store
+        if (!db.objectStoreNames.contains('digests')) {
+          const digestsStore = db.createObjectStore('digests', { keyPath: 'digestId' });
+          digestsStore.createIndex('runId', 'runId', { unique: false });
+          digestsStore.createIndex('scope', 'scope', { unique: false });
+        }
+      };
+    });
+  }
+
+  function _transaction(storeNames, mode, callback) {
+    return new Promise((resolve, reject) => {
+      if (!AppState.db) {
+        reject(new Error('Datenbank nicht initialisiert'));
+        return;
+      }
+
+      const tx = AppState.db.transaction(storeNames, mode);
+      const result = callback(tx);
+      
+      tx.oncomplete = () => resolve(result);
+      tx.onerror = () => reject(tx.error);
+      tx.onabort = () => reject(new Error('Transaction aborted'));
+    });
+  }
+
+  function saveRun(runObj) {
+    return _transaction(['runs'], 'readwrite', (tx) => {
+      tx.objectStore('runs').put(runObj);
+      return runObj;
+    });
+  }
+
+  function updateRun(runId, patch) {
+    return _transaction(['runs'], 'readwrite', (tx) => {
+      const store = tx.objectStore('runs');
+      const request = store.get(runId);
+      
+      request.onsuccess = () => {
+        const obj = request.result;
+        if (!obj) return;
+        Object.assign(obj, patch);
+        store.put(obj);
+      };
+    });
+  }
+
+  function getRun(runId) {
+    return _transaction(['runs'], 'readonly', (tx) => {
+      return new Promise((resolve) => {
+        const request = tx.objectStore('runs').get(runId);
+        request.onsuccess = () => resolve(request.result);
+      });
+    });
+  }
+
+  function getAllRuns() {
+    return _transaction(['runs'], 'readonly', (tx) => {
+      return new Promise((resolve) => {
+        const results = [];
+        const request = tx.objectStore('runs').openCursor(null, 'prev');
+        
+        request.onsuccess = (event) => {
+          const cursor = event.target.result;
+          if (cursor) {
+            results.push(cursor.value);
+            cursor.continue();
+          } else {
+            resolve(results);
+          }
+        };
+      });
+    });
+  }
+
+  function saveTurn(turnObj) {
+    return _transaction(['turns'], 'readwrite', (tx) => {
+      tx.objectStore('turns').put(turnObj);
+      return turnObj;
+    });
+  }
+
+  function getTurnsForRun(runId) {
+    return _transaction(['turns'], 'readonly', (tx) => {
+      return new Promise((resolve) => {
+        const results = [];
+        const index = tx.objectStore('turns').index('runId');
+        const request = index.openCursor(IDBKeyRange.only(runId));
+        
+        request.onsuccess = (event) => {
+          const cursor = event.target.result;
+          if (cursor) {
+            results.push(cursor.value);
+            cursor.continue();
+          } else {
+            resolve(results);
+          }
+        };
+      });
+    });
+  }
+
+  function saveDigest(digestObj) {
+    return _transaction(['digests'], 'readwrite', (tx) => {
+      tx.objectStore('digests').put(digestObj);
+      return digestObj;
+    });
+  }
+
+  function getDigestsForRun(runId) {
+    return _transaction(['digests'], 'readonly', (tx) => {
+      return new Promise((resolve) => {
+        const results = [];
+        const index = tx.objectStore('digests').index('runId');
+        const request = index.openCursor(IDBKeyRange.only(runId));
+        
+        request.onsuccess = (event) => {
+          const cursor = event.target.result;
+          if (cursor) {
+            results.push(cursor.value);
+            cursor.continue();
+          } else {
+            resolve(results);
+          }
+        };
+      });
+    });
+  }
+
+  function clearAllData() {
+    return _transaction(['runs', 'turns', 'digests'], 'readwrite', (tx) => {
+      tx.objectStore('runs').clear();
+      tx.objectStore('turns').clear();
+      tx.objectStore('digests').clear();
+    });
+  }
+
+  return {
+    initDb,
+    saveRun,
+    updateRun,
+    getRun,
+    getAllRuns,
+    saveTurn,
+    getTurnsForRun,
+    saveDigest,
+    getDigestsForRun,
+    clearAllData
+  };
+})();
+
+// ============================================================================
+// API ADAPTER (OpenRouter)
+// ============================================================================
+const ApiAdapter = (() => {
+  /**
+   * Führt einen Modellaufruf durch
+   */
+  async function callModel(options) {
+    const {
+      modelId,
+      messages,
+      sessionId,
+      signal,
+      stream = true,
+      onChunk = null
+    } = options;
+
+    const apiKey = ConfigManager.getApiKey();
+    
+    if (!apiKey) {
+      return {
+        ok: false,
+        error: {
+          class: 'validation',
+          code: 'NO_API_KEY',
+          retryable: false,
+          userMessage: 'Kein API-Key konfiguriert. Bitte in Einstellungen hinterlegen.',
+          timestamp: Date.now()
+        }
+      };
+    }
+
+    const model = ModelRegistry.getById(modelId);
+    if (!model) {
+      return {
+        ok: false,
+        error: {
+          class: 'validation',
+          code: 'INVALID_MODEL',
+          retryable: false,
+          userMessage: `Modell "${modelId}" nicht gefunden.`,
+          timestamp: Date.now()
+        }
+      };
+    }
+
+    const requestBody = {
+      model: modelId,
+      messages: messages,
+      max_tokens: 2048,
+      temperature: 0.7,
+      stream: stream && model.supportsStreaming
+    };
+
+    const headers = {
+      'Authorization': `Bearer ${apiKey}`,
+      'Content-Type': 'application/json',
+      'HTTP-Referer': window.location.origin,
+      'X-Title': 'KI-Stammtisch PWA'
+    };
+
+    let response;
+    const startTime = Date.now();
+
+    try {
+      response = await fetch(CONSTANTS.API_BASE_URL, {
+        method: 'POST',
+        headers,
+        body: JSON.stringify(requestBody),
+        signal
+      });
+    } catch (err) {
+      if (err.name === 'AbortError') {
+        return {
+          ok: false,
+          error: {
+            class: 'abort',
+            code: 'ABORTED',
+            retryable: false,
+            userMessage: 'Anfrage wurde abgebrochen.',
+            timestamp: Date.now()
+          }
+        };
+      }
+      
+      return {
+        ok: false,
+        error: {
+          class: 'network',
+          code: 'NETWORK_ERROR',
+          retryable: true,
+          userMessage: 'Netzwerkfehler. Bitte Verbindung prüfen.',
+          details: err.message,
+          timestamp: Date.now()
+        }
+      };
+    }
+
+    const latencyMs = Date.now() - startTime;
+
+    // Fehlerhafte HTTP-Antworten behandeln
+    if (!response.ok) {
+      const statusCode = response.status;
+      const retryable = CONSTANTS.RETRYABLE_STATUS_CODES.includes(statusCode);
+      
+      let userMessage = `API-Fehler ${statusCode}`;
+      
+      if (statusCode === 401) {
+        userMessage = 'API-Key ungültig oder abgelaufen.';
+      } else if (statusCode === 402) {
+        userMessage = 'Kontingent aufgebraucht.';
+      } else if (statusCode === 429) {
+        userMessage = 'Rate-Limit erreicht. Bitte warten.';
+      } else if (statusCode >= 500) {
+        userMessage = 'Server-Fehler bei OpenRouter.';
+      }
+
+      let errorBody = '';
+      try {
+        errorBody = await response.text();
+      } catch {}
+
+      return {
+        ok: false,
+        error: {
+          class: 'api',
+          code: statusCode,
+          retryable,
+          userMessage,
+          details: errorBody,
+          timestamp: Date.now()
+        }
+      };
+    }
+
+    // Streaming-Response verarbeiten
+    if (stream && model.supportsStreaming) {
+      return await processStreamResponse(response, modelId, latencyMs, onChunk);
+    }
+
+    // Non-Streaming Response
+    try {
+      const data = await response.json();
+      return processNonStreamResponse(data, modelId, latencyMs);
+    } catch (err) {
+      return {
+        ok: false,
+        error: {
+          class: 'parse',
+          code: 'JSON_PARSE_ERROR',
+          retryable: false,
+          userMessage: 'Antwort konnte nicht verarbeitet werden.',
+          details: err.message,
+          timestamp: Date.now()
+        }
+      };
+    }
+  }
+
+  async function processStreamResponse(response, modelId, latencyMs, onChunk) {
+    const reader = response.body.getReader();
+    const decoder = new TextDecoder();
+    
+    let fullContent = '';
+    let usage = null;
+    let buffer = '';
+
+    try {
+      while (true) {
+        const { done, value } = await reader.read();
+        
+        if (done) break;
+        
+        buffer += decoder.decode(value, { stream: true });
+        const lines = buffer.split('\n');
+        buffer = lines.pop() || ''; // Behalte unvollständige Zeile
+
+        for (const line of lines) {
+          if (!line.startsWith('data: ')) continue;
+          
+          const data = line.slice(6).trim();
+          if (!data || data === '[DONE]') continue;
+
+          const parsed = Utils.safeJsonParse(data);
+          if (!parsed) continue;
+
+          // OpenAI/OpenRouter Streaming Format
+          if (parsed.choices && parsed.choices[0]) {
+            const choice = parsed.choices[0];
+            const delta = choice.delta?.content || '';
+            
+            if (delta) {
+              fullContent += delta;
+              if (onChunk) {
+                try {
+                  onChunk(delta);
+                } catch {}
+              }
+            }
+
+            // Usage aus letztem Chunk
+            if (parsed.usage) {
+              usage = parsed.usage;
+            }
+          }
+        }
+      }
+
+      return {
+        ok: true,
+        content: fullContent,
+        usage: usage || { prompt_tokens: 0, completion_tokens: 0, total_tokens: 0 },
+        modelId,
+        latencyMs
+      };
+    } catch (err) {
+      return {
+        ok: false,
+        error: {
+          class: 'stream',
+          code: 'STREAM_ERROR',
+          retryable: false,
+          userMessage: 'Streaming-Fehler aufgetreten.',
+          details: err.message,
+          timestamp: Date.now()
+        }
+      };
+    }
+  }
+
+  function processNonStreamResponse(data, modelId, latencyMs) {
+    let content = '';
+    let usage = { prompt_tokens: 0, completion_tokens: 0, total_tokens: 0 };
+
+    // Standard OpenAI Format
+    if (data.choices && data.choices[0]) {
+      content = data.choices[0].message?.content || '';
+    }
+
+    if (data.usage) {
+      usage = {
+        prompt_tokens: data.usage.prompt_tokens || 0,
+        completion_tokens: data.usage.completion_tokens || 0,
+        total_tokens: data.usage.total_tokens || 0
+      };
+    }
+
+    return {
+      ok: true,
+      content,
+      usage,
+      modelId,
+      latencyMs
+    };
+  }
+
+  /**
+   * Führt einen Modellaufruf mit Retry-Logik durch
+   */
+  async function callWithRetry(options, maxRetries = null) {
+    const retries = maxRetries ?? AppState.settings.maxRetries;
+    let lastError = null;
+
+    for (let attempt = 0; attempt <= retries; attempt++) {
+      const result = await callModel(options);
+
+      if (result.ok) {
+        return result;
+      }
+
+      lastError = result.error;
+
+      // Nicht retrybar oder letzter Versuch
+      if (!result.error.retryable || attempt === retries) {
+        return result;
+      }
+
+      // Exponential Backoff
+      const delay = Utils.calculateExponentialBackoff(attempt);
+      await Utils.sleep(delay);
+    }
+
+    return {
+      ok: false,
+      error: lastError
+    };
+  }
+
+  return {
+    callModel,
+    callWithRetry
+  };
+})();
+
+// ============================================================================
+// DIGEST ENGINE
+// ============================================================================
+const DigestEngine = (() => {
+  function normalize(content, role) {
+    if (!content || typeof content !== 'string') {
+      return createEmptyDigest(role);
+    }
+
+    const lines = content.split(/\r?\n/)
+      .map(l => l.trim())
+      .filter(l => l.length > 0);
+
+    const digest = {
+      role,
+      facts: [],
+      claims: [],
+      assumptions: [],
+      criticisms: [],
+      questions: [],
+      risks: [],
+      actions: [],
+      confidence: 0.7,
+      rawLength: content.length
+    };
+
+    for (const line of lines) {
+      const lowerLine = line.toLowerCase();
+      
+      // Inhalt kategorisieren
+      if (line.endsWith('?') || lowerLine.startsWith('frage')) {
+        digest.questions.push(line);
+      } else if (lowerLine.includes('risiko') || lowerLine.includes('gefahr')) {
+        digest.risks.push(line);
+      } else if (lowerLine.includes('kritik') || lowerLine.includes('problem') || lowerLine.includes('nachteil')) {
+        digest.criticisms.push(line);
+      } else if (lowerLine.includes('annahme') || lowerLine.includes('vermutlich') || lowerLine.includes('möglicherweise')) {
+        digest.assumptions.push(line);
+      } else if (lowerLine.includes('empfehlung') || lowerLine.includes('schritt') || lowerLine.includes('vorschlag')) {
+        digest.actions.push(line);
+      } else if (lowerLine.includes('fazit') || lowerLine.includes('schlussfolgerung')) {
+        digest.claims.push(line);
+      } else {
+        digest.facts.push(line);
+      }
+    }
+
+    digest.confidence = calculateConfidence(digest);
+    return digest;
+  }
+
+  function calculateConfidence(digest) {
+    let score = 0.5;
+    if (digest.facts.length > 0) score += 0.1;
+    if (digest.claims.length > 0) score += 0.1;
+    if (digest.actions.length > 0) score += 0.1;
+    if (digest.questions.length > 0) score += 0.05;
+    if (digest.risks.length > 0) score += 0.05;
+    if (digest.rawLength > 500) score += 0.1;
+    if (digest.rawLength > 1000) score += 0.05;
+    return Math.min(score, 1.0);
+  }
+
+  function createEmptyDigest(role) {
+    return {
+      role,
+      facts: [],
+      claims: [],
+      assumptions: [],
+      criticisms: [],
+      questions: [],
+      risks: [],
+      actions: [],
+      confidence: 0,
+      rawLength: 0
+    };
+  }
+
+  function combineDigests(digests, scope = 'shared') {
+    const combined = {
+      scope,
+      facts: [],
+      claims: [],
+      assumptions: [],
+      criticisms: [],
+      questions: [],
+      risks: [],
+      actions: [],
+      conflicts: [],
+      consensus: [],
+      timestamp: Date.now()
+    };
+
+    const factSet = new Map();
+    const claimSet = new Map();
+
+    for (const digest of digests) {
+      for (const fact of digest.facts) {
+        const key = fact.toLowerCase().slice(0, 100);
+        if (!factSet.has(key)) {
+          factSet.set(key, { text: fact, count: 1, roles: [digest.role] });
+        } else {
+          const existing = factSet.get(key);
+          existing.count++;
+          existing.roles.push(digest.role);
+        }
+      }
+
+      for (const claim of digest.claims) {
+        const key = claim.toLowerCase().slice(0, 100);
+        if (!claimSet.has(key)) {
+          claimSet.set(key, { text: claim, count: 1, roles: [digest.role] });
+        } else {
+          const existing = claimSet.get(key);
+          existing.count++;
+          existing.roles.push(digest.role);
+        }
+      }
+
+      combined.assumptions.push(...digest.assumptions);
+      combined.criticisms.push(...digest.criticisms);
+      combined.questions.push(...digest.questions);
+      combined.risks.push(...digest.risks);
+      combined.actions.push(...digest.actions);
+    }
+
+    for (const [key, data] of factSet) {
+      if (data.count >= 2) {
+        combined.consensus.push({ text: data.text, agreementCount: data.count });
+      }
+      combined.facts.push(data.text);
+    }
+
+    for (const [key, data] of claimSet) {
+      if (data.count >= 2) {
+        combined.consensus.push({ text: data.text, agreementCount: data.count });
+      }
+      combined.claims.push(data.text);
+    }
+
+    combined.assumptions = [...new Set(combined.assumptions)].slice(0, 10);
+    combined.criticisms = [...new Set(combined.criticisms)].slice(0, 10);
+    combined.questions = [...new Set(combined.questions)].slice(0, 10);
+    combined.risks = [...new Set(combined.risks)].slice(0, 10);
+    combined.actions = [...new Set(combined.actions)].slice(0, 10);
+
+    return combined;
+  }
+
+  function createContextText(digest, maxLength = CONSTANTS.DIGEST_MAX_LENGTH) {
+    if (!digest) return '';
+
+    const sections = [];
+    
+    if (digest.consensus?.length > 0) {
+      sections.push('KONSENS:\n' + digest.consensus.slice(0, 5).map(c => `- ${c.text}`).join('\n'));
+    }
+    
+    if (digest.facts?.length > 0) {
+      sections.push('FAKTEN:\n' + digest.facts.slice(0, 8).map(f => `- ${f}`).join('\n'));
+    }
+    
+    if (digest.questions?.length > 0) {
+      sections.push('OFFENE FRAGEN:\n' + digest.questions.slice(0, 5).map(q => `- ${q}`).join('\n'));
+    }
+    
+    if (digest.risks?.length > 0) {
+      sections.push('RISIKEN:\n' + digest.risks.slice(0, 5).map(r => `- ${r}`).join('\n'));
+    }
+
+    let text = sections.join('\n\n');
+    
+    if (text.length > maxLength) {
+      text = text.slice(0, maxLength - 3) + '...';
+    }
+
+    return text;
+  }
+
+  return {
+    normalize,
+    combineDigests,
+    createContextText
+  };
+})();
+
+// ============================================================================
+// SUMMARY ENGINE
+// ============================================================================
+const SummaryEngine = (() => {
+  async function createSummary(turns, sharedDigest) {
+    const summary = {
+      overall: '',
+      consensus: '',
+      conflicts: '',
+      openQuestions: '',
+      risks: '',
+      generatedAt: Date.now()
+    };
+
+    if (!turns || turns.length === 0) {
+      summary.overall = 'Keine Ergebnisse verfügbar.';
+      return summary;
+    }
+
+    const digests = turns
+      .filter(t => t.normalizedOutput)
+      .map(t => t.normalizedOutput);
+
+    const combined = DigestEngine.combineDigests(digests, 'final');
+
+    summary.overall = generateOverallSummary(combined, turns);
+    summary.consensus = generateConsensusSection(combined);
+    summary.conflicts = generateConflictsSection(digests);
+    summary.openQuestions = generateQuestionsSection(combined);
+    summary.risks = generateRisksSection(combined);
+
+    return summary;
+  }
+
+  function generateOverallSummary(combined, turns) {
+    const parts = [];
+    
+    parts.push(`## Analyseergebnis\n`);
+    parts.push(`Anzahl Beiträge: ${turns.length}`);
+    
+    if (combined.facts?.length > 0) {
+      parts.push(`\n### Zentrale Fakten`);
+      parts.push(combined.facts.slice(0, 8).map(f => `• ${Utils.truncate(f, 200)}`).join('\n'));
+    }
+    
+    if (combined.claims?.length > 0) {
+      parts.push(`\n### Kernaussagen`);
+      parts.push(combined.claims.slice(0, 5).map(c => `• ${Utils.truncate(c, 200)}`).join('\n'));
+    }
+    
+    if (combined.actions?.length > 0) {
+      parts.push(`\n### Empfohlene Maßnahmen`);
+      parts.push(combined.actions.slice(0, 5).map(a => `• ${Utils.truncate(a, 200)}`).join('\n'));
+    }
+
+    return parts.join('\n');
+  }
+
+  function generateConsensusSection(combined) {
+    if (!combined.consensus || combined.consensus.length === 0) {
+      return 'Kein expliziter Konsens identifiziert.\n\nDie Modelle haben unterschiedliche Aspekte beleuchtet ohne direkte Übereinstimmungen.';
+    }
+
+    const items = combined.consensus
+      .slice(0, 8)
+      .map(c => `• ${Utils.truncate(c.text, 180)} (Bestätigungen: ${c.agreementCount})`)
+      .join('\n');
+
+    return `Folgende Punkte wurden von mehreren Modellen übereinstimmend genannt:\n\n${items}`;
+  }
+
+  function generateConflictsSection(digests) {
+    const conflicts = [];
+    const allCriticisms = digests.flatMap(d => d.criticisms || []);
+    
+    if (allCriticisms.length > 0) {
+      conflicts.push(...allCriticisms.slice(0, 5).map(c => `• ${Utils.truncate(c, 180)}`));
+    }
+
+    if (conflicts.length === 0) {
+      return 'Keine direkten Widersprüche zwischen den Modellantworten identifiziert.';
+    }
+
+    return `Kritische Punkte und potenzielle Konflikte:\n\n${conflicts.join('\n')}`;
+  }
+
+  function generateQuestionsSection(combined) {
+    const parts = [];
+    
+    if (combined.questions?.length > 0) {
+      parts.push('### Offene Fragen');
+      parts.push(combined.questions.slice(0, 8).map(q => `• ${Utils.truncate(q, 180)}`).join('\n'));
+    }
+    
+    if (combined.assumptions?.length > 0) {
+      parts.push('\n### Annahmen (zu verifizieren)');
+      parts.push(combined.assumptions.slice(0, 5).map(a => `• ${Utils.truncate(a, 180)}`).join('\n'));
+    }
+
+    return parts.length > 0 ? parts.join('\n') : 'Keine offenen Fragen identifiziert.';
+  }
+
+  function generateRisksSection(combined) {
+    if (!combined.risks || combined.risks.length === 0) {
+      return 'Keine expliziten Risiken identifiziert.';
+    }
+
+    return combined.risks
+      .slice(0, 8)
+      .map(r => `• ${Utils.truncate(r, 180)}`)
+      .join('\n');
+  }
+
+  return {
+    createSummary
+  };
+})();
+
+// ============================================================================
+// RUN ENGINE
+// ============================================================================
+const RunEngine = (() => {
+  let abortRequested = false;
+
+  async function startRun(userPrompt) {
+    if (!userPrompt || !userPrompt.trim()) {
+      ToastManager.error('Bitte eine Frage oder Problemstellung eingeben.');
+      return;
+    }
+
+    if (!ConfigManager.isConfigured()) {
+      ToastManager.error('Bitte zuerst einen gültigen API-Key hinterlegen.');
+      return;
+    }
+
+    const state = StateMachine.getState();
+    if (state !== CONSTANTS.STATES.IDLE && 
+        state !== CONSTANTS.STATES.DONE && 
+        state !== CONSTANTS.STATES.FAILED &&
+        state !== CONSTANTS.STATES.PARTIAL &&
+        state !== CONSTANTS.STATES.ABORTED) {
+      ToastManager.error('Ein Lauf ist bereits aktiv.');
+      return;
+    }
+
+    abortRequested = false;
+    AppState.totalUsage = { promptTokens: 0, completionTokens: 0, totalTokens: 0, estimatedCost: 0 };
+    AppState.turnResults.clear();
+    AppState.sharedDigest = null;
+    AppState.errorLog = [];
+
+    StateMachine.transitionTo(CONSTANTS.STATES.VALIDATING);
+    
+    SeatManager.resetFreeze();
+    SeatManager.resetStatus();
+    SeatManager.freezeForRun();
+
+    const activeSeats = SeatManager.getActiveSeats();
+    if (activeSeats.length === 0) {
+      ToastManager.error('Kein aktiver Sitz konfiguriert.');
+      StateMachine.transitionTo(CONSTANTS.STATES.FAILED);
+      return;
+    }
+
+    const runId = Utils.generateId('run');
+    const sessionId = Utils.generateId('sess');
+    
+    AppState.currentRun = {
+      runId,
+      sessionId,
+      createdAt: Date.now(),
+      state: CONSTANTS.STATES.VALIDATING,
+      userPrompt: userPrompt.trim(),
+      activeSeats: activeSeats.map(s => s.seatId),
+      roundCount: 2,
+      completionStatus: 'running',
+      startTime: Date.now()
+    };
+
+    await StorageLayer.saveRun(AppState.currentRun);
+    
+    UiController.resetStream();
+    UiController.updateFooterRunInfo();
+    UiController.setControlsRunning(true);
+    UiController.showProgress(true);
+
+    let failedSeats = 0;
+    const totalTurns = activeSeats.length * 2;
+
+    try {
+      StateMachine.transitionTo(CONSTANTS.STATES.ROUND1);
+      UiController.updateProgress(0, totalTurns);
+      
+      let turnIndex = 0;
+      for (const seat of activeSeats) {
+        if (abortRequested) throw new Error('Aborted');
+        
+        const result = await executeTurn(seat, 1, userPrompt, turnIndex++, totalTurns);
+        if (!result.ok) {
+          failedSeats++;
+          logError(seat, 1, result.error);
+        }
+      }
+
+      StateMachine.transitionTo(CONSTANTS.STATES.DIGEST1);
+      await runDigestPhase(1);
+
+      StateMachine.transitionTo(CONSTANTS.STATES.ROUND2);
+      
+      for (const seat of activeSeats) {
+        if (abortRequested) throw new Error('Aborted');
+        
+        const result = await executeTurn(seat, 2, userPrompt, turnIndex++, totalTurns);
+        if (!result.ok) {
+          failedSeats++;
+          logError(seat, 2, result.error);
+        }
+      }
+
+      StateMachine.transitionTo(CONSTANTS.STATES.DIGEST2);
+      await runDigestPhase(2);
+
+      StateMachine.transitionTo(CONSTANTS.STATES.SYNTHESIS);
+      await runSynthesis();
+
+      const finalState = failedSeats === 0 ? CONSTANTS.STATES.DONE :
+                         failedSeats < activeSeats.length ? CONSTANTS.STATES.PARTIAL :
+                         CONSTANTS.STATES.FAILED;
+
+      StateMachine.transitionTo(finalState);
+      
+      await StorageLayer.updateRun(runId, {
+        state: finalState,
+        completionStatus: finalState.toLowerCase(),
+        finishedAt: Date.now(),
+        duration: Date.now() - AppState.currentRun.startTime,
+        totalUsage: AppState.totalUsage,
+        failedSeats
+      });
+
+      if (finalState === CONSTANTS.STATES.DONE) {
+        ToastManager.success('Lauf erfolgreich abgeschlossen!');
+      } else if (finalState === CONSTANTS.STATES.PARTIAL) {
+        ToastManager.warn(`Lauf mit Teilfehlern abgeschlossen (${failedSeats} Sitze fehlerhaft).`);
+      }
+
+    } catch (err) {
+      if (err.message === 'Aborted') {
+        StateMachine.transitionTo(CONSTANTS.STATES.ABORTED);
+        await StorageLayer.updateRun(runId, {
+          state: CONSTANTS.STATES.ABORTED,
+          completionStatus: 'aborted',
+          finishedAt: Date.now()
+        });
+        ToastManager.info('Lauf abgebrochen.');
+      } else {
+        console.error('Run error:', err);
+        StateMachine.transitionTo(CONSTANTS.STATES.FAILED);
+        await StorageLayer.updateRun(runId, {
+          state: CONSTANTS.STATES.FAILED,
+          completionStatus: 'failed',
+          finishedAt: Date.now(),
+          error: err.message
+        });
+        ToastManager.error('Lauf fehlgeschlagen: ' + err.message);
+      }
+    } finally {
+      UiController.setControlsRunning(false);
+      UiController.showProgress(false);
+      SeatManager.resetFreeze();
+      UiController.renderSeats();
+    }
+  }
+
+  async function executeTurn(seat, round, userPrompt, turnIndex, totalTurns) {
+    const run = AppState.currentRun;
+    const turnId = Utils.generateId('turn');
+    
+    SeatManager.setSeatStatus(seat.seatId, 'running');
+    UiController.renderSeats();
+    UiController.appendStreamEntry(seat, round, 'Start...', 'info');
+
+    const messages = buildMessages(seat, round, userPrompt);
+
+    const controller = new AbortController();
+    AppState.streamAbortControllers.set(seat.seatId, controller);
+
+    const timeoutMs = AppState.settings.defaultTimeoutMs;
+    const timeoutId = setTimeout(() => controller.abort(), timeoutMs);
+
+    let streamedContent = '';
+    const startTime = Date.now();
+
+    try {
+      const result = await ApiAdapter.callWithRetry({
+        modelId: seat.modelId,
+        messages,
+        sessionId: run.sessionId,
+        signal: controller.signal,
+        stream: true,
+        onChunk: (chunk) => {
+          streamedContent += chunk;
+          UiController.handleStreamChunk(seat.seatId, chunk);
+        }
+      });
+
+      clearTimeout(timeoutId);
+
+      if (!result.ok) {
+        // Fallback versuchen
+        const fallbackModel = ModelRegistry.getFallback(seat.modelId);
+        if (fallbackModel && fallbackModel.id !== seat.modelId) {
+          UiController.appendStreamEntry(seat, round, 'Fallback-Modell wird versucht...', 'warn');
+          
+          const fallbackController = new AbortController();
+          AppState.streamAbortControllers.set(seat.seatId, fallbackController);
+          
+          const fallbackTimeoutId = setTimeout(() => fallbackController.abort(), timeoutMs);
+          
+          const fallbackResult = await ApiAdapter.callWithRetry({
+            modelId: fallbackModel.id,
+            messages,
+            sessionId: run.sessionId,
+            signal: fallbackController.signal,
+            stream: true,
+            onChunk: (chunk) => {
+              streamedContent += chunk;
+              UiController.handleStreamChunk(seat.seatId, chunk);
+            }
+          });
+          
+          clearTimeout(fallbackTimeoutId);
+          
+          if (fallbackResult.ok) {
+            seat.status = 'fallback';
+            seat.fallbackUsed = true;
+            return await finalizeTurn(seat, round, turnId, fallbackResult, startTime, true);
+          }
+        }
+
+        SeatManager.setSeatStatus(seat.seatId, 'error', result.error);
+        UiController.appendStreamEntry(seat, round, `Fehler: ${result.error.userMessage}`, 'error');
+        
+        await StorageLayer.saveTurn({
+          turnId,
+          runId: run.runId,
+          round,
+          seatId: seat.seatId,
+          modelId: seat.modelId,
+          inputMessages: messages,
+          finalRawOutput: '',
+          normalizedOutput: null,
+          usage: null,
+          latencyMs: Date.now() - startTime,
+          error: result.error,
+          finishedAt: Date.now()
+        });
+
+        return result;
+      }
+
+      return await finalizeTurn(seat, round, turnId, result, startTime, false);
+
+    } catch (err) {
+      clearTimeout(timeoutId);
+      
+      const error = {
+        class: 'unexpected',
+        code: 'UNEXPECTED_ERROR',
+        userMessage: err.message || 'Unerwarteter Fehler',
+        timestamp: Date.now()
+      };
+
+      SeatManager.setSeatStatus(seat.seatId, 'error', error);
+      UiController.appendStreamEntry(seat, round, `Fehler: ${error.userMessage}`, 'error');
+
+      return { ok: false, error };
+    } finally {
+      AppState.streamAbortControllers.delete(seat.seatId);
+      UiController.updateProgress(turnIndex + 1, totalTurns);
+    }
+  }
+
+  async function finalizeTurn(seat, round, turnId, result, startTime, isFallback) {
+    const run = AppState.currentRun;
+    const content = result.content || '';
+    const usage = result.usage || { prompt_tokens: 0, completion_tokens: 0, total_tokens: 0 };
+
+    const digest = DigestEngine.normalize(content, seat.role);
+    
+    const cost = ModelRegistry.estimateCost(
+      isFallback ? ModelRegistry.getFallback(seat.modelId).id : seat.modelId,
+      usage.prompt_tokens,
+      usage.completion_tokens
+    );
+
+    AppState.totalUsage.promptTokens += usage.prompt_tokens;
+    AppState.totalUsage.completionTokens += usage.completion_tokens;
+    AppState.totalUsage.totalTokens += usage.total_tokens;
+    AppState.totalUsage.estimatedCost += cost;
+
+    seat.usage = {
+      promptTokens: usage.prompt_tokens,
+      completionTokens: usage.completion_tokens
+    };
+
+    const turnObj = {
+      turnId,
+      runId: run.runId,
+      round,
+      seatId: seat.seatId,
+      modelId: isFallback ? ModelRegistry.getFallback(seat.modelId).id : seat.modelId,
+      inputMessages: null,
+      finalRawOutput: content,
+      normalizedOutput: digest,
+      usage: {
+        promptTokens: usage.prompt_tokens,
+        completionTokens: usage.completion_tokens,
+        totalTokens: usage.total_tokens,
+        estimatedCost: cost
+      },
+      latencyMs: result.latencyMs || (Date.now() - startTime),
+      fallbackUsed: isFallback,
+      finishedAt: Date.now()
+    };
+
+    await StorageLayer.saveTurn(turnObj);
+    
+    AppState.turnResults.set(`${seat.seatId}-${round}`, turnObj);
+
+    seat.lastSummary = Utils.truncate(content, 200);
+    SeatManager.setSeatStatus(seat.seatId, isFallback ? 'fallback' : 'done');
+    
+    UiController.updateSeatLastSummary(seat.seatId, seat.lastSummary);
+    UiController.renderSeats();
+    UiController.appendStreamEntry(seat, round, 'Fertig', 'success');
+    UiController.updateFooterUsage();
+
+    return { ok: true, turn: turnObj };
+  }
+
+  function buildMessages(seat, round, userPrompt) {
+    const role = CONSTANTS.ROLES.find(r => r.id === seat.role);
+    
+    const systemPrompt = [
+      `Du bist Teil eines KI-Stammtisches mit mehreren Modellen.`,
+      `Deine Rolle: ${role?.label || seat.role} - ${role?.description || ''}`,
+      ``,
+      `Regeln:`,
+      `- Bleibe in deiner Rolle und antworte aus dieser Perspektive`,
+      `- Strukturiere deine Antwort klar`,
+      `- Trenne Fakten von Annahmen`,
+      `- Nenne Risiken und offene Fragen`,
+      `- Sei prägnant aber gründlich`,
+      ``,
+      `Strukturiere deine Antwort mit folgenden Abschnitten:`,
+      `1. Analyse / Fakten`,
+      `2. Schlussfolgerungen`,
+      `3. Empfehlungen / Maßnahmen`,
+      `4. Risiken`,
+      `5. Offene Fragen`
+    ].join('\n');
+
+    const messages = [
+      { role: 'system', content: systemPrompt }
+    ];
+
+    if (round === 1) {
+      messages.push({
+        role: 'user',
+        content: `Bitte analysiere folgende Frage aus deiner Perspektive als ${role?.label || seat.role}:\n\n${userPrompt}`
+      });
+    }
+    
+    if (round === 2 && AppState.sharedDigest) {
+      const digestContext = DigestEngine.createContextText(AppState.sharedDigest);
+      
+      messages.push({
+        role: 'user',
+        content: `Die erste Diskussionsrunde hat folgende Erkenntnisse gebracht:\n\n${digestContext}\n\n` +
+                 `Bitte vertiefe deine Analyse als ${role?.label || seat.role} basierend auf diesen Erkenntnissen.\n\n` +
+                 `Originale Frage: ${userPrompt}`
+      });
+    } else if (round === 2) {
+      messages.push({
+        role: 'user',
+        content: `Bitte ergänze deine Analyse aus Runde 1:\n\n${userPrompt}`
+      });
+    }
+
+    return messages;
+  }
+
+  async function runDigestPhase(round) {
+    const turns = Array.from(AppState.turnResults.values())
+      .filter(t => t.round === round);
+
+    if (turns.length === 0) return;
+
+    const digests = turns
+      .filter(t => t.normalizedOutput)
+      .map(t => t.normalizedOutput);
+
+    const combined = DigestEngine.combineDigests(digests, `round${round}`);
+    
+    AppState.sharedDigest = combined;
+
+    await StorageLayer.saveDigest({
+      digestId: Utils.generateId('digest'),
+      runId: AppState.currentRun.runId,
+      scope: `round${round}`,
+      ...combined,
+      createdAt: Date.now()
+    });
+
+    UiController.appendStreamEntry(null, round, `Digest erstellt (${digests.length} Beiträge)`, 'info');
+  }
+
+  async function runSynthesis() {
+    const allTurns = Array.from(AppState.turnResults.values());
+    
+    const summary = await SummaryEngine.createSummary(allTurns, AppState.sharedDigest);
+    
+    UiController.updateSummary(summary);
+
+    await StorageLayer.saveDigest({
+      digestId: Utils.generateId('digest'),
+      runId: AppState.currentRun.runId,
+      scope: 'final',
+      summary,
+      sharedDigest: AppState.sharedDigest,
+      createdAt: Date.now()
+    });
+
+    UiController.appendStreamEntry(null, null, 'Synthese abgeschlossen', 'success');
+  }
+
+  function logError(seat, round, error) {
+    AppState.errorLog.push({
+      seatId: seat.seatId,
+      seatName: seat.seatName,
+      round,
+      error,
+      timestamp: Date.now()
+    });
+    UiController.updateDebug();
+  }
+
+  async function abortRun() {
+    if (StateMachine.getState() === CONSTANTS.STATES.IDLE) return;
+    
+    abortRequested = true;
+
+    AppState.streamAbortControllers.forEach(controller => {
+      try {
+        controller.abort();
+      } catch {}
+    });
+    AppState.streamAbortControllers.clear();
+
+    StateMachine.transitionTo(CONSTANTS.STATES.ABORTED);
+    
+    if (AppState.currentRun) {
+      await StorageLayer.updateRun(AppState.currentRun.runId, {
+        state: CONSTANTS.STATES.ABORTED,
+        completionStatus: 'aborted',
+        finishedAt: Date.now()
+      });
+    }
+
+    UiController.setControlsRunning(false);
+    SeatManager.resetFreeze();
+    UiController.renderSeats();
+  }
+
+  return {
+    startRun,
+    abortRun
+  };
+})();
+
+// ============================================================================
+// UI CONTROLLER
+// ============================================================================
+const UiController = (() => {
+  const elements = {};
+
+  function cacheElements() {
+    elements.seatsGrid = document.getElementById('seatsGrid');
+    elements.streamLog = document.getElementById('streamLog');
+    elements.runStateLabel = document.getElementById('runStateLabel');
+    elements.runStateDot = document.getElementById('runStateDot');
+    elements.roundPhaseLabel = document.getElementById('roundPhaseLabel');
+    elements.progressBar = document.getElementById('progressBar');
+    elements.progressFill = document.getElementById('progressFill');
+    elements.summaryOverall = document.getElementById('summaryOverall');
+    elements.summaryConsensus = document.getElementById('summaryConsensus');
+    elements.summaryConflicts = document.getElementById('summaryConflicts');
+    elements.summaryOpenQuestions = document.getElementById('summaryOpenQuestions');
+    elements.debugContextView = document.getElementById('debugContextView');
+    elements.debugStateView = document.getElementById('debugStateView');
+    elements.debugErrorView = document.getElementById('debugErrorView');
+    elements.footerRunInfo = document.getElementById('footerRunInfo');
+    elements.footerTokens = document.getElementById('footerTokens');
+    elements.footerCost = document.getElementById('footerCost');
+    elements.footerDuration = document.getElementById('footerDuration');
+    elements.startRunBtn = document.getElementById('startRunBtn');
+    elements.abortRunBtn = document.getElementById('abortRunBtn');
+    elements.userPrompt = document.getElementById('userPrompt');
+    elements.synthesisModel = document.getElementById('synthesisModel');
+  }
+
+  function init() {
+    cacheElements();
+    renderSeats();
+    bindTabs();
+    bindControls();
+    fillSettings();
+    populateSynthesisModelSelect();
+    updateStateIndicators();
+    setupOnlineOfflineHandler();
+    
+    updateSummary({
+      overall: 'Noch keine Ergebnisse.',
+      consensus: '–',
+      conflicts: '–',
+      openQuestions: '–'
+    });
+  }
+
+  function renderSeats() {
+    if (!elements.seatsGrid) return;
+    
+    elements.seatsGrid.innerHTML = '';
+    const allModels = ModelRegistry.getAll();
+    const isRunning = ![CONSTANTS.STATES.IDLE, CONSTANTS.STATES.DONE, CONSTANTS.STATES.FAILED, 
+                       CONSTANTS.STATES.PARTIAL, CONSTANTS.STATES.ABORTED].includes(StateMachine.getState());
+
+    AppState.seats.forEach(seat => {
+      const card = document.createElement('div');
+      card.className = 'seat-card';
+      card.dataset.seatId = seat.seatId;
+      
+      if (seat.status === 'running') card.classList.add('running');
+      if (seat.status === 'error') card.classList.add('error');
+      if (seat.status === 'done' || seat.status === 'fallback') card.classList.add('done');
+
+      const header = document.createElement('div');
+      header.className = 'seat-header';
+      
+      const title = document.createElement('div');
+      title.className = 'seat-title';
+      title.textContent = seat.seatName;
+      
+      const status = document.createElement('div');
+      status.className = 'seat-status';
+      status.id = `seatStatus_${seat.seatId}`;
+      
+      const statusText = {
+        idle: 'Bereit',
+        running: 'Läuft...',
+        done: 'Fertig',
+        error: 'Fehler',
+        fallback: 'Fallback'
+      };
+      status.textContent = statusText[seat.status] || 'Bereit';
+      
+      if (seat.status === 'running') status.classList.add('running');
+      if (seat.status === 'error') status.classList.add('error');
+      if (seat.status === 'done') status.classList.add('done');
+      if (seat.status === 'fallback') status.classList.add('fallback');
+      
+      header.appendChild(title);
+      header.appendChild(status);
+
+      const enableRow = document.createElement('div');
+      enableRow.className = 'seat-enable-toggle';
+      
+      const enableCheckbox = document.createElement('input');
+      enableCheckbox.type = 'checkbox';
+      enableCheckbox.id = `seatEnable_${seat.seatId}`;
+      enableCheckbox.checked = seat.enabled;
+      enableCheckbox.disabled = isRunning;
+      enableCheckbox.addEventListener('change', () => {
+        SeatManager.updateSeat(seat.seatId, { enabled: enableCheckbox.checked });
+      });
+      
+      const enableLabel = document.createElement('label');
+      enableLabel.htmlFor = `seatEnable_${seat.seatId}`;
+      enableLabel.textContent = 'Aktiv';
+      
+      enableRow.appendChild(enableCheckbox);
+      enableRow.appendChild(enableLabel);
+
+      const cfgRow = document.createElement('div');
+      cfgRow.className = 'seat-config-row';
+
+      const modelSelect = document.createElement('select');
+      modelSelect.className = 'seat-model';
+      modelSelect.id = `seatModel_${seat.seatId}`;
+      modelSelect.disabled = isRunning;
+      
+      allModels.forEach(m => {
+        const opt = document.createElement('option');
+        opt.value = m.id;
+        opt.textContent = m.label;
+        if (m.id === seat.modelId) opt.selected = true;
+        modelSelect.appendChild(opt);
+      });
+      
+      modelSelect.addEventListener('change', () => {
+        SeatManager.updateSeat(seat.seatId, { modelId: modelSelect.value });
+      });
+
+      const roleSelect = document.createElement('select');
+      roleSelect.className = 'seat-role';
+      roleSelect.id = `seatRole_${seat.seatId}`;
+      roleSelect.disabled = isRunning;
+      
+      CONSTANTS.ROLES.forEach(r => {
+        const opt = document.createElement('option');
+        opt.value = r.id;
+        opt.textContent = r.label;
+        if (r.id === seat.role) opt.selected = true;
+        roleSelect.appendChild(opt);
+      });
+      
+      roleSelect.addEventListener('change', () => {
+        const newRole = CONSTANTS.ROLES.find(r => r.id === roleSelect.value);
+        SeatManager.updateSeat(seat.seatId, { 
+          role: roleSelect.value,
+          roleLabel: newRole?.label,
+          seatName: `${newRole?.label} ${String.fromCharCode(64 + seat.seatId)}`
+        });
+      });
+
+      cfgRow.appendChild(modelSelect);
+      cfgRow.appendChild(roleSelect);
+
+      const lastDiv = document.createElement('div');
+      lastDiv.className = 'seat-last';
+      lastDiv.id = `seatLast_${seat.seatId}`;
+      lastDiv.textContent = seat.lastSummary || 'Noch keine Antwort.';
+
+      card.appendChild(header);
+      card.appendChild(enableRow);
+      card.appendChild(cfgRow);
+      card.appendChild(lastDiv);
+      
+      elements.seatsGrid.appendChild(card);
+    });
+  }
+
+  function bindTabs() {
+    const tabButtons = document.querySelectorAll('.tab-btn');
+    
+    tabButtons.forEach(btn => {
+      btn.addEventListener('click', () => {
+        const tab = btn.dataset.tab;
+        
+        tabButtons.forEach(b => b.classList.toggle('active', b === btn));
+        
+        document.querySelectorAll('.panel-section').forEach(sec => {
+          sec.classList.toggle('active', sec.id === `tab-${tab}`);
+        });
+      });
+    });
+  }
+
+  function bindControls() {
+    elements.startRunBtn.addEventListener('click', () => {
+      const userPrompt = elements.userPrompt.value;
+      RunEngine.startRun(userPrompt);
+    });
+
+    elements.abortRunBtn.addEventListener('click', () => {
+      RunEngine.abortRun();
+    });
+
+    document.getElementById('saveSettingsBtn').addEventListener('click', () => {
+      const apiKey = document.getElementById('apiKeyInput').value;
+      const timeout = parseInt(document.getElementById('defaultTimeoutMs').value, 10) || 60000;
+      const maxRetries = parseInt(document.getElementById('maxRetries').value, 10) || 2;
+      const tokenBudget = parseInt(document.getElementById('tokenBudget').value, 10) || 0;
+      const costBudget = parseFloat(document.getElementById('costBudget').value) || 0;
+      const debugMode = document.getElementById('debugModeToggle').checked;
+      const autoScroll = document.getElementById('autoScrollToggle').checked;
+      const synthesisModelId = elements.synthesisModel.value;
+
+      ConfigManager.setApiKey(apiKey);
+      AppState.settings.defaultTimeoutMs = Utils.clamp(timeout, 5000, 300000);
+      AppState.settings.maxRetries = Utils.clamp(maxRetries, 0, 5);
+      AppState.settings.tokenBudget = tokenBudget;
+      AppState.settings.costBudget = costBudget;
+      AppState.settings.debugMode = debugMode;
+      AppState.settings.autoScroll = autoScroll;
+      AppState.settings.synthesisModelId = synthesisModelId;
+      
+      ConfigManager.save();
+      updateDebug();
+      
+      ToastManager.success('Einstellungen gespeichert.');
+    });
+
+    document.getElementById('clearDataBtn').addEventListener('click', async () => {
+      if (!confirm('Alle gespeicherten Läufe wirklich löschen?')) return;
+      
+      try {
+        await StorageLayer.clearAllData();
+        ToastManager.success('Alle Daten gelöscht.');
+      } catch (err) {
+        ToastManager.error('Löschen fehlgeschlagen: ' + err.message);
+      }
+    });
+
+    document.getElementById('exportJsonBtn').addEventListener('click', async () => {
+      if (!AppState.currentRun) {
+        ToastManager.error('Kein Lauf zum Exportieren vorhanden.');
+        return;
+      }
+
+      const runId = AppState.currentRun.runId;
+      const turns = await StorageLayer.getTurnsForRun(runId);
+      const digests = await StorageLayer.getDigestsForRun(runId);
+
+      const payload = {
+        run: {
+          ...AppState.currentRun,
+          apiKey: undefined
+        },
+        turns,
+        digests,
+        exportedAt: new Date().toISOString()
+      };
+
+      const blob = new Blob([JSON.stringify(payload, null, 2)], { type: 'application/json' });
+      downloadBlob(blob, `ki-stammtisch-${runId}.json`);
+    });
+
+    document.getElementById('exportMdBtn').addEventListener('click', async () => {
+      if (!AppState.currentRun) {
+        ToastManager.error('Kein Lauf zum Exportieren vorhanden.');
+        return;
+      }
+
+      const turns = await StorageLayer.getTurnsForRun(AppState.currentRun.runId);
+      
+      let md = `# KI-Stammtisch Export\n\n`;
+      md += `**Lauf-ID:** ${AppState.currentRun.runId}\n`;
+      md += `**Erstellt:** ${new Date(AppState.currentRun.createdAt).toLocaleString('de-DE')}\n`;
+      md += `**Frage:** ${AppState.currentRun.userPrompt}\n\n---\n\n`;
+
+      turns.forEach(turn => {
+        const seat = SeatManager.getSeat(turn.seatId);
+        md += `## ${seat?.seatName || 'Sitz ' + turn.seatId} (Runde ${turn.round})\n\n`;
+        md += `**Modell:** ${turn.modelId}\n`;
+        md += `**Status:** ${turn.error ? 'Fehler' : 'OK'}\n\n`;
+        
+        if (turn.finalRawOutput) {
+          md += turn.finalRawOutput + '\n\n';
+        }
+        if (turn.error) {
+          md += `**Fehler:** ${turn.error.userMessage}\n\n`;
+        }
+        md += '---\n\n';
+      });
+
+      const blob = new Blob([md], { type: 'text/markdown' });
+      downloadBlob(blob, `ki-stammtisch-${AppState.currentRun.runId}.md`);
+    });
+  }
+
+  function downloadBlob(blob, filename) {
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = filename;
+    a.click();
+    URL.revokeObjectURL(url);
+  }
+
+  function fillSettings() {
+    document.getElementById('apiKeyInput').value = AppState.settings.apiKey || '';
+    document.getElementById('defaultTimeoutMs').value = AppState.settings.defaultTimeoutMs || 60000;
+    document.getElementById('maxRetries').value = AppState.settings.maxRetries || 2;
+    document.getElementById('tokenBudget').value = AppState.settings.tokenBudget || 0;
+    document.getElementById('costBudget').value = AppState.settings.costBudget || 0;
+    document.getElementById('debugModeToggle').checked = !!AppState.settings.debugMode;
+    document.getElementById('autoScrollToggle').checked = AppState.settings.autoScroll !== false;
+  }
+
+  function populateSynthesisModelSelect() {
+    const models = ModelRegistry.getAll();
+    models.forEach(m => {
+      const opt = document.createElement('option');
+      opt.value = m.id;
+      opt.textContent = m.label;
+      elements.synthesisModel.appendChild(opt);
+    });
+    
+    if (AppState.settings.synthesisModelId) {
+      elements.synthesisModel.value = AppState.settings.synthesisModelId;
+    }
+  }
+
+  function updateStateIndicators() {
+    const state = StateMachine.getState();
+    
+    elements.runStateLabel.textContent = state;
+    
+    elements.runStateDot.className = 'badge-dot';
+    
+    const stateClassMap = {
+      [CONSTANTS.STATES.IDLE]: 'state-idle',
+      [CONSTANTS.STATES.VALIDATING]: 'state-validating',
+      [CONSTANTS.STATES.ROUND1]: 'state-running',
+      [CONSTANTS.STATES.ROUND2]: 'state-running',
+      [CONSTANTS.STATES.DIGEST1]: 'state-digest',
+      [CONSTANTS.STATES.DIGEST2]: 'state-digest',
+      [CONSTANTS.STATES.SYNTHESIS]: 'state-synthesis',
+      [CONSTANTS.STATES.DONE]: 'state-done',
+      [CONSTANTS.STATES.PARTIAL]: 'state-partial',
+      [CONSTANTS.STATES.FAILED]: 'state-failed',
+      [CONSTANTS.STATES.ABORTED]: 'state-aborted'
+    };
+    
+    elements.runStateDot.classList.add(stateClassMap[state] || 'state-idle');
+
+    const phaseMap = {
+      [CONSTANTS.STATES.ROUND1]: 'Runde 1',
+      [CONSTANTS.STATES.DIGEST1]: 'Digest 1',
+      [CONSTANTS.STATES.ROUND2]: 'Runde 2',
+      [CONSTANTS.STATES.DIGEST2]: 'Digest 2',
+      [CONSTANTS.STATES.SYNTHESIS]: 'Synthese'
+    };
+    
+    elements.roundPhaseLabel.textContent = phaseMap[state] || '–';
+  }
+
+  function setControlsRunning(running) {
+    elements.startRunBtn.disabled = running;
+    elements.abortRunBtn.disabled = !running;
+    elements.userPrompt.disabled = running;
+    
+    document.querySelectorAll('.seat-model, .seat-role, .seat-enable-toggle input').forEach(el => {
+      el.disabled = running;
+    });
+  }
+
+  function showProgress(show) {
+    elements.progressBar.style.display = show ? 'block' : 'none';
+  }
+
+  function updateProgress(current, total) {
+    const percent = Math.round((current / total) * 100);
+    elements.progressFill.style.width = `${percent}%`;
+  }
+
+  function resetStream() {
+    elements.streamLog.innerHTML = '';
+  }
+
+  function appendStreamEntry(seat, round, text, type = 'info') {
+    const entry = document.createElement('div');
+    entry.className = 'stream-entry';
+    
+    const meta = document.createElement('div');
+    meta.className = 'stream-meta';
+    
+    if (seat) {
+      const tag = document.createElement('span');
+      tag.className = 'tag';
+      tag.textContent = seat.seatName;
+      meta.appendChild(tag);
+      
+      if (round) {
+        const roundTag = document.createElement('span');
+        roundTag.className = 'tag';
+        roundTag.textContent = `R${round}`;
+        meta.appendChild(roundTag);
+      }
+    } else {
+      const tag = document.createElement('span');
+      tag.className = 'tag';
+      tag.textContent = 'System';
+      meta.appendChild(tag);
+    }
+    
+    if (type === 'error') {
+      const errorTag = document.createElement('span');
+      errorTag.className = 'tag error';
+      errorTag.textContent = 'Fehler';
+      meta.appendChild(errorTag);
+    } else if (type === 'success') {
+      const successTag = document.createElement('span');
+      successTag.className = 'tag success';
+      successTag.textContent = 'OK';
+      meta.appendChild(successTag);
+    }
+    
+    const textEl = document.createElement('div');
+    textEl.className = 'stream-text';
+    textEl.textContent = text;
+    
+    entry.appendChild(meta);
+    entry.appendChild(textEl);
+    
+    elements.streamLog.appendChild(entry);
+    
+    if (AppState.settings.autoScroll !== false) {
+      elements.streamLog.scrollTop = elements.streamLog.scrollHeight;
+    }
+  }
+
+  function handleStreamChunk(seatId, chunk) {
+    // Optional: Chunk direkt anzeigen
+  }
+
+  function updateSeatLastSummary(seatId, text) {
+    const el = document.getElementById(`seatLast_${seatId}`);
+    if (el) {
+      el.textContent = text || 'Noch keine Antwort.';
+    }
+  }
+
+  function updateSummary(summary) {
+    elements.summaryOverall.textContent = summary.overall || '–';
+    elements.summaryConsensus.textContent = summary.consensus || '–';
+    elements.summaryConflicts.textContent = summary.conflicts || '–';
+    elements.summaryOpenQuestions.textContent = summary.openQuestions || '–';
+  }
+
+  function updateFooterRunInfo() {
+    if (!AppState.currentRun) {
+      elements.footerRunInfo.textContent = 'Kein aktiver Lauf.';
+      return;
+    }
+    
+    elements.footerRunInfo.textContent = 
+      `Run: ${AppState.currentRun.runId.slice(0, 12)}... · ` +
+      `${AppState.currentRun.activeSeats.length} Sitze`;
+  }
+
+  function updateFooterUsage() {
+    elements.footerTokens.textContent = Utils.formatTokens(AppState.totalUsage.totalTokens);
+    elements.footerCost.textContent = Utils.formatCost(AppState.totalUsage.estimatedCost);
+    
+    if (AppState.currentRun?.startTime) {
+      const duration = Date.now() - AppState.currentRun.startTime;
+      elements.footerDuration.textContent = Utils.formatDuration(duration);
+    }
+  }
+
+  function updateDebug() {
+    if (!AppState.settings.debugMode) {
+      elements.debugContextView.textContent = 'Debug-Modus deaktiviert.';
+      elements.debugStateView.textContent = '–';
+      elements.debugErrorView.textContent = '–';
+      return;
+    }
+
+    elements.debugContextView.textContent = JSON.stringify({
+      state: AppState.currentState,
+      runId: AppState.currentRun?.runId,
+      activeSeats: AppState.currentRun?.activeSeats,
+      sharedDigest: AppState.sharedDigest ? 'present' : 'none'
+    }, null, 2);
+
+    elements.debugStateView.textContent = JSON.stringify({
+      currentState: AppState.currentState,
+      seats: AppState.seats.map(s => ({
+        seatId: s.seatId,
+        role: s.role,
+        modelId: s.modelId,
+        status: s.status,
+        enabled: s.enabled
+      }))
+    }, null, 2);
+
+    if (AppState.errorLog.length > 0) {
+      elements.debugErrorView.textContent = AppState.errorLog.map(e => 
+        `[${new Date(e.timestamp).toISOString()}] ${e.seatName} R${e.round}: ${e.error?.userMessage || e.error}`
+      ).join('\n');
+    } else {
+      elements.debugErrorView.textContent = 'Keine Fehler.';
+    }
+  }
+
+  function setupOnlineOfflineHandler() {
+    const indicator = document.getElementById('offlineIndicator');
+    
+    window.addEventListener('online', () => {
+      AppState.isOnline = true;
+      indicator.classList.remove('visible');
+      ToastManager.success('Verbindung wiederhergestellt.');
+    });
+    
+    window.addEventListener('offline', () => {
+      AppState.isOnline = false;
+      indicator.classList.add('visible');
+      ToastManager.warn('Offline-Modus aktiv.');
+    });
+    
+    if (!navigator.onLine) {
+      indicator.classList.add('visible');
+    }
+  }
+
+  return {
+    init,
+    renderSeats,
+    updateStateIndicators,
+    resetStream,
+    appendStreamEntry,
+    handleStreamChunk,
+    updateSeatLastSummary,
+    updateSummary,
+    updateDebug,
+    setControlsRunning,
+    showProgress,
+    updateProgress,
+    updateFooterRunInfo,
+    updateFooterUsage
+  };
+})();
+
+// ============================================================================
+// TOAST MANAGER
+// ============================================================================
+const ToastManager = (() => {
+  function show(message, type = 'info', duration = 4000) {
+    const container = document.getElementById('toastContainer');
+    
+    const toast = document.createElement('div');
+    toast.className = `toast ${type}`;
+    toast.textContent = message;
+    
+    container.appendChild(toast);
+    
+    setTimeout(() => {
+      toast.style.animation = 'slideIn 0.3s ease reverse';
+      setTimeout(() => toast.remove(), 300);
+    }, duration);
+  }
+
+  function success(message) { show(message, 'success'); }
+  function error(message) { show(message, 'error', 6000); }
+  function warn(message) { show(message, 'warn'); }
+  function info(message) { show(message, 'info'); }
+
+  return { show, success, error, warn, info };
+})();
+
+// ============================================================================
+// SERVICE WORKER REGISTRATION
+// ============================================================================
+async function registerServiceWorker() {
+  if ('serviceWorker' in navigator) {
+    try {
+      const registration = await navigator.serviceWorker.register('sw.js');
+      console.log('Service Worker registered:', registration.scope);
+    } catch (err) {
+      console.warn('Service Worker registration failed:', err);
+    }
+  }
+}
+
+// ============================================================================
+// INITIALIZATION
+// ============================================================================
+window.addEventListener('load', async () => {
+  ConfigManager.load();
+  SeatManager.initDefaultSeats();
+  
+  try {
+    await StorageLayer.initDb();
+  } catch (err) {
+    console.error('IndexedDB init failed:', err);
+    ToastManager.error('Lokale Datenbank konnte nicht initialisiert werden.');
+  }
+  
+  UiController.init();
+  registerServiceWorker();
+});
   </script>
 </body>
 </html>
