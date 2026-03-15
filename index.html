@@ -4,7 +4,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
   <title>KI‑Stammtisch Pro</title>
-  <meta name="description" content="Moderierte KI-Diskussionen mit bis zu 5 LLM-Modellen.">
+  <meta name="description" content="Moderierte KI-Diskussionen mit bis zu 5 LLM-Modellen – vollständig offline-fähige PWA.">
   <meta name="theme-color" content="#080d0b">
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
@@ -17,7 +17,7 @@
   --bg:#080d0b;--s1:#101a16;--s2:#182820;--s3:#1e3229;
   --p:#0fbe84;--pg:rgba(15,190,132,.2);--pd:rgba(15,190,132,.08);
   --b:#1f3c32;--txt:#f0f5f1;--mu:#7a9e8c;--mu2:#4a6e5c;
-  --warn:#f0b429;--err:#f04545;
+  --warn:#f0b429;--err:#f04545;--info:#5ba3f5;
   --r1:.3rem;--r2:.5rem;--r3:.875rem;--r4:1.25rem;
   --font:'Inter',system-ui,sans-serif;
   --hh:3rem;--bn:3.5rem;
@@ -27,8 +27,16 @@
 html{height:100%;-webkit-text-size-adjust:100%}
 body{margin:0;height:100%;background:var(--bg);color:var(--txt);font-family:var(--font);line-height:1.5;overscroll-behavior:none;overflow:hidden}
 #app{display:flex;flex-direction:column;height:100dvh;max-width:1500px;margin:0 auto;overflow:hidden}
+/* PWA INSTALL BANNER */
+#pwaBanner{display:none;flex-shrink:0;background:linear-gradient(135deg,#0f1f19,#162b22);border-bottom:1px solid var(--b);padding:.55rem 1rem;align-items:center;gap:.75rem;z-index:60;animation:slideDown .3s ease}
+#pwaBanner.show{display:flex}
+@keyframes slideDown{from{opacity:0;transform:translateY(-100%)}to{opacity:1;transform:none}}
+.pwa-ico{width:2rem;height:2rem;border-radius:.5rem;background:linear-gradient(135deg,var(--p),#0a9966);display:flex;align-items:center;justify-content:center;font-size:.65rem;font-weight:900;color:#000;flex-shrink:0}
+.pwa-text{flex:1;min-width:0}
+.pwa-title{font-size:.72rem;font-weight:700;color:var(--txt)}
+.pwa-sub{font-size:.58rem;color:var(--mu)}
 /* HEADER */
-.hdr{flex-shrink:0;height:var(--hh);display:flex;align-items:center;justify-content:space-between;padding:0 1rem;border-bottom:1px solid var(--b);background:rgba(8,13,11,.97);backdrop-filter:blur(14px);z-index:50}
+.hdr{flex-shrink:0;height:var(--hh);display:flex;align-items:center;justify-content:space-between;padding:0 1rem;border-bottom:1px solid var(--b);background:rgba(8,13,11,.97);backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px);z-index:50}
 .logo{display:flex;align-items:center;gap:.45rem;font-size:.875rem;font-weight:800;color:var(--txt);letter-spacing:-.02em;white-space:nowrap;user-select:none}
 .logo-mark{width:1.5rem;height:1.5rem;border-radius:.375rem;background:linear-gradient(135deg,var(--p),#0a9966);display:flex;align-items:center;justify-content:center;font-size:.55rem;font-weight:900;color:#000;flex-shrink:0}
 .desk-nav{display:none;align-items:center;gap:.15rem}
@@ -41,7 +49,7 @@ body{margin:0;height:100%;background:var(--bg);color:var(--txt);font-family:var(
 .view.active{display:flex}
 @keyframes fadeIn{from{opacity:0;transform:translateY(3px)}to{opacity:1;transform:none}}
 /* BOTTOM NAV */
-.bnav{flex-shrink:0;display:flex;background:rgba(8,13,11,.97);border-top:1px solid var(--b);backdrop-filter:blur(14px);padding-bottom:var(--sb);z-index:50}
+.bnav{flex-shrink:0;display:flex;background:rgba(8,13,11,.97);border-top:1px solid var(--b);backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px);padding-bottom:var(--sb);z-index:50}
 .bn{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:.18rem;background:transparent;border:none;color:var(--mu2);font-family:var(--font);font-size:.42rem;font-weight:700;cursor:pointer;padding:.6rem 0;transition:color .15s;text-transform:uppercase;letter-spacing:.06em;-webkit-tap-highlight-color:transparent}
 .bn svg{width:1.1rem;height:1.1rem;stroke:currentColor;fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
 .bn.active{color:var(--p)}
@@ -64,6 +72,16 @@ body{margin:0;height:100%;background:var(--bg);color:var(--txt);font-family:var(
 .sc-model{font-size:.52rem;color:var(--mu);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 .sc-dot{position:absolute;top:.45rem;right:.45rem;width:.33rem;height:.33rem;border-radius:50%;background:var(--b)}
 .scard.running .sc-dot{background:var(--p);box-shadow:0 0 4px var(--p)}
+/* FILE UPLOAD ZONE */
+.upload-zone{display:flex;gap:.4rem;flex-wrap:wrap;margin-bottom:.4rem}
+.upload-btn{display:inline-flex;align-items:center;gap:.2rem;background:var(--s2);border:1px dashed var(--b);color:var(--mu);padding:.25rem .55rem;border-radius:var(--r1);font-family:var(--font);font-size:.58rem;font-weight:600;cursor:pointer;transition:all .15s;-webkit-tap-highlight-color:transparent}
+.upload-btn:hover{border-color:var(--p);color:var(--p)}
+.upload-btn svg{width:.7rem;height:.7rem;stroke:currentColor;fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;flex-shrink:0}
+.file-chips{display:flex;gap:.3rem;flex-wrap:wrap}
+.file-chip{display:inline-flex;align-items:center;gap:.25rem;background:var(--pd);border:1px solid rgba(15,190,132,.2);color:var(--p);padding:.18rem .45rem;border-radius:var(--r1);font-size:.55rem;font-weight:600;max-width:9rem}
+.file-chip span{overflow:hidden;text-overflow:ellipsis;white-space:nowrap;flex:1;min-width:0}
+.file-chip button{background:none;border:none;color:var(--mu);cursor:pointer;padding:0;font-size:.65rem;line-height:1;flex-shrink:0}
+.file-chip button:hover{color:var(--err)}
 .mob-bar{flex-shrink:0;padding:.6rem .75rem;border-top:1px solid var(--b);background:rgba(8,13,11,.97);display:flex;flex-direction:column;gap:.4rem}
 .mob-ta{width:100%;background:var(--s1);border:1px solid var(--b);color:var(--txt);font-family:var(--font);font-size:.875rem;padding:.5rem .75rem;border-radius:var(--r2);resize:none;outline:none;min-height:2.5rem;max-height:6rem;line-height:1.5;transition:border-color .2s}
 .mob-ta:focus{border-color:var(--p)}
@@ -89,7 +107,7 @@ body{margin:0;height:100%;background:var(--bg);color:var(--txt);font-family:var(
 .dlabel .dm{font-size:.44rem;color:var(--txt);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 .dbadge{position:absolute;top:-.7rem;font-size:.44rem;padding:.1rem .3rem;border-radius:var(--r1);background:var(--s1);border:1px solid var(--b);white-space:nowrap;font-weight:700;display:none}
 .dbadge.warn{border-color:var(--warn);color:var(--warn)}
-.console{position:absolute;top:50%;left:50%;transform:translate(-50%,-55%);z-index:10;width:44%;max-width:440px;background:rgba(14,24,19,.92);border:1px solid var(--b);border-radius:var(--r4);padding:1.125rem;backdrop-filter:blur(16px)}
+.console{position:absolute;top:50%;left:50%;transform:translate(-50%,-55%);z-index:10;width:46%;max-width:460px;background:rgba(14,24,19,.92);border:1px solid var(--b);border-radius:var(--r4);padding:1.125rem;backdrop-filter:blur(16px);-webkit-backdrop-filter:blur(16px)}
 .con-ta{width:100%;background:transparent;border:none;color:var(--txt);font-family:var(--font);font-size:.875rem;resize:none;min-height:4.5rem;max-height:8rem;outline:none;line-height:1.6}
 .con-foot{display:flex;justify-content:space-between;align-items:center;margin-top:.6rem;border-top:1px solid var(--b);padding-top:.6rem;gap:.5rem}
 /* BUTTONS */
@@ -109,7 +127,13 @@ body{margin:0;height:100%;background:var(--bg);color:var(--txt);font-family:var(
 .mpick-hdr{padding:.75rem 1rem;border-bottom:1px solid var(--b)}
 .mp-search{width:100%;background:var(--s2);border:1px solid var(--b);color:var(--txt);padding:.55rem .8rem;border-radius:var(--r2);font-family:var(--font);font-size:.8rem;outline:none;transition:border-color .2s}
 .mp-search:focus{border-color:var(--p)}
-.tags-row{display:flex;gap:.3rem;flex-wrap:wrap;padding:.5rem 1rem .35rem;border-bottom:1px solid var(--b)}
+/* Family filter chips */
+.fam-row{display:flex;gap:.25rem;flex-wrap:wrap;padding:.4rem 1rem .3rem;border-bottom:1px solid var(--b);background:var(--s1)}
+.fam-chip{padding:.16rem .5rem;border-radius:var(--r1);font-size:.56rem;font-weight:700;cursor:pointer;border:1px solid var(--b);background:var(--s2);color:var(--mu);transition:all .15s;white-space:nowrap;-webkit-tap-highlight-color:transparent}
+.fam-chip:hover{color:var(--txt);border-color:var(--mu)}
+.fam-chip.sel{color:var(--p);border-color:var(--p);background:var(--pd)}
+/* Capability tags */
+.tags-row{display:flex;gap:.3rem;flex-wrap:wrap;padding:.4rem 1rem .3rem;border-bottom:1px solid var(--b)}
 .tag{padding:.18rem .55rem;border-radius:var(--r1);font-size:.58rem;font-weight:700;cursor:pointer;border:1px solid transparent;transition:all .15s;white-space:nowrap;-webkit-tap-highlight-color:transparent;user-select:none}
 .tag.free{background:rgba(15,190,132,.1);color:#0fbe84;border-color:rgba(15,190,132,.18)}
 .tag.coding{background:rgba(91,163,245,.1);color:#5ba3f5;border-color:rgba(91,163,245,.18)}
@@ -131,8 +155,10 @@ body{margin:0;height:100%;background:var(--bg);color:var(--txt);font-family:var(
 .mp-name{font-size:.75rem;font-weight:700;display:flex;align-items:center;gap:.3rem;flex-wrap:wrap}
 .mp-tier{font-size:.6rem;opacity:.7}
 .mp-id{font-size:.52rem;color:var(--mu);font-family:monospace;margin-top:.05rem;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.mp-price{font-size:.52rem;color:var(--warn);font-weight:600;padding:.08rem .3rem;background:rgba(240,180,41,.08);border:1px solid rgba(240,180,41,.18);border-radius:.2rem;white-space:nowrap}
+.mp-price.free-price{color:var(--p);background:var(--pd);border-color:rgba(15,190,132,.18)}
 .mp-str{font-size:.62rem;color:var(--mu);margin-top:.18rem;line-height:1.45}
-.mp-wk{font-size:.6rem;color:#f0454566;margin-top:.1rem;line-height:1.4}
+.mp-wk{font-size:.6rem;color:rgba(240,69,69,.6);margin-top:.1rem;line-height:1.4}
 .mp-tags{display:flex;gap:.18rem;flex-wrap:wrap;margin-top:.28rem}
 .mtag{padding:.08rem .3rem;border-radius:.2rem;font-size:.48rem;font-weight:700}
 .mtag.free{background:rgba(15,190,132,.1);color:#0fbe84}
@@ -146,19 +172,52 @@ body{margin:0;height:100%;background:var(--bg);color:var(--txt);font-family:var(
 .dash{flex:1;overflow-y:auto;padding:1rem;display:flex;flex-direction:column;gap:1.75rem}
 .dash::-webkit-scrollbar{width:3px}
 .dash::-webkit-scrollbar-thumb{background:var(--b);border-radius:4px}
-.sec-hd{font-size:.875rem;font-weight:700;color:var(--p);border-bottom:1px solid var(--b);padding-bottom:.35rem;margin:0 0 .75rem}
+.sec-hd{font-size:.875rem;font-weight:700;color:var(--p);border-bottom:1px solid var(--b);padding-bottom:.35rem;margin:0 0 .75rem;display:flex;align-items:center;justify-content:space-between;gap:.5rem}
+.sec-hd span{flex:1}
+/* Tendency chart */
+.tendency-wrap{background:var(--s2);border:1px solid var(--b);border-radius:var(--r3);padding:.875rem;margin-bottom:0}
+.tend-title{font-size:.62rem;font-weight:700;color:var(--mu);text-transform:uppercase;letter-spacing:.06em;margin-bottom:.6rem}
+.tend-row{display:flex;align-items:center;gap:.5rem;margin-bottom:.45rem}
+.tend-label{font-size:.62rem;color:var(--mu);width:5rem;flex-shrink:0;text-align:right}
+.tend-bar-bg{flex:1;height:.45rem;background:var(--s3);border-radius:.25rem;overflow:hidden}
+.tend-bar{height:100%;border-radius:.25rem;transition:width .6s cubic-bezier(.22,.68,0,1.2)}
+.tend-val{font-size:.6rem;font-weight:700;width:2.5rem;flex-shrink:0}
+.tend-legend{display:flex;gap:.75rem;flex-wrap:wrap;margin-top:.5rem}
+.tend-dot{display:flex;align-items:center;gap:.25rem;font-size:.58rem;color:var(--mu)}
+.tend-dot::before{content:'';width:.5rem;height:.5rem;border-radius:50%;flex-shrink:0}
+/* View toggle */
+.view-toggle{display:flex;gap:.2rem;background:var(--s2);border:1px solid var(--b);border-radius:var(--r2);padding:.15rem;flex-shrink:0}
+.vt-btn{background:transparent;border:none;color:var(--mu);width:1.5rem;height:1.5rem;border-radius:.3rem;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:all .15s}
+.vt-btn svg{width:.75rem;height:.75rem;stroke:currentColor;fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+.vt-btn.active{background:var(--p);color:#000}
+/* Modell akte grid vs list */
 .mx-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(230px,1fr));gap:.6rem}
+.mx-list{display:flex;flex-direction:column;gap:.35rem}
 .mx-card{background:var(--s1);border:1px solid var(--b);border-radius:var(--r3);padding:.875rem;cursor:pointer;transition:border-color .18s,box-shadow .18s;display:flex;flex-direction:column;gap:.4rem;-webkit-tap-highlight-color:transparent}
 .mx-card:hover,.mx-card:active{border-color:var(--p);box-shadow:0 0 12px var(--pg)}
+.mx-list .mx-card{flex-direction:row;align-items:flex-start;gap:.75rem}
+.mx-list .mx-card .mxh{border-bottom:none;padding-bottom:0;min-width:6rem;flex-shrink:0}
+.mx-list .mx-card .mx-prev{flex:1}
 .mxh{display:flex;align-items:center;gap:.5rem;border-bottom:1px solid var(--b);padding-bottom:.4rem}
+.mx-list .mxh{flex-direction:column;align-items:flex-start;gap:.2rem;border-right:1px solid var(--b);border-bottom:none;padding-right:.75rem;padding-bottom:0}
 .mx-av{width:1.75rem;height:1.75rem;border-radius:.35rem;display:flex;align-items:center;justify-content:center;font-weight:700;font-size:.62rem;flex-shrink:0}
 .mx-name{font-weight:700;font-size:.78rem}
 .mx-sub{font-size:.58rem;color:var(--mu)}
 .mx-prev{font-size:.73rem;color:var(--mu);display:-webkit-box;-webkit-line-clamp:3;-webkit-box-orient:vertical;overflow:hidden;line-height:1.5}
+/* List format output */
+.list-output{display:flex;flex-direction:column;gap:.3rem}
+.list-item{display:flex;align-items:flex-start;gap:.5rem;padding:.45rem .6rem;background:var(--s2);border-radius:var(--r2);border:1px solid var(--b);font-size:.8rem;line-height:1.5}
+.list-item-num{color:var(--p);font-weight:700;font-size:.65rem;flex-shrink:0;min-width:1.25rem;margin-top:.1rem}
+.list-item-text{flex:1;color:#d8eedb}
+/* Evaluation */
 .eval-wrap{display:flex;flex-direction:column;gap:.45rem}
 .eval-blk{background:var(--s2);padding:.75rem;border-radius:var(--r2);border:1px solid var(--b)}
 .eval-blk h4{margin:0 0 .35rem;color:var(--p);font-size:.62rem;text-transform:uppercase;font-weight:700;letter-spacing:.06em}
 .eval-blk p{margin:0;font-size:.78rem;white-space:pre-wrap;color:#d8eedb;line-height:1.65}
+.kp-list{list-style:none;padding:0;margin:0;display:flex;flex-direction:column;gap:.3rem}
+.kp-list li{display:flex;align-items:flex-start;gap:.4rem;font-size:.78rem;color:#d8eedb;line-height:1.5}
+.kp-list li::before{content:'→';color:var(--p);font-weight:700;flex-shrink:0;font-size:.7rem;margin-top:.1rem}
+/* Word cloud */
 .wc-wrap{display:flex;flex-wrap:wrap;justify-content:center;align-items:center;gap:.75rem;padding:2rem 1rem;background:rgba(14,24,18,.4);border-radius:var(--r4);border:1px solid var(--b);min-height:130px}
 .wc-word{transition:transform .2s;cursor:default;line-height:1}
 .wc-word:hover{transform:scale(1.12)}
@@ -172,9 +231,12 @@ body{margin:0;height:100%;background:var(--bg);color:var(--txt);font-family:var(
 .run-meta{flex:1;min-width:0}
 .run-q{font-size:.78rem;font-weight:600;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 .run-d{font-size:.58rem;color:var(--mu);margin-top:.13rem}
-.run-bd{display:flex;gap:.25rem;flex-shrink:0;align-items:flex-start}
+.run-bd{display:flex;gap:.25rem;flex-shrink:0;align-items:flex-start;flex-wrap:wrap;justify-content:flex-end;max-width:5rem}
 .rbg{font-size:.48rem;padding:.13rem .38rem;border-radius:var(--r1);background:var(--pd);color:var(--p);font-weight:700;border:1px solid rgba(15,190,132,.12)}
+.run-sentiment{width:.45rem;height:.45rem;border-radius:50%;flex-shrink:0;margin-top:.35rem}
 .hist-empty{color:var(--mu);text-align:center;padding:3rem 1rem;font-size:.8rem}
+/* Run detail in history */
+.run-eval-preview{font-size:.62rem;color:var(--mu);margin-top:.25rem;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;line-height:1.4}
 /* READER */
 .rnd-sep{font-size:.52rem;color:var(--mu);font-weight:700;text-transform:uppercase;letter-spacing:.08em;margin:1rem 0 .38rem;display:flex;align-items:center;gap:.4rem}
 .rnd-sep::after{content:'';flex:1;height:1px;background:var(--b)}
@@ -184,10 +246,11 @@ body{margin:0;height:100%;background:var(--bg);color:var(--txt);font-family:var(
 .rb-role{font-size:.58rem;font-weight:700;text-transform:uppercase;flex-shrink:0}
 .rb-mdl{font-size:.5rem;color:var(--mu);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 .rb-warn{font-size:.48rem;color:var(--warn);flex-shrink:0}
-.rb-body{padding:.7rem .7rem;white-space:pre-wrap;font-size:.8rem;line-height:1.8;color:#d8eedb;word-break:break-word}
+.rb-body{padding:.7rem;white-space:pre-wrap;font-size:.8rem;line-height:1.8;color:#d8eedb;word-break:break-word}
+.rb-body-list{padding:.7rem}
 /* DIALOGS */
 dialog{background:var(--s1);color:var(--txt);border:1px solid var(--b);border-radius:var(--r4);padding:0;width:95vw;max-width:700px;max-height:92dvh;box-shadow:0 30px 80px rgba(0,0,0,.85);margin:auto}
-dialog::backdrop{background:rgba(0,0,0,.78);backdrop-filter:blur(6px)}
+dialog::backdrop{background:rgba(0,0,0,.78);backdrop-filter:blur(6px);-webkit-backdrop-filter:blur(6px)}
 .dlg-hd{padding:.7rem 1rem;border-bottom:1px solid var(--b);display:flex;justify-content:space-between;align-items:center;gap:.5rem;background:var(--s1);border-radius:var(--r4) var(--r4) 0 0;position:sticky;top:0;z-index:2}
 .dlg-hd h2{margin:0;font-size:.875rem;color:var(--p);font-weight:700;flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 .dlg-hd-r{display:flex;gap:.3rem;align-items:center;flex-shrink:0}
@@ -195,7 +258,7 @@ dialog::backdrop{background:rgba(0,0,0,.78);backdrop-filter:blur(6px)}
 .dlg-body::-webkit-scrollbar{width:3px}
 .dlg-body::-webkit-scrollbar-thumb{background:var(--b);border-radius:4px}
 .dlg-ft{padding:.7rem 1rem;border-top:1px solid var(--b);display:flex;justify-content:flex-end;gap:.5rem}
-.mp-dlg-body{padding:0!important;display:flex;flex-direction:column;max-height:calc(92dvh - 4.5rem)}
+.mp-dlg-body{padding:0!important;display:flex;flex-direction:column;max-height:calc(92dvh - 4rem)}
 /* FORMS */
 .fg{display:flex;flex-direction:column;gap:.25rem;margin-bottom:.875rem}
 .fg label{font-size:.58rem;color:var(--mu);font-weight:700;text-transform:uppercase;letter-spacing:.06em}
@@ -204,6 +267,7 @@ dialog::backdrop{background:rgba(0,0,0,.78);backdrop-filter:blur(6px)}
 optgroup{background:#14231c;color:var(--mu);font-weight:700}
 .cur-mdl-row{display:flex;align-items:center;justify-content:space-between;padding:.45rem .7rem;background:var(--pd);border:1px solid rgba(15,190,132,.18);border-radius:var(--r2);margin-bottom:.75rem;gap:.5rem}
 .cur-mdl-name{font-size:.72rem;font-weight:700;color:var(--p);flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.set-section{font-size:.6rem;font-weight:700;color:var(--p);text-transform:uppercase;letter-spacing:.06em;margin:.875rem 0 .5rem;padding-bottom:.25rem;border-bottom:1px solid var(--b)}
 /* TOAST */
 #toasts{position:fixed;right:.75rem;bottom:calc(var(--bn) + .625rem + var(--sb));z-index:9999;display:flex;flex-direction:column-reverse;gap:.3rem;pointer-events:none;max-width:270px}
 .toast{background:var(--s1);border:1px solid var(--b);color:var(--txt);padding:.5rem .875rem;border-radius:var(--r2);font-size:.72rem;font-weight:600;box-shadow:0 10px 28px rgba(0,0,0,.6);display:flex;align-items:center;gap:.4rem;animation:tIn .2s ease;pointer-events:auto}
@@ -227,10 +291,62 @@ optgroup{background:#14231c;color:var(--mu);font-weight:700}
   dialog{width:100vw;max-width:100vw;border-radius:var(--r4) var(--r4) 0 0;margin:auto auto 0}
 }
 @media(max-width:360px){.seats-grid{grid-template-columns:1fr}}
+/* ── CONTEXT LAYER ACCORDION ───────────────────────────────────── */
+.ctx-layers{display:flex;flex-direction:column;gap:.3rem;margin-bottom:.75rem}
+.ctx-layer{background:var(--bg);border:1px solid var(--b);border-radius:var(--r2);overflow:hidden;transition:border-color .2s}
+.ctx-layer-hd{display:flex;align-items:center;gap:.5rem;padding:.48rem .65rem;cursor:pointer;user-select:none;-webkit-tap-highlight-color:transparent;transition:background .15s}
+.ctx-layer-hd:hover{background:var(--s2)}
+.ctx-ico{width:1.6rem;height:1.6rem;border-radius:.3rem;display:flex;align-items:center;justify-content:center;font-size:.72rem;flex-shrink:0}
+.ctx-title{flex:1;min-width:0}
+.ctx-lname{font-size:.65rem;font-weight:700;color:var(--txt)}
+.ctx-lhint{font-size:.52rem;color:var(--mu);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;margin-top:.05rem}
+.ctx-chev{flex-shrink:0;transition:transform .2s}
+.ctx-chev svg{width:.7rem;height:.7rem;stroke:var(--mu);fill:none;stroke-width:2.5;stroke-linecap:round;stroke-linejoin:round}
+.ctx-layer.open .ctx-chev svg{transform:rotate(180deg)}
+.ctx-layer-bd{display:none;padding:.45rem .65rem .55rem;border-top:1px solid var(--b)}
+.ctx-layer.open .ctx-layer-bd{display:block}
+.ctx-layer-bd textarea{width:100%;background:var(--s2);border:1px solid var(--b);color:var(--txt);font-family:var(--font);font-size:.75rem;padding:.45rem .6rem;border-radius:var(--r1);resize:vertical;outline:none;min-height:3.75rem;line-height:1.55;transition:border-color .2s}
+.ctx-layer-bd textarea:focus{border-color:currentColor}
+.ctx-layer-acts{display:flex;justify-content:flex-end;margin-top:.3rem}
+.ctx-def-btn{background:transparent;border:1px solid var(--b);color:var(--mu);padding:.13rem .4rem;border-radius:var(--r1);font-family:var(--font);font-size:.53rem;cursor:pointer;transition:all .15s}
+.ctx-def-btn:hover{color:var(--p);border-color:var(--p)}
+/* Layer color themes */
+.ctx-l1 .ctx-ico{background:rgba(240,180,41,.12);color:#f0b429}
+.ctx-l2 .ctx-ico{background:rgba(91,163,245,.12);color:#5ba3f5}
+.ctx-l3 .ctx-ico{background:rgba(168,100,255,.12);color:#a864ff}
+.ctx-l4 .ctx-ico{background:rgba(15,190,132,.12);color:#0fbe84}
+.ctx-l5 .ctx-ico{background:rgba(240,69,69,.1);color:#f04545}
+.ctx-l1.open{border-color:rgba(240,180,41,.35)}
+.ctx-l1.open .ctx-layer-bd textarea:focus{border-color:#f0b429}
+.ctx-l2.open{border-color:rgba(91,163,245,.35)}
+.ctx-l2.open .ctx-layer-bd textarea:focus{border-color:#5ba3f5}
+.ctx-l3.open{border-color:rgba(168,100,255,.35)}
+.ctx-l3.open .ctx-layer-bd textarea:focus{border-color:#a864ff}
+.ctx-l4.open{border-color:rgba(15,190,132,.35)}
+.ctx-l4.open .ctx-layer-bd textarea:focus{border-color:#0fbe84}
+.ctx-l5.open{border-color:rgba(240,69,69,.25)}
+.ctx-l5.open .ctx-layer-bd textarea:focus{border-color:#f04545}
+/* Seat role change button */
+.role-change-row{display:flex;align-items:center;gap:.5rem;margin-bottom:.75rem}
+.role-pill{display:inline-flex;align-items:center;gap:.3rem;background:var(--pd);border:1px solid rgba(15,190,132,.25);border-radius:var(--r2);padding:.3rem .7rem;font-size:.72rem;font-weight:700;color:var(--p)}
+/* Context preview on seat card */
+.sc-ctx{font-size:.47rem;color:var(--mu2);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;margin-top:.08rem;max-width:100%}
 </style>
 </head>
 <body>
 <div id="app">
+
+  <!-- PWA INSTALL BANNER -->
+  <div id="pwaBanner">
+    <div class="pwa-ico">KI</div>
+    <div class="pwa-text">
+      <div class="pwa-title">KI-Stammtisch installieren</div>
+      <div class="pwa-sub">Offline-Zugriff · Schnellstart · Kein Browser nötig</div>
+    </div>
+    <button class="btn" id="pwaInstallBtn" style="font-size:.65rem;padding:.35rem .7rem">Installieren</button>
+    <button class="btn-i" id="pwaDismiss" aria-label="Schließen" style="border:none"><svg viewBox="0 0 24 24"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></button>
+  </div>
+
   <header class="hdr">
     <div class="logo">
       <div class="logo-mark">KI</div>
@@ -246,11 +362,21 @@ optgroup{background:#14231c;color:var(--mu);font-weight:700}
   </header>
 
   <div class="vs">
+    <!-- TISCH VIEW -->
     <section id="vTable" class="view active">
       <!-- Mobile -->
       <div class="tbl-m">
         <div class="seats-grid" id="seatsGrid"></div>
         <div class="mob-bar">
+          <!-- File upload zone -->
+          <div class="upload-zone" id="uploadZoneM">
+            <label class="upload-btn" title="Datei anhängen">
+              <svg viewBox="0 0 24 24"><path d="M21.44 11.05l-9.19 9.19a6 6 0 0 1-8.49-8.49l9.19-9.19a4 4 0 0 1 5.66 5.66l-9.2 9.19a2 2 0 0 1-2.83-2.83l8.49-8.48"/></svg>
+              Datei
+              <input type="file" id="fileInputM" multiple accept=".txt,.md,.pdf,.xlsx,.xls,.csv,.png,.jpg,.jpeg,.webp,.gif" style="display:none">
+            </label>
+          </div>
+          <div class="file-chips" id="fileChipsM"></div>
           <textarea id="inpM" class="mob-ta" rows="2" placeholder="Deine Frage an alle KIs…"></textarea>
           <div class="bar-row">
             <span class="syslog" id="logM">Lade…</span>
@@ -264,6 +390,15 @@ optgroup{background:#14231c;color:var(--mu);font-weight:700}
         <div class="sabs" id="seatsD"></div>
         <div class="console">
           <textarea id="inpD" class="con-ta" placeholder="Originale Nutzerfrage…"></textarea>
+          <!-- File upload zone desktop -->
+          <div style="margin-top:.5rem;display:flex;align-items:center;gap:.5rem;flex-wrap:wrap">
+            <label class="upload-btn" title="Datei anhängen (Bild, PDF, MD, Excel, CSV)">
+              <svg viewBox="0 0 24 24"><path d="M21.44 11.05l-9.19 9.19a6 6 0 0 1-8.49-8.49l9.19-9.19a4 4 0 0 1 5.66 5.66l-9.2 9.19a2 2 0 0 1-2.83-2.83l8.49-8.48"/></svg>
+              Datei
+              <input type="file" id="fileInputD" multiple accept=".txt,.md,.pdf,.xlsx,.xls,.csv,.png,.jpg,.jpeg,.webp,.gif" style="display:none">
+            </label>
+            <div class="file-chips" id="fileChipsD"></div>
+          </div>
           <div class="con-foot">
             <span class="syslog" id="logD">Lade Modelle…</span>
             <button class="btn" id="btnD" disabled>Starten</button>
@@ -272,23 +407,43 @@ optgroup{background:#14231c;color:var(--mu);font-weight:700}
       </div>
     </section>
 
+    <!-- ERGEBNISSE VIEW -->
     <section id="vDash" class="view">
       <div class="dash">
+        <!-- Tendency Chart -->
+        <div id="tendencyWrap" style="display:none">
+          <h2 class="sec-hd"><span>📊 Tendenz-Analyse</span></h2>
+          <div class="tendency-wrap" id="tendencyChart"></div>
+        </div>
+        <!-- Modell Akte -->
         <div>
-          <h2 class="sec-hd">Modell-Akte</h2>
+          <h2 class="sec-hd">
+            <span>Modell-Akte</span>
+            <div class="view-toggle">
+              <button class="vt-btn active" id="vtGrid" title="Kacheln">
+                <svg viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/></svg>
+              </button>
+              <button class="vt-btn" id="vtList" title="Liste">
+                <svg viewBox="0 0 24 24"><line x1="8" y1="6" x2="21" y2="6"/><line x1="8" y1="12" x2="21" y2="12"/><line x1="8" y1="18" x2="21" y2="18"/><line x1="3" y1="6" x2="3.01" y2="6"/><line x1="3" y1="12" x2="3.01" y2="12"/><line x1="3" y1="18" x2="3.01" y2="18"/></svg>
+              </button>
+            </div>
+          </h2>
           <div class="mx-grid" id="mxC"><span style="color:var(--mu);font-size:.8rem">Noch keine Ergebnisse.</span></div>
         </div>
+        <!-- Auto-Evaluation -->
         <div>
-          <h2 class="sec-hd">Auto-Evaluation</h2>
+          <h2 class="sec-hd"><span>Auto-Evaluation</span></h2>
           <div id="evalB"><span style="color:var(--mu);font-size:.8rem">Noch keine Evaluation.</span></div>
         </div>
+        <!-- Word Cloud -->
         <div>
-          <h2 class="sec-hd">Word Cloud</h2>
+          <h2 class="sec-hd"><span>Word Cloud</span></h2>
           <div class="wc-wrap" id="wcB"><span style="color:var(--mu);font-size:.8rem">Erscheint nach erstem Lauf.</span></div>
         </div>
       </div>
     </section>
 
+    <!-- VERLAUF VIEW -->
     <section id="vHist" class="view">
       <div class="hist" id="histL">
         <div class="hist-empty">Noch keine Läufe gespeichert.</div>
@@ -312,55 +467,150 @@ optgroup{background:#14231c;color:var(--mu);font-weight:700}
   </nav>
 </div>
 
-<!-- DIALOG: SEAT -->
+<!-- DIALOG: SEAT CONFIG -->
 <dialog id="dlgSeat">
   <div class="dlg-hd">
-    <h2>Sitz konfigurieren</h2>
-    <div class="dlg-hd-r">
-      <button class="btn-i cdlg" aria-label="Schließen"><svg viewBox="0 0 24 24"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></button>
-    </div>
+    <h2 id="seatDlgTitle">Sitz konfigurieren</h2>
+    <div class="dlg-hd-r"><button class="btn-i cdlg"><svg viewBox="0 0 24 24"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></button></div>
   </div>
   <div class="dlg-body">
     <input type="hidden" id="seatIdx">
-    <div class="fg">
-      <label>Rolle</label>
-      <select id="seatRole">
-        <option value="Analyst">🔍 Analyst</option>
-        <option value="Kritiker">⚡ Kritiker</option>
-        <option value="Visionär">🚀 Visionär</option>
-        <option value="Synthetisierer">🧩 Synthetisierer</option>
-        <option value="Risikoprüfer">🛡 Risikoprüfer</option>
-      </select>
-    </div>
-    <div class="fg">
-      <label>Modell</label>
-      <div class="cur-mdl-row">
-        <span class="cur-mdl-name" id="curMdlName">—</span>
-        <button class="btn" id="openPickerBtn" style="padding:.35rem .7rem;font-size:.62rem">Modell wählen ▸</button>
+
+    <!-- Role + Model row -->
+    <div style="display:flex;gap:.5rem;margin-bottom:.875rem;flex-wrap:wrap;align-items:flex-end">
+      <div class="fg" style="flex:1;min-width:140px;margin-bottom:0">
+        <label>Rolle</label>
+        <select id="seatRole" style="font-size:.78rem">
+          <option value="Analyst">🔍 Analyst</option>
+          <option value="Kritiker">⚡ Kritiker</option>
+          <option value="Visionär">🚀 Visionär</option>
+          <option value="Synthetisierer">🧩 Synthetisierer</option>
+          <option value="Risikoprüfer">🛡 Risikoprüfer</option>
+          <option value="Stratege">♟ Stratege</option>
+          <option value="Ethiker">⚖️ Ethiker</option>
+          <option value="Techniker">⚙️ Techniker</option>
+          <option value="Ökonom">💰 Ökonom</option>
+          <option value="Psychologe">🧠 Psychologe</option>
+          <option value="Jurist">⚖ Jurist</option>
+          <option value="Moderator">🎯 Moderator</option>
+          <option value="Kreativdirektor">🎨 Kreativdirektor</option>
+          <option value="Projektmanager">📋 Projektmanager</option>
+          <option value="Wissenschaftler">🔬 Wissenschaftler</option>
+        </select>
+      </div>
+      <div class="fg" style="flex:1.5;min-width:180px;margin-bottom:0">
+        <label>Modell</label>
+        <div class="cur-mdl-row" style="margin-bottom:0">
+          <span class="cur-mdl-name" id="curMdlName">—</span>
+          <button class="btn" id="openPickerBtn" style="padding:.35rem .7rem;font-size:.62rem">Wählen ▸</button>
+        </div>
       </div>
     </div>
-    <div class="fg"><label>System-Prompt</label><textarea id="seatPrompt" rows="4"></textarea></div>
-    <div class="fg"><label>Kontext</label><textarea id="seatCtx" rows="3"></textarea></div>
+
+    <!-- Default load notice -->
+    <div id="seatDefaultNotice" style="display:flex;align-items:center;gap:.5rem;padding:.45rem .7rem;background:rgba(15,190,132,.06);border:1px solid rgba(15,190,132,.18);border-radius:var(--r2);margin-bottom:.75rem;font-size:.62rem;color:var(--mu)">
+      <span style="color:var(--p)">✦</span>
+      <span>5-Ebenen Kontext geladen. Klicke eine Ebene um sie anzupassen.</span>
+      <button id="reloadDefaultBtn" class="ctx-def-btn" style="margin-left:auto;flex-shrink:0">↺ Alle Defaults</button>
+    </div>
+
+    <!-- 5-Layer Accordion -->
+    <div class="ctx-layers" id="ctxLayers">
+      <!-- Layer 1: Systemkontext -->
+      <div class="ctx-layer ctx-l1 open" data-layer="sys">
+        <div class="ctx-layer-hd">
+          <div class="ctx-ico">🎭</div>
+          <div class="ctx-title">
+            <div class="ctx-lname">① Systemkontext <span style="color:var(--warn);font-size:.55rem">Identität & Leitplanken</span></div>
+            <div class="ctx-lhint">Wer bist du? Fachgebiet, Arbeitsprinzipien, Grenzen des Verhaltens.</div>
+          </div>
+          <div class="ctx-chev"><svg viewBox="0 0 24 24"><polyline points="6 9 12 15 18 9"/></svg></div>
+        </div>
+        <div class="ctx-layer-bd">
+          <textarea id="ctxSys" rows="4" placeholder="z.B. Du bist ein Senior Data Analyst mit Expertise in Faktenprüfung…"></textarea>
+          <div class="ctx-layer-acts"><button class="ctx-def-btn" data-reset="sys">↺ Default</button></div>
+        </div>
+      </div>
+      <!-- Layer 2: Aufgaben-/Zielkontext -->
+      <div class="ctx-layer ctx-l2" data-layer="goal">
+        <div class="ctx-layer-hd">
+          <div class="ctx-ico">🎯</div>
+          <div class="ctx-title">
+            <div class="ctx-lname">② Aufgaben-/Zielkontext <span style="color:#5ba3f5;font-size:.55rem">Das „Warum"</span></div>
+            <div class="ctx-lhint">Zweck der Interaktion und übergeordnetes Ziel. Wofür wird der Output genutzt?</div>
+          </div>
+          <div class="ctx-chev"><svg viewBox="0 0 24 24"><polyline points="6 9 12 15 18 9"/></svg></div>
+        </div>
+        <div class="ctx-layer-bd">
+          <textarea id="ctxGoal" rows="3" placeholder="z.B. Analysiere das Thema. Ziel: Belastbare Erkenntnisse als Entscheidungsgrundlage liefern."></textarea>
+          <div class="ctx-layer-acts"><button class="ctx-def-btn" data-reset="goal">↺ Default</button></div>
+        </div>
+      </div>
+      <!-- Layer 3: Wissenskontext -->
+      <div class="ctx-layer ctx-l3" data-layer="know">
+        <div class="ctx-layer-hd">
+          <div class="ctx-ico">📚</div>
+          <div class="ctx-title">
+            <div class="ctx-lname">③ Wissenskontext <span style="color:#a864ff;font-size:.55rem">Informationsbasis</span></div>
+            <div class="ctx-lhint">Welche Quellen/Daten sind Grundlage? Was soll die KI bevorzugt nutzen?</div>
+          </div>
+          <div class="ctx-chev"><svg viewBox="0 0 24 24"><polyline points="6 9 12 15 18 9"/></svg></div>
+        </div>
+        <div class="ctx-layer-bd">
+          <textarea id="ctxKnow" rows="3" placeholder="z.B. Stütze dich auf verfügbare Fakten. Trenne gesicherte Daten von Schätzungen."></textarea>
+          <div class="ctx-layer-acts"><button class="ctx-def-btn" data-reset="know">↺ Default</button></div>
+        </div>
+      </div>
+      <!-- Layer 4: Interaktionskontext -->
+      <div class="ctx-layer ctx-l4" data-layer="inter">
+        <div class="ctx-layer-hd">
+          <div class="ctx-ico">✍️</div>
+          <div class="ctx-title">
+            <div class="ctx-lname">④ Interaktionskontext <span style="color:#0fbe84;font-size:.55rem">Format & Stil</span></div>
+            <div class="ctx-lhint">Wie soll geantwortet werden? Tonfall, Format, was soll vermieden werden?</div>
+          </div>
+          <div class="ctx-chev"><svg viewBox="0 0 24 24"><polyline points="6 9 12 15 18 9"/></svg></div>
+        </div>
+        <div class="ctx-layer-bd">
+          <textarea id="ctxInter" rows="3" placeholder="z.B. Strukturierte Antwort mit Unterpunkten. Sachlicher Ton. Vermeide werbliche Sprache."></textarea>
+          <div class="ctx-layer-acts"><button class="ctx-def-btn" data-reset="inter">↺ Default</button></div>
+        </div>
+      </div>
+      <!-- Layer 5: Situationskontext -->
+      <div class="ctx-layer ctx-l5" data-layer="sit">
+        <div class="ctx-layer-hd">
+          <div class="ctx-ico">📍</div>
+          <div class="ctx-title">
+            <div class="ctx-lname">⑤ Situationskontext <span style="color:#f04545;font-size:.55rem">Umgebungsvariable</span></div>
+            <div class="ctx-lhint">Wer fragt? Welche Vorarbeit existiert? Wo stehen wir im Prozess?</div>
+          </div>
+          <div class="ctx-chev"><svg viewBox="0 0 24 24"><polyline points="6 9 12 15 18 9"/></svg></div>
+        </div>
+        <div class="ctx-layer-bd">
+          <textarea id="ctxSit" rows="3" placeholder="z.B. Der Nutzer sucht eine erste Einschätzung. Du setzt den Präzisionsstandard der Runde."></textarea>
+          <div class="ctx-layer-acts"><button class="ctx-def-btn" data-reset="sit">↺ Default</button></div>
+        </div>
+      </div>
+    </div>
   </div>
-  <div class="dlg-ft">
-    <button class="btn-g cdlg">Abbrechen</button>
-    <button class="btn" id="saveSeatBtn">Speichern</button>
-  </div>
+  <div class="dlg-ft"><button class="btn-g cdlg">Abbrechen</button><button class="btn" id="saveSeatBtn">Speichern</button></div>
 </dialog>
 
 <!-- DIALOG: MODEL PICKER -->
 <dialog id="dlgPicker">
   <div class="dlg-hd">
     <h2>🤖 Modell wählen</h2>
-    <div class="dlg-hd-r">
-      <button class="btn-i" id="closePicker" aria-label="Schließen"><svg viewBox="0 0 24 24"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></button>
-    </div>
+    <div class="dlg-hd-r"><button class="btn-i" id="closePicker"><svg viewBox="0 0 24 24"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></button></div>
   </div>
   <div class="dlg-body mp-dlg-body">
     <div class="mpick-hdr">
-      <input class="mp-search" id="mpSearch" placeholder="Suche nach Name, Anbieter oder Fähigkeit…" autocomplete="off" spellcheck="false">
+      <input class="mp-search" id="mpSearch" placeholder="Name, Anbieter oder Fähigkeit suchen…" autocomplete="off" spellcheck="false">
     </div>
+    <!-- Family filter -->
+    <div class="fam-row" id="famRow"></div>
+    <!-- Capability tags -->
     <div class="tags-row" id="mpTags"></div>
+    <!-- Model list -->
     <div class="mp-list" id="mpList"></div>
   </div>
 </dialog>
@@ -369,25 +619,41 @@ optgroup{background:#14231c;color:var(--mu);font-weight:700}
 <dialog id="dlgSettings">
   <div class="dlg-hd">
     <h2>⚙ Einstellungen</h2>
-    <div class="dlg-hd-r">
-      <button class="btn-i cdlg" aria-label="Schließen"><svg viewBox="0 0 24 24"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></button>
-    </div>
+    <div class="dlg-hd-r"><button class="btn-i cdlg"><svg viewBox="0 0 24 24"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></button></div>
   </div>
   <div class="dlg-body">
+    <div class="set-section">API & Modelle</div>
     <div class="fg"><label>OpenRouter API-Key</label><input type="password" id="setApi" placeholder="sk-or-…" autocomplete="current-password"></div>
     <div class="fg"><label>Runden-Anzahl (1–10)</label><input type="number" id="setRounds" min="1" max="10" value="3"></div>
-    <div class="fg">
-      <label>Summarizer / Fallback-Modell</label>
+    <div class="fg"><label>Summarizer / Fallback-Modell</label>
       <div class="cur-mdl-row">
         <span class="cur-mdl-name" id="sumMdlName">—</span>
         <button class="btn" id="openSumPickerBtn" style="padding:.35rem .7rem;font-size:.62rem">Wählen ▸</button>
       </div>
     </div>
+    <div class="set-section">Ausgabe-Konfiguration</div>
+    <div class="fg"><label>Max. Wörter pro Antwort (100–2000)</label><input type="number" id="setMaxWords" min="100" max="2000" value="500"></div>
+    <div class="fg"><label>Antwort-Format</label>
+      <select id="setFormat">
+        <option value="auto">Auto (KI entscheidet)</option>
+        <option value="prose">Fließtext</option>
+        <option value="bullets">Bullet-Points</option>
+        <option value="list">Nummerierte Liste</option>
+        <option value="structured">Strukturiert mit Überschriften</option>
+      </select>
+    </div>
+    <div class="fg"><label>Fokus-Bereich (optional, z.B. "Nachhaltigkeit, Kosten")</label><input type="text" id="setFocus" placeholder="Komma-getrennte Schwerpunkte…"></div>
+    <div class="fg"><label>Key-Points-Anzahl in Evaluation (3–10)</label><input type="number" id="setKeyPoints" min="3" max="10" value="5"></div>
+    <div class="set-section">Sprache & Darstellung</div>
+    <div class="fg"><label>Antwort-Sprache</label>
+      <select id="setLang">
+        <option value="de">Deutsch</option>
+        <option value="en">English</option>
+        <option value="auto">Auto (Frage-Sprache)</option>
+      </select>
+    </div>
   </div>
-  <div class="dlg-ft">
-    <button class="btn-g cdlg">Abbrechen</button>
-    <button class="btn" id="saveSetBtn">Speichern</button>
-  </div>
+  <div class="dlg-ft"><button class="btn-g cdlg">Abbrechen</button><button class="btn" id="saveSetBtn">Speichern</button></div>
 </dialog>
 
 <!-- DIALOG: READER -->
@@ -395,10 +661,14 @@ optgroup{background:#14231c;color:var(--mu);font-weight:700}
   <div class="dlg-hd">
     <h2 id="rTitle">Output</h2>
     <div class="dlg-hd-r">
+      <button class="btn-c" id="readerToggleList" title="Als Liste anzeigen" style="margin-right:.15rem">
+        <svg viewBox="0 0 24 24"><line x1="8" y1="6" x2="21" y2="6"/><line x1="8" y1="12" x2="21" y2="12"/><line x1="8" y1="18" x2="21" y2="18"/><line x1="3" y1="6" x2="3.01" y2="6"/><line x1="3" y1="12" x2="3.01" y2="12"/><line x1="3" y1="18" x2="3.01" y2="18"/></svg>
+        Liste
+      </button>
       <button class="btn-c" id="copyAllBtn">
         <svg viewBox="0 0 24 24"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>Alles
       </button>
-      <button class="btn-i cdlg" aria-label="Schließen"><svg viewBox="0 0 24 24"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></button>
+      <button class="btn-i cdlg"><svg viewBox="0 0 24 24"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></button>
     </div>
   </div>
   <div class="dlg-body" id="rBody"></div>
@@ -408,49 +678,49 @@ optgroup{background:#14231c;color:var(--mu);font-weight:700}
 
 <script>
 'use strict';
-const STOP=new Set(['und','oder','der','die','das','ein','eine','ist','sind','wir','ihr','sie','es','zu','in','den','auf','für','mit','von','dass','als','an','nicht','auch','wie','aus','bei','um','noch','nur','so','sich','dem','des','im','werden','kann','zur','the','and','or','is','are','to','for','with','of','that','on','a','an','this','it','its','be','was','has','have','ich','du','er','aber','wenn','dann','nach','vor','durch','über','unter']);
+const STOP=new Set(['und','oder','der','die','das','ein','eine','ist','sind','wir','ihr','sie','es','zu','in','den','auf','für','mit','von','dass','als','an','nicht','auch','wie','aus','bei','um','noch','nur','so','sich','dem','des','im','werden','kann','zur','the','and','or','is','are','to','for','with','of','that','on','a','an','this','it','its','be','was','has','have','ich','du','er','aber','wenn','dann','nach','vor','durch','über','unter','haben','sein','nicht','sehr','auch','noch','aber','mehr','ihre','ihrer','ihrem']);
 
-/* ── MODEL CATALOG ─────────────────────────────────────────────────────── */
+/* ── MODEL CATALOG ────────────────────────────────────────────────── */
 const CAT=[
-  {id:'openrouter/auto',name:'Auto Router',provider:'OpenRouter',color:'#8b5cf6',tags:['smart','fast'],tier:'⭐',str:'Wählt automatisch das beste verfügbare Modell pro Anfrage.',wk:'Kosten unvorhersehbar; Modellwahl nicht transparent.'},
-  {id:'openrouter/hunter-alpha',name:'Hunter Alpha',provider:'OpenRouter',color:'#8b5cf6',tags:['reasoning','smart'],tier:'🔬',str:'Experimentelles Meta-Modell mit tiefem Reasoning für komplexe Analyse.',wk:'Preview-Status; instabilere Verfügbarkeit.'},
-  {id:'anthropic/claude-sonnet-4.6',name:'Claude Sonnet 4.6',provider:'Anthropic',color:'#c97c30',tags:['reasoning','coding','creative'],tier:'🏆',str:'Frontier-Performance bei Code und professioneller Arbeit – stärkster Sonnet.',wk:'Hohe Ausgabekosten; kein Free-Tier.'},
-  {id:'anthropic/claude-opus-4.6',name:'Claude Opus 4.6',provider:'Anthropic',color:'#c97c30',tags:['reasoning','creative','long'],tier:'👑',str:'Anthropics mächtigstes Modell – unübertroffen bei Nuancen und langem Kontext.',wk:'Sehr teuer; langsamer als Sonnet.'},
-  {id:'anthropic/claude-haiku-4.5',name:'Claude Haiku 4.5',provider:'Anthropic',color:'#c97c30',tags:['fast'],tier:'⚡',str:'Schnellstes Anthropic-Modell mit niedrigen Kosten für kurze Tasks.',wk:'Begrenzte Tiefe bei komplexen Aufgaben.'},
-  {id:'openai/gpt-5',name:'GPT-5',provider:'OpenAI',color:'#19c37d',tags:['reasoning','coding','creative','long'],tier:'👑',str:'Flaggschiff von OpenAI – exzellent in Reasoning und Multimodalität.',wk:'Teuerste Klasse; API-Zugang begrenzt.'},
-  {id:'openai/gpt-5-mini',name:'GPT-5 Mini',provider:'OpenAI',color:'#19c37d',tags:['fast','coding'],tier:'⚡',str:'Schnell und kosteneffizient mit GPT-5-Architektur für alltägliche Tasks.',wk:'Weniger Tiefe als Vollversion bei komplexem Reasoning.'},
-  {id:'openai/gpt-oss-120b',name:'GPT-OSS 120B',provider:'OpenAI',color:'#19c37d',tags:['reasoning','coding','free'],tier:'🔓',str:'Open-Weight MoE – native Tool-Use, konfigurierbares Reasoning auf H100.',wk:'Größer = mehr Latenz; kein vollständig offener Stack.'},
-  {id:'google/gemini-3.1-pro-preview',name:'Gemini 3.1 Pro',provider:'Google',color:'#4285f4',tags:['reasoning','coding','long'],tier:'🏆',str:'Googles stärkstes Modell – überragend bei Mathematik, Coding und langen Docs.',wk:'Preview-Status; teurer Flagship.'},
-  {id:'google/gemini-3.1-flash-lite-preview',name:'Gemini 3.1 Flash Lite',provider:'Google',color:'#4285f4',tags:['fast','free'],tier:'⚡',str:'Extrem schnell und günstig für Standard-Tasks.',wk:'Begrenzte Tiefe bei komplexem Reasoning.'},
-  {id:'google/gemini-2.5-flash',name:'Gemini 2.5 Flash',provider:'Google',color:'#4285f4',tags:['reasoning','fast'],tier:'⭐',str:'Workhorse mit eingebautem Thinking – beste Preis-Leistung im Reasoning.',wk:'Weniger kreativ als Pro-Modelle.'},
-  {id:'google/gemini-2.5-pro',name:'Gemini 2.5 Pro',provider:'Google',color:'#4285f4',tags:['reasoning','long','coding'],tier:'🏆',str:'Tiefes Denken, 1M Token Kontext – ideal für Dokument-Analyse und Research.',wk:'Hohe Kosten bei langen Kontexten.'},
-  {id:'x-ai/grok-4',name:'Grok 4',provider:'xAI',color:'#1da1f2',tags:['reasoning','coding'],tier:'🏆',str:'Führt aktuell Reasoning-Leaderboards an – stark bei Code und Faktencheck.',wk:'Teuer; Verfügbarkeit schwankt.'},
-  {id:'x-ai/grok-3-mini',name:'Grok 3 Mini',provider:'xAI',color:'#1da1f2',tags:['fast','reasoning'],tier:'⚡',str:'Kosteneffizientes Reasoning-Modell mit schnellem Thinking.',wk:'Kleiner als Grok 4; weniger Weltkenntnis.'},
-  {id:'deepseek/deepseek-v3.2',name:'DeepSeek V3.2',provider:'DeepSeek',color:'#2277ff',tags:['reasoning','coding','long'],tier:'🏆',str:'GPT-5-Klasse laut Benchmarks – Gold-Medaille bei IMO 2025, starkes Tool-Use.',wk:'Chinesischer Anbieter; mögl. Filterung polit. Themen.'},
-  {id:'deepseek/deepseek-r1',name:'DeepSeek R1',provider:'DeepSeek',color:'#2277ff',tags:['reasoning','coding'],tier:'⭐',str:'Open-Source Reasoning-Champion – transparent mit vollst. Chain-of-Thought.',wk:'Langsam durch sichtbares Reasoning; teuer bei langen Antworten.'},
-  {id:'qwen/qwen3.5-35b-a3b',name:'Qwen 3.5 35B',provider:'Qwen',color:'#e43b2e',tags:['reasoning','coding','long'],tier:'⭐',str:'Starkes MoE – balanciert Effizienz und Qualität hervorragend.',wk:'Neueres Modell; Community-Erfahrung noch begrenzt.'},
-  {id:'qwen/qwen3.5-9b',name:'Qwen 3.5 9B',provider:'Qwen',color:'#e43b2e',tags:['fast','coding'],tier:'⚡',str:'Kompaktes Modell mit starker Coding-Performance für seine Größe.',wk:'Begrenzt bei komplexem Multi-Step-Reasoning.'},
-  {id:'qwen/qwen3-235b-a22b',name:'Qwen 3 235B',provider:'Qwen',color:'#e43b2e',tags:['reasoning','coding','long'],tier:'👑',str:'Massiver MoE – 235B Parameter, führt viele Benchmarks; starke Mehrsprachigkeit.',wk:'Hohe Latenz; teuer bei großen Kontexten.'},
-  {id:'minimax/minimax-m2.5',name:'MiniMax M2.5',provider:'MiniMax',color:'#ff5c5c',tags:['coding','reasoning','long'],tier:'⭐',str:'80.2% SWE-Bench Verified – designed für echte Office-Produktivität und Agenten.',wk:'Weniger bekannt außerhalb Coding/Office.'},
-  {id:'moonshotai/kimi-k2.5',name:'Kimi K2.5',provider:'MoonshotAI',color:'#ff9900',tags:['coding','reasoning','long'],tier:'⭐',str:'Native multimodales Coding-Modell mit visueller Coding-Stärke und Self-Agents.',wk:'Weniger stark bei rein textuellen kreativen Aufgaben.'},
-  {id:'liquid/lfm-2-24b-a2b',name:'LFM-2 24B',provider:'Liquid AI',color:'#00bcd4',tags:['fast','reasoning'],tier:'🔬',str:'Alternatives Architektur-Design – effizient bei langen Kontexten.',wk:'Wenig Benchmarkdaten; ungewohnte Architektur.'},
-  {id:'aion-labs/aion-2.0',name:'Aion 2.0',provider:'Aion Labs',color:'#9c27b0',tags:['reasoning','creative'],tier:'🔬',str:'Spezialisiert auf komplexe Reasoning-Ketten und Inferenz-intensive Tasks.',wk:'Preview-Stadium; wenig Community-Erfahrung.'},
-  {id:'stepfun/step-3.5-flash',name:'Step 3.5 Flash',provider:'StepFun',color:'#e91e63',tags:['fast','reasoning'],tier:'⚡',str:'MoE 196B/11B aktiv – speed-effizienter Reasoner auch bei langen Kontexten.',wk:'Chinesischer Anbieter mit mögl. Content-Einschränkungen.'},
-  {id:'z-ai/glm-5',name:'GLM-5',provider:'Z.AI',color:'#00acc1',tags:['coding','reasoning','long'],tier:'⭐',str:'Flagship für komplexe System-Designs und lange Agentenworkflows.',wk:'Weniger stark bei kreativem Schreiben.'},
-  {id:'perplexity/sonar',name:'Sonar',provider:'Perplexity',color:'#20beff',tags:['fast','smart'],tier:'🌐',str:'Eingebettete Web-Suche in Echtzeit – liefert aktuelle Infos mit Quellen.',wk:'Abhängig von Suchergebnisqualität; kein reines parametrisches Reasoning.'},
-  {id:'mistralai/mistral-large',name:'Mistral Large',provider:'Mistral',color:'#f37626',tags:['reasoning','coding'],tier:'⭐',str:'Europäisches Flaggschiff – stark bei Mehrsprachigkeit und Function-Calling.',wk:'Leicht hinter GPT-5-Klasse bei max. Reasoning-Tiefe.'},
-  {id:'mistralai/ministral-14b-2512',name:'Ministral 14B',provider:'Mistral',color:'#f37626',tags:['fast','coding'],tier:'⚡',str:'Kompaktes, effizientes Modell mit guter Instruktionstreue.',wk:'Limitiert bei sehr komplexem oder langem Kontext.'},
-  {id:'mistralai/mistral-small-3.2-24b-instruct-2506',name:'Mistral Small 3.2',provider:'Mistral',color:'#f37626',tags:['fast','free'],tier:'⚡',str:'Starke 24B-Basis mit niedrigen Kosten für schnelle Chat-Tasks.',wk:'Überholt von größeren Modellen bei komplexen Aufgaben.'},
-  {id:'arcee-ai/trinity-large-preview:free',name:'Trinity Large (Free)',provider:'Arcee AI',color:'#673ab7',tags:['free','reasoning'],tier:'🔓',str:'Kostenlos verfügbares Reasoning-Modell – gut als Einstieg ohne API-Kosten.',wk:'Preview; unzuverlässige Verfügbarkeit.'},
-  {id:'nvidia/nemotron-3-super-120b-a12b:free',name:'Nemotron 3 Super (Free)',provider:'NVIDIA',color:'#76b900',tags:['free','coding'],tier:'🔓',str:'Kostenlos; 120B MoE von NVIDIA – stark bei Coding und Instruktionen.',wk:'Free = Rate-Limits; Verfügbarkeit nicht garantiert.'},
-  {id:'meta-llama/llama-3.3-70b-instruct',name:'Llama 3.3 70B',provider:'Meta',color:'#0064d3',tags:['coding','fast','free'],tier:'⭐',str:'Gold-Standard Open-Source – exzellente Instruktionstreue, günstig, überall verfügbar.',wk:'Schwächer als 405B bei tiefen Reasoning-Aufgaben.'},
-  {id:'meta-llama/llama-3.1-8b-instruct',name:'Llama 3.1 8B',provider:'Meta',color:'#0064d3',tags:['fast','free'],tier:'⚡',str:'Sehr schnell und günstig für einfache Chat-Tasks.',wk:'Begrenzte Kapazität; überholt von neueren Modellen.'},
-  {id:'microsoft/wizardlm-2-8x22b',name:'WizardLM 2 8×22B',provider:'Microsoft',color:'#00adef',tags:['reasoning','coding'],tier:'⭐',str:'Starkes MoE für komplexe Instructionfolge und Coding.',wk:'Älter; überholt von neueren Modellen in Top-Tier.'},
-  {id:'nousresearch/hermes-4-405b',name:'Hermes 4 405B',provider:'Nous Research',color:'#d32f2f',tags:['reasoning','coding','creative'],tier:'⭐',str:'Hybrid-Reasoning (Think-Tags), starke Schema-Adherenz – top für strukturierte Outputs.',wk:'Massiv; hohe Latenz und Kosten.'},
-  {id:'prime-intellect/intellect-3',name:'Intellect-3',provider:'Prime Intellect',color:'#7b1fa2',tags:['reasoning'],tier:'🔬',str:'Community-trainiertes Modell mit dezentralem Trainingsansatz.',wk:'Weniger etabliert; schwächere Top-Tier-Performance.'},
-  {id:'allenai/olmo-3.1-32b-instruct',name:'OLMo 3.1 32B',provider:'AllenAI',color:'#2196f3',tags:['reasoning','free'],tier:'🔓',str:'Vollständig Open-Source (Daten, Gewichte, Training) – wissenschaftlich transparent.',wk:'Leistungsrückstand gegenüber proprietären Modellen.'},
-  {id:'writer/palmyra-x5',name:'Palmyra X5',provider:'Writer',color:'#ff6b35',tags:['creative','coding'],tier:'⭐',str:'Enterprise-fokussiert mit starker Genauigkeit für Business-Content.',wk:'Weniger bekannt außerhalb Business-Anwendungen.'},
-  {id:'xiaomi/minicpm-o-2.6',name:'MiniCPM-o 2.6',provider:'Xiaomi',color:'#ff6900',tags:['fast','free'],tier:'⚡',str:'Extrem kompaktes Multimodal-Modell für Edge-Inference und On-Device.',wk:'Kleine Parameterzahl; limitiert bei komplexen Tasks.'},
+  {id:'openrouter/auto',name:'Auto Router',provider:'OpenRouter',family:'OpenRouter',color:'#8b5cf6',tags:['smart','fast'],tier:'⭐',str:'Wählt automatisch das beste verfügbare Modell pro Anfrage.',wk:'Kosten unvorhersehbar; Modellwahl nicht transparent.',inputPer1M:0,outputPer1M:0},
+  {id:'openrouter/hunter-alpha',name:'Hunter Alpha',provider:'OpenRouter',family:'OpenRouter',color:'#8b5cf6',tags:['reasoning','smart'],tier:'🔬',str:'Experimentelles Meta-Modell mit tiefem Reasoning für komplexe Analyse.',wk:'Preview-Status; instabilere Verfügbarkeit.',inputPer1M:0,outputPer1M:0},
+  {id:'anthropic/claude-sonnet-4.6',name:'Claude Sonnet 4.6',provider:'Anthropic',family:'Anthropic',color:'#c97c30',tags:['reasoning','coding','creative'],tier:'🏆',str:'Frontier-Performance bei Code und professioneller Arbeit – stärkster Sonnet.',wk:'Hohe Ausgabekosten; kein Free-Tier.',inputPer1M:3.0,outputPer1M:15.0},
+  {id:'anthropic/claude-opus-4.6',name:'Claude Opus 4.6',provider:'Anthropic',family:'Anthropic',color:'#c97c30',tags:['reasoning','creative','long'],tier:'👑',str:'Anthropics mächtigstes Modell – unübertroffen bei Nuancen und langem Kontext.',wk:'Sehr teuer; langsamer als Sonnet.',inputPer1M:15.0,outputPer1M:75.0},
+  {id:'anthropic/claude-haiku-4.5',name:'Claude Haiku 4.5',provider:'Anthropic',family:'Anthropic',color:'#c97c30',tags:['fast'],tier:'⚡',str:'Schnellstes Anthropic-Modell mit niedrigen Kosten für kurze Tasks.',wk:'Begrenzte Tiefe bei komplexen Aufgaben.',inputPer1M:0.8,outputPer1M:4.0},
+  {id:'openai/gpt-5',name:'GPT-5',provider:'OpenAI',family:'OpenAI',color:'#19c37d',tags:['reasoning','coding','creative','long'],tier:'👑',str:'Flaggschiff von OpenAI – exzellent in Reasoning und Multimodalität.',wk:'Teuerste Klasse; API-Zugang begrenzt.',inputPer1M:10.0,outputPer1M:40.0},
+  {id:'openai/gpt-5-mini',name:'GPT-5 Mini',provider:'OpenAI',family:'OpenAI',color:'#19c37d',tags:['fast','coding'],tier:'⚡',str:'Schnell und kosteneffizient mit GPT-5-Architektur für alltägliche Tasks.',wk:'Weniger Tiefe als Vollversion bei komplexem Reasoning.',inputPer1M:0.4,outputPer1M:1.6},
+  {id:'openai/gpt-oss-120b',name:'GPT-OSS 120B',provider:'OpenAI',family:'OpenAI',color:'#19c37d',tags:['reasoning','coding','free'],tier:'🔓',str:'Open-Weight MoE – native Tool-Use, konfigurierbares Reasoning auf H100.',wk:'Größer = mehr Latenz; kein vollständig offener Stack.',inputPer1M:0.15,outputPer1M:0.60},
+  {id:'google/gemini-3.1-pro-preview',name:'Gemini 3.1 Pro',provider:'Google',family:'Google',color:'#4285f4',tags:['reasoning','coding','long'],tier:'🏆',str:'Googles stärkstes Modell – überragend bei Mathematik, Coding und langen Docs.',wk:'Preview-Status; teurer Flagship.',inputPer1M:1.25,outputPer1M:10.0},
+  {id:'google/gemini-3.1-flash-lite-preview',name:'Gemini 3.1 Flash Lite',provider:'Google',family:'Google',color:'#4285f4',tags:['fast','free'],tier:'⚡',str:'Extrem schnell und günstig für Standard-Tasks.',wk:'Begrenzte Tiefe bei komplexem Reasoning.',inputPer1M:0.0,outputPer1M:0.0},
+  {id:'google/gemini-2.5-flash',name:'Gemini 2.5 Flash',provider:'Google',family:'Google',color:'#4285f4',tags:['reasoning','fast'],tier:'⭐',str:'Workhorse mit eingebautem Thinking – beste Preis-Leistung im Reasoning.',wk:'Weniger kreativ als Pro-Modelle.',inputPer1M:0.30,outputPer1M:2.50},
+  {id:'google/gemini-2.5-pro',name:'Gemini 2.5 Pro',provider:'Google',family:'Google',color:'#4285f4',tags:['reasoning','long','coding'],tier:'🏆',str:'Tiefes Denken, 1M Token Kontext – ideal für Dokument-Analyse und Research.',wk:'Hohe Kosten bei langen Kontexten.',inputPer1M:1.25,outputPer1M:10.0},
+  {id:'x-ai/grok-4',name:'Grok 4',provider:'xAI',family:'xAI',color:'#1da1f2',tags:['reasoning','coding'],tier:'🏆',str:'Führt aktuell Reasoning-Leaderboards an – stark bei Code und Faktencheck.',wk:'Teuer; Verfügbarkeit schwankt.',inputPer1M:3.0,outputPer1M:15.0},
+  {id:'x-ai/grok-3-mini',name:'Grok 3 Mini',provider:'xAI',family:'xAI',color:'#1da1f2',tags:['fast','reasoning'],tier:'⚡',str:'Kosteneffizientes Reasoning-Modell mit schnellem Thinking.',wk:'Kleiner als Grok 4; weniger Weltkenntnis.',inputPer1M:0.30,outputPer1M:0.50},
+  {id:'deepseek/deepseek-v3.2',name:'DeepSeek V3.2',provider:'DeepSeek',family:'DeepSeek',color:'#2277ff',tags:['reasoning','coding','long'],tier:'🏆',str:'GPT-5-Klasse laut Benchmarks – Gold-Medaille bei IMO 2025, starkes Tool-Use.',wk:'Chinesischer Anbieter; mögl. Filterung polit. Themen.',inputPer1M:0.26,outputPer1M:0.38},
+  {id:'deepseek/deepseek-r1',name:'DeepSeek R1',provider:'DeepSeek',family:'DeepSeek',color:'#2277ff',tags:['reasoning','coding'],tier:'⭐',str:'Open-Source Reasoning-Champion – transparent mit vollst. Chain-of-Thought.',wk:'Langsam durch sichtbares Reasoning; teuer bei langen Antworten.',inputPer1M:0.45,outputPer1M:2.15},
+  {id:'qwen/qwen3.5-35b-a3b',name:'Qwen 3.5 35B',provider:'Alibaba/Qwen',family:'Qwen',color:'#e43b2e',tags:['reasoning','coding','long'],tier:'⭐',str:'Starkes MoE – balanciert Effizienz und Qualität hervorragend.',wk:'Neueres Modell; Community-Erfahrung noch begrenzt.',inputPer1M:0.15,outputPer1M:0.60},
+  {id:'qwen/qwen3.5-9b',name:'Qwen 3.5 9B',provider:'Alibaba/Qwen',family:'Qwen',color:'#e43b2e',tags:['fast','coding'],tier:'⚡',str:'Kompaktes Modell mit starker Coding-Performance für seine Größe.',wk:'Begrenzt bei komplexem Multi-Step-Reasoning.',inputPer1M:0.06,outputPer1M:0.24},
+  {id:'qwen/qwen3-235b-a22b',name:'Qwen 3 235B',provider:'Alibaba/Qwen',family:'Qwen',color:'#e43b2e',tags:['reasoning','coding','long'],tier:'👑',str:'Massiver MoE – 235B Parameter, führt viele Benchmarks; starke Mehrsprachigkeit.',wk:'Hohe Latenz; teuer bei großen Kontexten.',inputPer1M:0.13,outputPer1M:0.40},
+  {id:'minimax/minimax-m2.5',name:'MiniMax M2.5',provider:'MiniMax',family:'MiniMax',color:'#ff5c5c',tags:['coding','reasoning','long'],tier:'⭐',str:'80.2% SWE-Bench Verified – designed für echte Office-Produktivität und Agenten.',wk:'Weniger bekannt außerhalb Coding/Office.',inputPer1M:0.30,outputPer1M:1.20},
+  {id:'moonshotai/kimi-k2.5',name:'Kimi K2.5',provider:'MoonshotAI',family:'MoonshotAI',color:'#ff9900',tags:['coding','reasoning','long'],tier:'⭐',str:'Native multimodales Coding-Modell mit visueller Coding-Stärke und Self-Agents.',wk:'Weniger stark bei rein textuellen kreativen Aufgaben.',inputPer1M:0.60,outputPer1M:3.0},
+  {id:'liquid/lfm-2-24b-a2b',name:'LFM-2 24B',provider:'Liquid AI',family:'Liquid AI',color:'#00bcd4',tags:['fast','reasoning'],tier:'🔬',str:'Alternatives Architektur-Design – effizient bei langen Kontexten.',wk:'Wenig Benchmarkdaten; ungewohnte Architektur.',inputPer1M:0.15,outputPer1M:0.40},
+  {id:'aion-labs/aion-2.0',name:'Aion 2.0',provider:'Aion Labs',family:'Aion Labs',color:'#9c27b0',tags:['reasoning','creative'],tier:'🔬',str:'Spezialisiert auf komplexe Reasoning-Ketten und Inferenz-intensive Tasks.',wk:'Preview-Stadium; wenig Community-Erfahrung.',inputPer1M:0,outputPer1M:0},
+  {id:'stepfun/step-3.5-flash',name:'Step 3.5 Flash',provider:'StepFun',family:'StepFun',color:'#e91e63',tags:['fast','reasoning'],tier:'⚡',str:'MoE 196B/11B aktiv – speed-effizienter Reasoner auch bei langen Kontexten.',wk:'Chinesischer Anbieter mit mögl. Content-Einschränkungen.',inputPer1M:0.10,outputPer1M:0.40},
+  {id:'z-ai/glm-5',name:'GLM-5',provider:'Z.AI',family:'Z.AI',color:'#00acc1',tags:['coding','reasoning','long'],tier:'⭐',str:'Flagship für komplexe System-Designs und lange Agentenworkflows.',wk:'Weniger stark bei kreativem Schreiben.',inputPer1M:1.0,outputPer1M:3.20},
+  {id:'perplexity/sonar',name:'Sonar',provider:'Perplexity',family:'Perplexity',color:'#20beff',tags:['fast','smart'],tier:'🌐',str:'Eingebettete Web-Suche in Echtzeit – liefert aktuelle Infos mit Quellen.',wk:'Abhängig von Suchergebnisqualität; kein reines parametrisches Reasoning.',inputPer1M:1.0,outputPer1M:1.0},
+  {id:'mistralai/mistral-large',name:'Mistral Large',provider:'Mistral AI',family:'Mistral',color:'#f37626',tags:['reasoning','coding'],tier:'⭐',str:'Europäisches Flaggschiff – stark bei Mehrsprachigkeit und Function-Calling.',wk:'Leicht hinter GPT-5-Klasse bei max. Reasoning-Tiefe.',inputPer1M:2.0,outputPer1M:6.0},
+  {id:'mistralai/ministral-14b-2512',name:'Ministral 14B',provider:'Mistral AI',family:'Mistral',color:'#f37626',tags:['fast','coding'],tier:'⚡',str:'Kompaktes, effizientes Modell mit guter Instruktionstreue.',wk:'Limitiert bei sehr komplexem oder langem Kontext.',inputPer1M:0.10,outputPer1M:0.30},
+  {id:'mistralai/mistral-small-3.2-24b-instruct-2506',name:'Mistral Small 3.2',provider:'Mistral AI',family:'Mistral',color:'#f37626',tags:['fast','free'],tier:'⚡',str:'Starke 24B-Basis mit niedrigen Kosten für schnelle Chat-Tasks.',wk:'Überholt von größeren Modellen bei komplexen Aufgaben.',inputPer1M:0.10,outputPer1M:0.30},
+  {id:'arcee-ai/trinity-large-preview:free',name:'Trinity Large (Free)',provider:'Arcee AI',family:'Arcee AI',color:'#673ab7',tags:['free','reasoning'],tier:'🔓',str:'Kostenlos verfügbares Reasoning-Modell – gut als Einstieg ohne API-Kosten.',wk:'Preview; unzuverlässige Verfügbarkeit.',inputPer1M:0,outputPer1M:0},
+  {id:'nvidia/nemotron-3-super-120b-a12b:free',name:'Nemotron 3 Super (Free)',provider:'NVIDIA',family:'NVIDIA',color:'#76b900',tags:['free','coding'],tier:'🔓',str:'Kostenlos; 120B MoE von NVIDIA – stark bei Coding und Instruktionen.',wk:'Free = Rate-Limits; Verfügbarkeit nicht garantiert.',inputPer1M:0,outputPer1M:0},
+  {id:'meta-llama/llama-3.3-70b-instruct',name:'Llama 3.3 70B',provider:'Meta',family:'Meta',color:'#0064d3',tags:['coding','fast','free'],tier:'⭐',str:'Gold-Standard Open-Source – exzellente Instruktionstreue, günstig, überall verfügbar.',wk:'Schwächer als 405B bei tiefen Reasoning-Aufgaben.',inputPer1M:0.12,outputPer1M:0.30},
+  {id:'meta-llama/llama-3.1-8b-instruct',name:'Llama 3.1 8B',provider:'Meta',family:'Meta',color:'#0064d3',tags:['fast','free'],tier:'⚡',str:'Sehr schnell und günstig für einfache Chat-Tasks.',wk:'Begrenzte Kapazität; überholt von neueren Modellen.',inputPer1M:0.05,outputPer1M:0.10},
+  {id:'microsoft/wizardlm-2-8x22b',name:'WizardLM 2 8×22B',provider:'Microsoft',family:'Microsoft',color:'#00adef',tags:['reasoning','coding'],tier:'⭐',str:'Starkes MoE für komplexe Instructionfolge und Coding.',wk:'Älter; überholt von neueren Modellen in Top-Tier.',inputPer1M:0.50,outputPer1M:0.50},
+  {id:'nousresearch/hermes-4-405b',name:'Hermes 4 405B',provider:'Nous Research',family:'Nous Research',color:'#d32f2f',tags:['reasoning','coding','creative'],tier:'⭐',str:'Hybrid-Reasoning (Think-Tags), starke Schema-Adherenz – top für strukturierte Outputs.',wk:'Massiv; hohe Latenz und Kosten.',inputPer1M:1.5,outputPer1M:4.5},
+  {id:'prime-intellect/intellect-3',name:'Intellect-3',provider:'Prime Intellect',family:'Prime Intellect',color:'#7b1fa2',tags:['reasoning'],tier:'🔬',str:'Community-trainiertes Modell mit dezentralem Trainingsansatz.',wk:'Weniger etabliert; schwächere Top-Tier-Performance.',inputPer1M:0,outputPer1M:0},
+  {id:'allenai/olmo-3.1-32b-instruct',name:'OLMo 3.1 32B',provider:'AllenAI',family:'AllenAI',color:'#2196f3',tags:['reasoning','free'],tier:'🔓',str:'Vollständig Open-Source (Daten, Gewichte, Training) – wissenschaftlich transparent.',wk:'Leistungsrückstand gegenüber proprietären Modellen.',inputPer1M:0.15,outputPer1M:0.50},
+  {id:'writer/palmyra-x5',name:'Palmyra X5',provider:'Writer',family:'Writer',color:'#ff6b35',tags:['creative','coding'],tier:'⭐',str:'Enterprise-fokussiert mit starker Genauigkeit für Business-Content.',wk:'Weniger bekannt außerhalb Business-Anwendungen.',inputPer1M:0.50,outputPer1M:2.0},
+  {id:'xiaomi/minicpm-o-2.6',name:'MiniCPM-o 2.6',provider:'Xiaomi',family:'Xiaomi',color:'#ff6900',tags:['fast','free'],tier:'⚡',str:'Extrem kompaktes Multimodal-Modell für Edge-Inference und On-Device.',wk:'Kleine Parameterzahl; limitiert bei komplexen Tasks.',inputPer1M:0,outputPer1M:0},
 ];
 
 const ALL_TAGS=[
@@ -463,12 +733,22 @@ const ALL_TAGS=[
   {id:'smart',label:'🔀 Smart-Routing',cls:'reasoning'},
 ];
 
-/* ── UTILS ──────────────────────────────────────────────────────────── */
+// Unique families for filter chips
+const FAMILIES=[...new Set(CAT.map(m=>m.family))].sort();
+// Fallback priority: best quality free-ish models per family
+const FALLBACK_CHAIN=['meta-llama/llama-3.3-70b-instruct','google/gemini-2.5-flash','mistralai/mistral-small-3.2-24b-instruct-2506','deepseek/deepseek-v3.2','openai/gpt-oss-120b'];
+
+/* ── UTILS ──────────────────────────────────────────────────────── */
 const pause=ms=>new Promise(r=>setTimeout(r,ms));
 const esc=s=>String(s).replace(/[<>"'&]/g,c=>({'<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;','&':'&amp;'}[c]));
 const q=id=>document.getElementById(id);
 const mdlById=id=>CAT.find(m=>m.id===id)||null;
 const mdlName=id=>{const m=mdlById(id);return m?m.name:(id?id.split('/').pop():'—');};
+const fmtPrice=m=>{
+  if(!m||(!m.inputPer1M&&!m.outputPer1M))return null;
+  if(m.inputPer1M===0&&m.outputPer1M===0)return{label:'Free',cls:'free-price'};
+  return{label:`$${m.inputPer1M.toFixed(2)} / $${m.outputPer1M.toFixed(2)}`,cls:''};
+};
 
 function fmtDate(ts){
   const d=new Date(ts),now=new Date(),yd=new Date(now);yd.setDate(now.getDate()-1);
@@ -477,6 +757,7 @@ function fmtDate(ts){
   if(d.toDateString()===yd.toDateString())return'Gestern '+t;
   return d.toLocaleDateString('de-DE',{day:'2-digit',month:'short',year:'2-digit'})+' '+t;
 }
+
 const Toast={
   show(msg,type='ok',ms=3200){
     const el=document.createElement('div');
@@ -486,6 +767,7 @@ const Toast={
     setTimeout(()=>{el.style.cssText='opacity:0;transform:translateX(.5rem);transition:.2s';setTimeout(()=>el.remove(),220);},ms);
   }
 };
+
 async function copyText(text,label='Text'){
   try{
     if(navigator.clipboard?.writeText)await navigator.clipboard.writeText(text);
@@ -494,15 +776,120 @@ async function copyText(text,label='Text'){
   }catch{Toast.show('Kopieren fehlgeschlagen','err');}
 }
 
-/* ── API ADAPTER ────────────────────────────────────────────────────── */
+/* ── FILE HANDLER ────────────────────────────────────────────────── */
+const FileHandler={
+  attachments:[],  // [{name, type, data, mimeType}]
+
+  async processFiles(files){
+    const results=[];
+    for(const f of files){
+      try{
+        const ext=f.name.split('.').pop().toLowerCase();
+        if(['png','jpg','jpeg','webp','gif'].includes(ext)){
+          const b64=await this._toBase64(f);
+          results.push({name:f.name,type:'image',data:b64,mimeType:f.type||'image/jpeg'});
+        } else if(ext==='pdf'){
+          // PDF: send as base64 document
+          const b64=await this._toBase64(f);
+          results.push({name:f.name,type:'pdf',data:b64,mimeType:'application/pdf'});
+        } else {
+          // Text-based: txt, md, csv, xlsx (read as text)
+          const text=await this._toText(f);
+          results.push({name:f.name,type:'text',data:text,mimeType:'text/plain'});
+        }
+      } catch(e){ Toast.show(`Datei "${f.name}" konnte nicht gelesen werden`,'err'); }
+    }
+    return results;
+  },
+
+  _toBase64(file){
+    return new Promise((res,rej)=>{
+      const r=new FileReader();
+      r.onload=e=>res(e.target.result.split(',')[1]);
+      r.onerror=rej;
+      r.readAsDataURL(file);
+    });
+  },
+
+  _toText(file){
+    return new Promise((res,rej)=>{
+      const r=new FileReader();
+      r.onload=e=>res(e.target.result);
+      r.onerror=rej;
+      r.readAsText(file,'UTF-8');
+    });
+  },
+
+  buildContextString(){
+    if(!this.attachments.length) return '';
+    const parts=this.attachments.filter(a=>a.type==='text'||a.type==='pdf').map(a=>`\n\n[Anhang: ${a.name}]\n${a.type==='text'?a.data:'(PDF-Inhalt als Dokument-Attachment)'}`);
+    return parts.join('');
+  },
+
+  buildMessages(systemPrompt, userContent){
+    // Build multi-modal messages if images present
+    const images=this.attachments.filter(a=>a.type==='image');
+    const pdfs=this.attachments.filter(a=>a.type==='pdf');
+    const texts=this.attachments.filter(a=>a.type==='text');
+    const textCtx=texts.map(t=>`[Datei: ${t.name}]\n${t.data}`).join('\n\n');
+    const fullUser=userContent+(textCtx?'\n\n'+textCtx:'');
+
+    if(images.length===0&&pdfs.length===0){
+      return[{role:'system',content:systemPrompt},{role:'user',content:fullUser}];
+    }
+
+    // Multi-modal content array
+    const contentArr=[{type:'text',text:fullUser}];
+    images.forEach(img=>{contentArr.push({type:'image_url',image_url:{url:`data:${img.mimeType};base64,${img.data}`,detail:'auto'}});});
+    pdfs.forEach(pdf=>{contentArr.push({type:'text',text:`[PDF Anhang: ${pdf.name}]\n`});});
+
+    return[{role:'system',content:systemPrompt},{role:'user',content:contentArr}];
+  }
+};
+
+/* ── PWA ─────────────────────────────────────────────────────────── */
+let _pwaPrompt=null;
+window.addEventListener('beforeinstallprompt',e=>{
+  e.preventDefault();
+  _pwaPrompt=e;
+  const banner=q('pwaBanner');
+  if(banner&&!localStorage.getItem('pwa_dismissed')){
+    banner.classList.add('show');
+  }
+});
+window.addEventListener('appinstalled',()=>{
+  q('pwaBanner')?.classList.remove('show');
+  _pwaPrompt=null;
+  Toast.show('App erfolgreich installiert! 🎉','ok',5000);
+});
+
+/* ── API ADAPTER ─────────────────────────────────────────────────── */
 class Api{
+  static _failedModels=new Set(); // track models that failed this session
+
   static async fetchModels(){
     try{const r=await fetch('https://openrouter.ai/api/v1/models');if(!r.ok)throw 0;return(await r.json()).data||[];}catch{return[];}
   }
+
+  // Smart fallback: find best alternative in same family, then global fallback chain
+  static _getFallback(failedId){
+    const failed=mdlById(failedId);
+    const sameFamilyCandidates=failed
+      ?CAT.filter(m=>m.family===failed.family&&m.id!==failedId&&!this._failedModels.has(m.id))
+      :[];
+    if(sameFamilyCandidates.length)return sameFamilyCandidates[0].id;
+    // Global chain
+    for(const fb of FALLBACK_CHAIN){
+      if(!this._failedModels.has(fb))return fb;
+    }
+    return State.s.summarizer||'meta-llama/llama-3.3-70b-instruct';
+  }
+
   static async call(modelId,messages,opts={}){
     if(!State.s.api)throw new Error('API-Key fehlt – bitte in Settings eintragen.');
     const{seatIdx=null,timeoutMs=90000}=opts;
     let model=modelId,retries=0,isFb=false;
+
     while(retries<=4){
       const ctrl=new AbortController();
       const timer=setTimeout(()=>ctrl.abort(),timeoutMs);
@@ -510,41 +897,61 @@ class Api{
         const r=await fetch('https://openrouter.ai/api/v1/chat/completions',{
           method:'POST',signal:ctrl.signal,
           headers:{'Authorization':`Bearer ${State.s.api}`,'Content-Type':'application/json','HTTP-Referer':location.href,'X-Title':'KI-Stammtisch Pro'},
-          body:JSON.stringify({model,messages,temperature:0.75,max_tokens:2048})
+          body:JSON.stringify({
+            model,messages,
+            temperature:0.75,
+            max_tokens:Math.round((State.s.maxWords||500)*1.5),
+          })
         });
         clearTimeout(timer);
+
         if(r.status===429){
           retries++;
           if(retries>4)throw new Error('Rate-Limit: Max-Retries erreicht.');
           const ra=parseInt(r.headers.get('Retry-After')||'0')||0;
-          const jitter=Math.random()*800;
-          const wait=ra>0?(ra*1000+jitter):Math.min((2**retries)*1200+jitter,32000);
-          UI.log(`⏳ Rate-Limit [${model.split('/').pop()}]. Warte ${Math.round(wait/1000)}s…`);
-          if(seatIdx!==null)UI.badge(seatIdx,`Warten ${Math.round(wait/1000)}s`,'warn');
+          const wait=ra>0?(ra*1000+Math.random()*800):Math.min((2**retries)*1200+Math.random()*800,32000);
+          UI.log(`⏳ Rate-Limit [${model.split('/').pop()}] → ${Math.round(wait/1000)}s`);
+          if(seatIdx!==null)UI.badge(seatIdx,`Warte ${Math.round(wait/1000)}s`,'warn');
           await pause(wait);continue;
         }
+
+        if(r.status===402||r.status===403){
+          // Quota/billing issue – immediately switch to free fallback
+          let em='Quota/Billing-Fehler';
+          try{em=(await r.json())?.error?.message||em;}catch{}
+          this._failedModels.add(model);
+          const fb=this._getFallback(model);
+          if(fb===model)throw new Error(`Quota-Fehler: ${em}`);
+          UI.log(`💳 Quota [${model.split('/').pop()}] → Fallback: ${mdlName(fb)}`);
+          if(seatIdx!==null)UI.badge(seatIdx,'💳 Quota-Fallback','warn',true);
+          model=fb;isFb=true;retries++;
+          await pause(800);continue;
+        }
+
         if(!r.ok){
           let em=r.statusText;
           try{em=(await r.json())?.error?.message||em;}catch{}
-          const fb=State.s.summarizer;
-          if(!fb)throw new Error(`Fehler ${r.status}: ${em}`);
-          if(model===fb)throw new Error(`Fallback [${fb}] ebenfalls fehlgeschlagen: ${em}`);
-          UI.log(`⚠ Fehler [${model.split('/').pop()}]: ${em} → Fallback`);
+          this._failedModels.add(model);
+          const fb=this._getFallback(model);
+          if(fb===model)throw new Error(`Fehler ${r.status}: ${em}`);
+          UI.log(`⚠ Fehler [${model.split('/').pop()}]: ${em} → ${mdlName(fb)}`);
           if(seatIdx!==null)UI.badge(seatIdx,'⚠ Fallback','warn',true);
           model=fb;isFb=true;retries++;
           await pause(1800+Math.random()*600);continue;
         }
+
         const data=await r.json();
         const content=data.choices?.[0]?.message?.content;
         if(!content&&content!=='')throw new Error('Leere API-Antwort.');
         if(seatIdx!==null&&!isFb)UI.badge(seatIdx,'','',false,true);
         return{content,usedModel:model,isFallback:isFb};
+
       }catch(e){
         clearTimeout(timer);
         if(e.name==='AbortError'){
           retries++;
           if(retries>4)throw new Error(`Timeout nach ${timeoutMs/1000}s.`);
-          UI.log(`⏱ Timeout [${model.split('/').pop()}] – Retry ${retries}…`);
+          UI.log(`⏱ Timeout – Retry ${retries}…`);
           await pause(2000);continue;
         }
         if(retries>=4)throw e;
@@ -555,26 +962,156 @@ class Api{
   }
 }
 
-/* ── STATE ──────────────────────────────────────────────────────────── */
+/* ── ROLE DEFAULTS (5-Layer Context Engineering) ─────────────────── */
+const ROLE_DEFAULTS={
+  'Analyst':{emoji:'🔍',
+    sys:'Du bist ein Senior Data Analyst mit Expertise in Faktenprüfung, quantitativer Analyse und evidenzbasiertem Denken. Antworte präzise, strukturiert und datengetrieben. Vermeide Spekulation ohne Grundlage und weise proaktiv auf fehlende Daten oder Messlücken hin.',
+    goal:'Analysiere das Thema auf Basis nachprüfbarer Fakten und Daten. Ziel: Belastbare Erkenntnisse liefern, die als Entscheidungsgrundlage dienen.',
+    know:'Stütze dich auf verfügbare Fakten, Statistiken und empirische Evidenz. Trenne klar zwischen gesicherten Daten, Schätzungen und Spekulationen.',
+    inter:'Strukturierte Antwort mit klaren Unterpunkten. Nutze Zahlen und konkrete Beispiele. Sachlicher, nüchterner Ton ohne werbliche Sprache.',
+    sit:'Du bist die erste Stimme in der Runde und setzt den Maßstab für Präzision und faktische Grundlage.',
+    r2:'Prüfe die Faktenbehauptungen aller Runde-1-Beiträge kritisch. Wo fehlen belastbare Daten? Wo wurden Fakten korrekt dargestellt, wo fehlt Evidenz? Ergänze mit deiner analytischen Perspektive.',
+    r3:'Liefere abschließend die drei wichtigsten datengestützten Erkenntnisse des gesamten Gesprächs in priorisierten Bulletpoints.'},
+  'Kritiker':{emoji:'⚡',
+    sys:'Du bist ein erfahrener kritischer Denker mit Fokus auf logische Konsistenz, Widersprüche und Schwachstellen. Deine Rolle ist konstruktive Herausforderung: Identifiziere Lücken, ungeprüfte Annahmen und blinde Flecken.',
+    goal:'Hinterfrage Argumente und Thesen kritisch. Ziel: Schwachstellen aufdecken, damit bessere Lösungen entstehen.',
+    know:'Nutze logische Argumentation und bekannte Fallstricke (Confirmation Bias, falsche Kausalitäten). Erkenne ungeprüfte Prämissen.',
+    inter:'Direkt und pointiert. Keine ellenlangen Einleitungen. Nenne konkrete Schwachstellen mit Begründung und biete Verbesserungsansätze an.',
+    sit:'Du reagierst auf bestehende Positionen und bist Advokat des Zweifels. Konstruktives Infragestellen ist dein Kernbeitrag.',
+    r2:'Identifiziere die schwächsten Argumentationsketten aus Runde 1. Welche Annahmen wurden ohne Prüfung übernommen? Welche Risiken werden unterschätzt? Nenne die kritisierte Rolle beim Namen.',
+    r3:'Bitte ein finales Urteil: Was sind die drei größten ungelösten Schwachstellen der gesamten Diskussion?'},
+  'Visionär':{emoji:'🚀',
+    sys:'Du bist ein strategischer Vordenker und Innovationsexperte. Denkst in Szenarien, Möglichkeiten und Durchbrüchen. Durchbrichst bestehende Denkrahmen mit First-Principles-Thinking und Analogien aus anderen Domänen.',
+    goal:'Entwickle unkonventionelle Perspektiven und Zukunftsszenarien. Ziel: Den Raum des Möglichen erweitern und neue Lösungsräume öffnen.',
+    know:'Nutze Analogien aus anderen Branchen, historische Wendepunkte, Technologietrends und "Was wäre wenn?"-Szenarien.',
+    inter:'Inspirierend und lebhaft. Zeige konkrete Szenarien. Kurze prägnante Gedanken gefolgt von einem konkreten Vorschlag. Vermeide Fachjargon.',
+    sit:'Du bist der Katalysator in der Runde. Wenn alle in die gleiche Richtung denken, zeige die entgegengesetzte oder völlig neue Perspektive.',
+    r2:'Welche Idee aus Runde 1 hat das größte transformative Potenzial? Erweitere sie radikal ins Unkonventionelle. Was übersehen alle anderen systematisch?',
+    r3:'Male das beste realistische Zukunftsszenario, das aus dieser Diskussion entstehen könnte – konkret und inspiring.'},
+  'Synthetisierer':{emoji:'🧩',
+    sys:'Du bist ein Meister der Integration und Brückenbildung. Erkennst Muster zwischen scheinbar widersprüchlichen Positionen. Deine Stärke ist das Verbinden von Ideen zu einem kohärenten Ganzen.',
+    goal:'Fasse die wichtigsten Standpunkte zusammen und finde übergeordnete Prinzipien. Ziel: Einen Konsens herausarbeiten, der die Stärken aller Beiträge vereint.',
+    know:'Beziehe dich explizit auf alle bisherigen Beiträge. Destilliere das Wesentliche und erkenne Synergien.',
+    inter:'Integrativ und ausgewogen. Strukturiere nach: Gemeinsamer Kern → Spannungsfeld → übergeordnetes Prinzip. Verbindlicher Ton.',
+    sit:'Du trittst nach anderen Rollen an, wenn Positionen klar sind. Deine Antwort fühlt sich wie eine natürliche Schlussfolgerung an.',
+    r2:'Mappe explizit die Verbindungen zwischen den Runde-1-Beiträgen: Wo ergänzen sie sich, wo widersprechen sie sich? Welches übergeordnete Prinzip verbindet alle?',
+    r3:'Formuliere die 5 wichtigsten Kernthesen der Gesamtdiskussion als präzise, eigenständige Sätze.'},
+  'Risikoprüfer':{emoji:'🛡',
+    sys:'Du bist ein Risikomanager und Worst-Case-Analyst. Bewertest systematisch Gefahren, Nebenwirkungen und Eskalationsszenarien. Nutzt Frameworks wie Risk Matrix, FMEA und Scenario Planning.',
+    goal:'Identifiziere und bewerte Risiken, die übersehen werden könnten. Ziel: Handlungsempfehlungen mit Fokus auf Schadensminimierung und Resilienz.',
+    know:'Analysiere Eintrittswahrscheinlichkeit und Schadensausmaß (Hoch/Mittel/Niedrig). Unterscheide kontrollierbare von unkontrollierbaren Risiken.',
+    inter:'Systematisch und nüchtern. Nutze Risikoklassifizierungen. Keine Panikmache, aber klare Warnhinweise mit Mitigationsvorschlägen.',
+    sit:'Du bist die letzte Sicherheitslinie vor einer Fehlentscheidung. Der Nutzer braucht eine ungeschönte Risikobewertung.',
+    r2:'Welche Risiken wurden in Runde 1 unterschätzt oder komplett übersehen? Analysiere die Top-3-Szenarien mit Eintrittswahrscheinlichkeit und Schadensausmaß.',
+    r3:'Gib ein finales Risiko-Ranking: Was sind die kritischsten nicht-adressierten Risiken der gesamten Diskussion?'},
+  'Stratege':{emoji:'♟',
+    sys:'Du bist ein erfahrener Unternehmensberater und Strategieexperte. Denkst in Wettbewerbsvorteilen, Ressourcenallokation und langfristiger Positionierung. Nutzt Frameworks wie Porter\'s Five Forces, SWOT und OKRs.',
+    goal:'Entwickle eine klare strategische Handlungsempfehlung. Ziel: Langfristige Wettbewerbsfähigkeit und optimale Ressourcennutzung sicherstellen.',
+    know:'Denke in Zeitlinien (0-12 Monate / 1-3 Jahre / 3-5+ Jahre). Berücksichtige Stakeholder, Ressourcen und Marktdynamik.',
+    inter:'Klare Empfehlungen mit Priorisierung. "Quick Wins" vs. "Long Bets" unterscheiden. Entscheidungsunterstützend, nicht akademisch.',
+    sit:'Dein Output fließt direkt in eine strategische Entscheidung ein. Sei konkret und actionable.',
+    r2:'Bewertet die strategische Validität der Runde-1-Positionen: Welche Empfehlung hat den höchsten strategischen Hebeleffekt? Was fehlt strategisch?',
+    r3:'Formuliere eine klare strategische Prioritätenliste: Was sind die Top-3-Maßnahmen mit dem höchsten Return on Strategy?'},
+  'Ethiker':{emoji:'⚖️',
+    sys:'Du bist ein Ethikberater mit Expertise in angewandter Ethik und gesellschaftlichen Implikationen. Analysierst aus mehreren ethischen Frameworks (Utilitarismus, Deontologie, Tugendethik) ohne zu moralisieren.',
+    goal:'Bewerte die ethischen Dimensionen. Ziel: Mögliche Wertekonflikte, gesellschaftliche Auswirkungen und moralische Verantwortung sichtbar machen.',
+    know:'Berücksichtige verschiedene Stakeholder-Perspektiven, marginalisierte Gruppen und langfristige gesellschaftliche Folgen.',
+    inter:'Ausgewogen und differenziert. Zeige alle ethischen Seiten. Stelle die richtigen Fragen statt einfache Antworten zu geben. Keine Vorlesung.',
+    sit:'Der Nutzer benötigt ethische Orientierung. Du erinnerst die Runde an gesellschaftliche Verantwortung.',
+    r2:'Welche ethischen Dimensionen wurden in Runde 1 ignoriert oder unzureichend behandelt? Nenne konkrete Wertekonflikte mit Handlungsempfehlung.',
+    r3:'Bewerte abschließend: Wie ethisch vertretbar ist die Gesamtrichtung der Diskussion? Was muss ethisch sichergestellt werden?'},
+  'Techniker':{emoji:'⚙️',
+    sys:'Du bist ein Senior-Ingenieur und technischer Experte. Denkst in Systemen, Implementierungen und technischen Machbarkeiten. Erkennst Implementierungsrisiken und technische Schulden.',
+    goal:'Bewerte die technische Umsetzbarkeit und zeige Implementierungswege auf. Ziel: Machbare technische Lösung mit klaren Anforderungen definieren.',
+    know:'Konzentriere dich auf technische Spezifika: Architekturen, Tools, Performance, Skalierbarkeit und Abhängigkeiten.',
+    inter:'Präzise und technisch. Nutze Pseudocode, Schrittfolgen oder Systemdiagramm-Beschreibungen wo hilfreich. Ehrlich über Aufwände.',
+    sit:'Du übersetzt Anforderungen in technische Realität. Sei ehrlich über Machbarkeit und Grenzen.',
+    r2:'Bewertet die technische Machbarkeit der Runde-1-Vorschläge. Was ist realistisch implementierbar? Wo sind die größten technischen Herausforderungen?',
+    r3:'Liefere einen technischen Umsetzungsfahrplan in 3 Phasen: Was ist heute machbar, was in 6 Monaten, was langfristig?'},
+  'Ökonom':{emoji:'💰',
+    sys:'Du bist ein Wirtschaftsanalyst und Finanzexperte. Analysierst Kosten-Nutzen-Verhältnisse, Marktmechanismen, ROI und wirtschaftliche Anreize. Denkst in Angebot, Nachfrage und Opportunitätskosten.',
+    goal:'Bewerte die wirtschaftliche Dimension und liefere eine Kosten-Nutzen-Analyse. Ziel: Finanzielle Auswirkungen und wirtschaftliche Sinnhaftigkeit klären.',
+    know:'Quantifiziere Kosten und Nutzen wo möglich. Denke in Szenarien (Best/Base/Worst Case). Berücksichtige Opportunitätskosten.',
+    inter:'Zahlenorientiert und sachlich. Nutze Größenordnungen mit Bandbreiten. ROI und Break-Even klar benennen.',
+    sit:'Der Nutzer braucht wirtschaftliche Entscheidungsgrundlagen. Sei konkret über Investitionen und erwartete Renditen.',
+    r2:'Berechne oder schätze die wirtschaftlichen Auswirkungen der Runde-1-Vorschläge. Was kostet es, was bringt es? Welcher Ansatz hat den besten ROI?',
+    r3:'Gib eine finale wirtschaftliche Bewertung: Top-3-Prioritäten nach Kosten-Nutzen-Effizienz sortiert.'},
+  'Psychologe':{emoji:'🧠',
+    sys:'Du bist ein Verhaltenspsychologe und Experte für menschliches Verhalten, kognitive Verzerrungen und Gruppenpsychologie. Analysierst menschliche Faktoren, Akzeptanzhürden und Verhaltensänderungen.',
+    goal:'Untersuche die menschliche Dimension: Wie reagieren Menschen? Ziel: Verhaltens- und Akzeptanzhürden identifizieren und Lösungsansätze vorschlagen.',
+    know:'Nutze Erkenntnisse aus Behavioral Economics, Change Management und sozialer Psychologie. Berücksichtige Motivationen, Ängste und Gewohnheiten.',
+    inter:'Empathisch aber analytisch. Erkläre menschliche Reaktionen ohne zu werten. Praxisnahe Handlungsempfehlungen.',
+    sit:'Du bist die menschliche Stimme. Erinnerst die Runde daran, dass hinter jedem System Menschen stehen.',
+    r2:'Welche menschlichen Faktoren wurden in Runde 1 ignoriert? Analysiere Akzeptanzhürden, emotionale Reaktionen und Verhaltensänderungsrisiken.',
+    r3:'Gib konkrete Empfehlungen: Was brauchen Menschen, um die Diskussionsergebnisse anzunehmen und umzusetzen?'},
+  'Jurist':{emoji:'⚖',
+    sys:'Du bist ein Rechtsberater mit Fokus auf rechtliche Risiken, Compliance und regulatorische Anforderungen. Analysierst juristisch ohne konkrete Rechtsberatung zu ersetzen.',
+    goal:'Identifiziere rechtliche Risiken und Compliance-Anforderungen. Ziel: Rechtssicherheit herstellen und blinde Flecken aufzeigen.',
+    know:'Beziehe relevante Rechtsbereiche ein (Datenschutz, Vertragsrecht, Haftung, Regulatorik). Differenziere zwischen Jurisdiktionen.',
+    inter:'Präzise und vorsichtig formuliert. Klar zwischen gesichert/unklar/riskant unterscheiden. Expertenkonsultation empfehlen wo nötig.',
+    sit:'Der Nutzer braucht einen ersten Rechtsscheck. Fokus auf die wichtigsten Risiken, kein vollständiges Rechtsgutachten.',
+    r2:'Welche rechtlichen Fallstricke wurden in Runde 1 übersehen? Nenne die Top-3-rechtlichen Risiken mit Einstufung (kritisch/moderat/gering).',
+    r3:'Gib ein abschließendes Compliance-Checklist: Was muss rechtlich vor der Umsetzung geklärt werden?'},
+  'Moderator':{emoji:'🎯',
+    sys:'Du bist ein erfahrener Diskussionsmoderator und Facilitator. Strukturierst komplexe Debatten, identifizierst Gemeinsamkeiten und Konflikte und führst die Runde zu produktiven Ergebnissen.',
+    goal:'Moderiere die Diskussion und destilliere klare nächste Schritte. Ziel: Entscheidungsgrundlagen und Handlungsempfehlungen aus der Runde erarbeiten.',
+    know:'Beziehe dich auf ALLE bisherigen Beiträge. Benenne explizit Konsens und Dissens. Identifiziere offene Fragen.',
+    inter:'Neutral und strukturierend: Einigkeit über X → Unterschiedliche Einschätzung bei Y → Offene Frage Z. Moderierender Ton.',
+    sit:'Du kommst nach allen anderen. Deine Antwort ist die Zusammenfassung und der Handlungsrahmen für den Nutzer.',
+    r2:'Strukturiere die Runde-1-Beiträge: Was sind die 3 Kernaussagen? Wo gibt es echte Einigkeit, wo fundamentalen Dissens?',
+    r3:'Formuliere das Diskussionsergebnis als Executive Summary mit klaren nächsten Schritten und Verantwortlichkeiten.'},
+  'Kreativdirektor':{emoji:'🎨',
+    sys:'Du bist ein Kreativdirektor und Storytelling-Experte. Denkst in Narrativen, visuellen Metaphern und emotionalen Resonanzen. Verwandelst komplexe Sachverhalte in zugängliche, überzeugende Geschichten.',
+    goal:'Entwickle eine kommunikative und kreative Perspektive. Ziel: Die Kernbotschaft so formen, dass sie Menschen berührt und überzeugt.',
+    know:'Denke in Zielgruppen, Narrativen und emotionalen Hooks. Wie würde ein guter Kommunikator dieses Thema erzählen?',
+    inter:'Bildhaft und inspirierend. Nutze Metaphern und kurze prägnante Formulierungen. Mache Abstraktes greifbar.',
+    sit:'Du übersetzt Inhalte in Kommunikation. Deine Stimme ist anders als alle anderen – nutze das als Stärke.',
+    r2:'Entwickle aus den Runde-1-Inhalten eine überzeugende Kernbotschaft: Was ist das Narrativ? Welche Metapher beschreibt das Ganze am besten?',
+    r3:'Formuliere 3 kommunikative Versionen der Kernbotschaft: für Experten, für Laien und als One-Liner.'},
+  'Projektmanager':{emoji:'📋',
+    sys:'Du bist ein erfahrener Projektmanager mit Fokus auf Umsetzbarkeit, Timelines und Ressourcenplanung. Denkst in Meilensteinen, Abhängigkeiten und Deliverables. Nutzt PM-Frameworks (Agile, Wasserfall, OKR).',
+    goal:'Entwickle einen konkreten Umsetzungsplan. Ziel: Aus Ideen actionable Schritte mit Verantwortlichkeiten und Zeitrahmen machen.',
+    know:'Identifiziere kritische Pfade, Blocker und Ressourcenbedarfe. Schätze realistische Aufwände.',
+    inter:'Praktisch und konkret. Nutze Phasen, Meilensteine und Prioritäten. Was zuerst? Was kann warten? Was ist ein Blocker?',
+    sit:'Der Nutzer will wissen "Wie setzen wir das konkret um?". Liefere einen klaren Fahrplan ohne viel Theorie.',
+    r2:'Entwickle aus den Runde-1-Ideen eine konkrete Umsetzungssequenz: Was sind die 5 ersten Schritte? Wer muss involviert werden?',
+    r3:'Gib einen finalen Projektplan: 3 Phasen mit je Ziel, Dauer, benötigten Ressourcen und Erfolgskriterien.'},
+  'Wissenschaftler':{emoji:'🔬',
+    sys:'Du bist ein Forschungsexperte mit Fokus auf wissenschaftliche Methodik und Evidenzqualität. Unterscheidest zwischen korrelativen und kausalen Aussagen, Hypothesen und bewiesenen Fakten.',
+    goal:'Analysiere das Thema nach wissenschaftlichen Standards. Ziel: Belastbare Evidenz von Spekulation trennen und den Forschungsstand darstellen.',
+    know:'Referenziere Evidenzebenen: Einzelstudie vs. Meta-Analyse vs. Konsens. Weise auf Replikationsprobleme und Bias hin.',
+    inter:'Epistemisch differenziert. Nutze "Evidenz legt nahe", "gesichert gilt", "spekulativ". Vermeide Gewissheiten wo keine bestehen.',
+    sit:'Du kalibrierst die Verlässlichkeit aller anderen Aussagen. Deine wissenschaftliche Einschätzung ist der Maßstab.',
+    r2:'Bewerte die wissenschaftliche Qualität der Runde-1-Aussagen: Was ist empirisch gesichert, was sind Hypothesen, was ist Spekulation?',
+    r3:'Formuliere abschließend: Was wissen wir mit Sicherheit, was ist wahrscheinlich, was bleibt offen und forschungsbedürftig?'},
+};
+
+/* ── STATE ───────────────────────────────────────────────────────── */
 class State{
-  static s={api:'',rounds:3,summarizer:'meta-llama/llama-3.3-70b-instruct'};
+  static s={api:'',rounds:3,summarizer:'meta-llama/llama-3.3-70b-instruct',maxWords:500,format:'auto',focus:'',keyPoints:5,lang:'de'};
   static seats=[
-    {role:'Analyst',model:'google/gemini-2.5-flash',prompt:'Fokussiere dich auf Fakten und Daten. Sei präzise und strukturiert.',context:'Bleibe sachlich.'},
-    {role:'Kritiker',model:'anthropic/claude-sonnet-4.6',prompt:'Suche logische Lücken, Widersprüche und blinde Flecken.',context:'Sei konstruktiv-kritisch.'},
-    {role:'Visionär',model:'openai/gpt-5',prompt:'Denke unkonventionell, kreativ und zukunftsorientiert.',context:'Ignoriere scheinbare Limits.'},
-    {role:'Synthetisierer',model:'deepseek/deepseek-v3.2',prompt:'Verbinde die Ideen anderer zu einem kohärenten Ganzen.',context:'Denke integrativ.'},
-    {role:'Risikoprüfer',model:'mistralai/mistral-large',prompt:'Bewerte Risiken, Nebenwirkungen und mögliche Fehler.',context:'Worst-Case-Fokus.'}
+    {role:'Analyst',model:'google/gemini-2.5-flash',ctx:{...ROLE_DEFAULTS['Analyst']}},
+    {role:'Kritiker',model:'anthropic/claude-sonnet-4.6',ctx:{...ROLE_DEFAULTS['Kritiker']}},
+    {role:'Visionär',model:'openai/gpt-5',ctx:{...ROLE_DEFAULTS['Visionär']}},
+    {role:'Synthetisierer',model:'deepseek/deepseek-v3.2',ctx:{...ROLE_DEFAULTS['Synthetisierer']}},
+    {role:'Risikoprüfer',model:'mistralai/mistral-large',ctx:{...ROLE_DEFAULTS['Risikoprüfer']}}
   ];
   static history=[];
   static db=null;
+
   static async init(){
     return new Promise(res=>{
-      const req=indexedDB.open('KIStammtischV3',1);
-      req.onupgradeneeded=e=>{const db=e.target.result;if(!db.objectStoreNames.contains('state'))db.createObjectStore('state');if(!db.objectStoreNames.contains('runs'))db.createObjectStore('runs',{keyPath:'id',autoIncrement:true});};
+      const req=indexedDB.open('KIStammtischV4',1);
+      req.onupgradeneeded=e=>{
+        const db=e.target.result;
+        if(!db.objectStoreNames.contains('state'))db.createObjectStore('state');
+        if(!db.objectStoreNames.contains('runs'))db.createObjectStore('runs',{keyPath:'id',autoIncrement:true});
+      };
       req.onsuccess=async e=>{this.db=e.target.result;await this.load();res();};
       req.onerror=()=>res();
     });
   }
+
   static async load(){
     return new Promise(res=>{
       try{
@@ -585,98 +1122,303 @@ class State{
       }catch{res();}
     });
   }
+
   static async save(){
     if(!this.db)return;
-    const tx=this.db.transaction('state','readwrite');const st=tx.objectStore('state');
-    st.put(this.s,'settings');st.put(this.seats,'seats');
+    // Safari/iOS: wrap in try-catch, IndexedDB can throw QuotaExceededError
+    try{
+      const tx=this.db.transaction('state','readwrite');const st=tx.objectStore('state');
+      st.put(this.s,'settings');st.put(this.seats,'seats');
+    }catch(e){console.warn('IDB save error:',e);}
   }
-  static async saveRun(query,evalData){
+
+  // Save complete run data including eval object, wordcloud tokens, tendency
+  static async saveRun(runData){
     if(!this.db)return;
-    return new Promise(res=>{const tx=this.db.transaction('runs','readwrite');tx.objectStore('runs').put({ts:Date.now(),query,history:[...this.history],eval:evalData});tx.oncomplete=res;});
+    try{
+      // Prune oldest runs if > 25 (protect storage on mobile)
+      await this._pruneRuns(25);
+      return new Promise(res=>{
+        const tx=this.db.transaction('runs','readwrite');
+        tx.objectStore('runs').put(runData);
+        tx.oncomplete=res;
+        tx.onerror=res; // don't fail silently
+      });
+    }catch(e){console.warn('IDB saveRun error:',e);}
   }
-  static async loadRuns(n=10){
+
+  static async _pruneRuns(max){
+    return new Promise(res=>{
+      try{
+        const req=this.db.transaction('runs','readonly').objectStore('runs').openCursor(null,'prev');
+        const ids=[];
+        req.onsuccess=e=>{
+          const c=e.target.result;
+          if(c){ids.push(c.primaryKey);c.continue();}
+          else{
+            const toDelete=ids.slice(max);
+            if(!toDelete.length){res();return;}
+            const tx2=this.db.transaction('runs','readwrite');const st2=tx2.objectStore('runs');
+            toDelete.forEach(id=>st2.delete(id));
+            tx2.oncomplete=res;tx2.onerror=res;
+          }
+        };
+        req.onerror=()=>res();
+      }catch{res();}
+    });
+  }
+
+  static async loadRuns(n=25){
     if(!this.db)return[];
     return new Promise(res=>{
-      const req=this.db.transaction('runs','readonly').objectStore('runs').openCursor(null,'prev');
-      const runs=[];
-      req.onsuccess=e=>{const c=e.target.result;if(c&&runs.length<n){runs.push(c.value);c.continue();}else res(runs);};
-      req.onerror=()=>res([]);
+      try{
+        const req=this.db.transaction('runs','readonly').objectStore('runs').openCursor(null,'prev');
+        const runs=[];
+        req.onsuccess=e=>{const c=e.target.result;if(c&&runs.length<n){runs.push(c.value);c.continue();}else res(runs);};
+        req.onerror=()=>res([]);
+      }catch{res([]);}
     });
   }
 }
 
-/* ── ENGINE ─────────────────────────────────────────────────────────── */
+/* ── ENGINE ──────────────────────────────────────────────────────── */
 class Engine{
+
+  // Build system prompt from 5-layer context
+  static _buildSysPrompt(seat, globals){
+    const c=seat.ctx||{};
+    const {lang,fmt,focus,maxWords}=globals;
+    const langI=lang==='de'?'Antworte auf Deutsch.':(lang==='en'?'Reply in English.':'');
+    const focI=focus?`\nFokussiere besonders auf: ${focus}.`:'';
+    const fmtMap={prose:'Schreibe in zusammenhängendem Fließtext.',bullets:'Strukturiere in prägnanten Bullet-Points.',list:'Gib eine nummerierte Liste.',structured:'Gliedere mit kurzen Überschriften und Absätzen.',auto:''};
+    const fmtI=fmtMap[fmt]||'';
+
+    const layers=[
+      `=== EBENE 1 – SYSTEMKONTEXT: DEINE IDENTITÄT & LEITPLANKEN ===\n${c.sys||'Du bist ein hilfreicher Experte.'}`,
+      `=== EBENE 2 – AUFGABEN-/ZIELKONTEXT: DAS WARUM ===\n${c.goal||'Analysiere die Frage gründlich.'}`,
+      c.know?`=== EBENE 3 – WISSENSKONTEXT: DEINE INFORMATIONSBASIS ===\n${c.know}`:'',
+      `=== EBENE 4 – INTERAKTIONSKONTEXT: FORMAT & STIL ===\n${c.inter||''}\n${fmtI}\n${langI}`.trim(),
+      `=== EBENE 5 – SITUATIONSKONTEXT: UMGEBUNG & PROZESSSTAND ===\n${c.sit||''}\nDeine Rolle: ${seat.role}. Maximale Länge: ${maxWords} Wörter.${focI}`.trim()
+    ].filter(Boolean).join('\n\n');
+
+    return layers;
+  }
+
+  // Build structured cross-round user message
+  static _buildCrossRoundMsg(r, seat, query, globals){
+    const {allHistory, summary}=globals;
+    const role=seat.role;
+    const def=ROLE_DEFAULTS[role]||{};
+
+    if(r===1){
+      return query; // Pure first impression
+    }
+
+    if(r===2){
+      const r1items=allHistory.filter(h=>h.round===1);
+      const prevBlock=r1items.map(h=>{
+        const mdl=mdlById(h.model);
+        return `┌─ ${h.role.toUpperCase()} [${mdl?.name||h.model.split('/').pop()}] ─┐\n${h.content}\n└${'─'.repeat(40)}┘`;
+      }).join('\n\n');
+
+      const r2instr=def.r2||`Reagiere auf die obigen Beiträge aus deiner Rolle als ${role}. Nenne explizit welche Punkte du aufgreifst oder hinterfragst.`;
+
+      return `URSPRÜNGLICHE FRAGE:\n${query}
+
+═══════════════════════════════════════
+RUNDE 1 – ALLE BEITRÄGE IM ÜBERBLICK
+═══════════════════════════════════════
+${prevBlock}
+
+═══════════════════════════════════════
+DEIN AUFTRAG FÜR RUNDE 2 (als ${role}):
+═══════════════════════════════════════
+${r2instr}
+
+WICHTIG: Beziehe dich explizit auf die Beiträge anderer Rollen (nenne sie beim Namen). Baue auf Stärken auf und zeige Lücken auf.`;
+    }
+
+    // Round 3+
+    // Get previous round outputs for this seat's role
+    const myPrevRound=allHistory.filter(h=>h.role===role&&typeof h.round==='number'&&h.round===r-1);
+    const myPrevText=myPrevRound.length?`\nDEIN LETZTER BEITRAG (Runde ${r-1}):\n${myPrevRound.map(h=>h.content).join('\n')}`:'';
+
+    const r3instr=def.r3||`Trage deinen finalen, destillierten Beitrag aus der Perspektive des ${role} bei.`;
+
+    return `URSPRÜNGLICHE FRAGE:\n${query}
+
+═══════════════════════════════════════
+KONTEXT-ZUSAMMENFASSUNG ALLER RUNDEN
+═══════════════════════════════════════
+${summary}
+${myPrevText}
+
+═══════════════════════════════════════
+DEIN ABSCHLUSS-BEITRAG (als ${role}, Runde ${r}):
+═══════════════════════════════════════
+${r3instr}
+
+Fokussiere auf das, was aus deiner spezifischen Rollenperspektive noch fehlt oder verdichtet werden muss.`;
+  }
+
   static async run(){
     const query=(q('inpD').value||q('inpM').value).trim();
     if(!query){Toast.show('Bitte eine Frage eingeben!','info');return;}
     if(!State.s.api){Toast.show('API-Key in Settings eintragen!','err');q('dlgSettings').showModal();return;}
+
+    Api._failedModels.clear();
     UI.setRunning(true);UI.resetDash();State.history=[];let summary='';
+
+    const globals={
+      lang:State.s.lang||'de',
+      fmt:State.s.format||'auto',
+      focus:State.s.focus||'',
+      maxWords:State.s.maxWords||500,
+      allHistory:State.history,
+      summary
+    };
+
     try{
       for(let r=1;r<=State.s.rounds;r++){
+        globals.allHistory=State.history;
+
+        // Build rolling summary from round 3 onward
         if(r>=3&&State.history.length){
-          UI.log(`[R${r}] Erstelle Zusammenfassung…`);
-          const payload=State.history.map(h=>`[${h.role}]: ${h.content}`).join('\n\n');
+          UI.log(`[R${r}] Erstelle Kontext-Zusammenfassung…`);
+          const langI=globals.lang==='de'?'auf Deutsch':(globals.lang==='en'?'in English':'');
+          const payload=State.history
+            .filter(h=>h.role!=='Summarizer'&&typeof h.round==='number')
+            .map(h=>`[${h.role}|R${h.round}]: ${h.content}`)
+            .join('\n\n');
           const sr=await Api.call(State.s.summarizer,[
-            {role:'system',content:'Du bist ein präziser Kontext-Bewahrer. Fasse alle Beiträge neutral zusammen. Max 300 Wörter.'},
+            {role:'system',content:`Du bist ein präziser Kontext-Bewahrer. Fasse alle Beiträge ${langI} neutral zusammen. Bewahre die Kernaussagen jeder Rolle. Max 350 Wörter.`},
             {role:'user',content:payload}
           ]);
           summary=sr.content;
+          globals.summary=summary;
           State.history.push({round:'Sys',role:'Summarizer',content:summary,model:sr.usedModel,isFallback:false});
-          await pause(1500);
+          await pause(1200);
         }
+
         for(let i=0;i<State.seats.length;i++){
           const seat=State.seats[i];
           UI.setSeat(i,true);
           UI.log(`[R${r}] ${seat.role} (${mdlName(seat.model)})…`);
-          let userMsg;
-          if(r===1){
-            userMsg=query;
-          }else if(r===2){
-            const prev=State.history.filter(h=>h.round===1).map(h=>`**${h.role}:** ${h.content}`).join('\n\n');
-            userMsg=`Frage: ${query}\n\nRunde 1 – alle Beiträge:\n${prev}\n\nBaue auf den Beiträgen auf und erweitere sie aus deiner Rolle (${seat.role}).`;
+
+          // Build 5-layer system prompt
+          const sysPart=this._buildSysPrompt(seat,globals);
+
+          // Build user message with cross-round context
+          const rawUserMsg=this._buildCrossRoundMsg(r,seat,query,{...globals,allHistory:State.history,summary});
+
+          // Add file context to Round 1
+          let messages;
+          if(r===1&&FileHandler.attachments.length>0){
+            messages=FileHandler.buildMessages(sysPart,rawUserMsg);
           }else{
-            userMsg=`Frage: ${query}\n\nKonsens-Zusammenfassung:\n${summary}\n\nFinaler Beitrag aus deiner Rolle (${seat.role}):`;
+            messages=[{role:'system',content:sysPart},{role:'user',content:rawUserMsg}];
           }
-          const res=await Api.call(seat.model,[
-            {role:'system',content:`${seat.prompt}\n${seat.context}\nRolle: ${seat.role}. Sei prägnant aber tiefgründig. Max 500 Wörter.`},
-            {role:'user',content:userMsg}
-          ],{seatIdx:i});
-          State.history.push({round:r,role:seat.role,content:res.content,model:res.usedModel,isFallback:res.isFallback});
+
+          const res=await Api.call(seat.model,messages,{seatIdx:i});
+          State.history.push({
+            round:r,
+            role:seat.role,
+            content:res.content,
+            model:res.usedModel,
+            isFallback:res.isFallback,
+            ctxSnapshot:{sys:seat.ctx?.sys?.slice(0,80),goal:seat.ctx?.goal?.slice(0,60)}
+          });
           UI.setSeat(i,false);
-          await pause(700+Math.random()*500);
+          await pause(600+Math.random()*500);
         }
       }
+
+      // Final evaluation
       UI.log('Erstelle Evaluation…');
-      const evalText=State.history.filter(h=>h.role!=='Summarizer').map(h=>`[${h.role}|R${h.round}]: ${h.content}`).join('\n\n');
+      const langI=globals.lang==='de'?'Antworte auf Deutsch.':'';
+      const evalText=State.history
+        .filter(h=>h.role!=='Summarizer')
+        .map(h=>`[${h.role}|R${h.round}]: ${h.content}`)
+        .join('\n\n');
+
       const evRes=await Api.call(State.s.summarizer,[
-        {role:'system',content:'Analysiere die Diskussion. Antworte NUR als gültiges JSON (keine Backticks). Keys: "Konsens","Konflikte","KeyTakeaways" (Array),"Stimmung".'},
+        {role:'system',content:`Analysiere die Diskussion mehrerer KI-Rollen. Antworte NUR als gültiges JSON (keine Backticks, kein Text außen). Exakt diese Keys:
+"Konsens": string – wo alle übereinstimmen,
+"Konflikte": string – wo Meinungen auseinandergehen,
+"KeyTakeaways": array of ${State.s.keyPoints||5} strings – wichtigste Erkenntnisse als präzise eigenständige Sätze,
+"Stimmung": "positiv"|"negativ"|"neutral"|"gemischt",
+"Tendenz": object mit Rollennamen als Keys und 0-100 Werten (100=maximal konstruktiv/positiv).
+${langI}`},
         {role:'user',content:evalText}
       ]);
-      UI.renderEval(evRes.content);
-      await State.saveRun(query,evRes.content);
-      UI.renderMatrix();UI.renderWC();
+
+      // Build wordcloud
+      const allText=State.history.map(h=>h.content).join(' ').toLowerCase();
+      const tokens=allText.split(/\W+/).filter(w=>w.length>3&&isNaN(w)&&!STOP.has(w));
+      const freq={};tokens.forEach(t=>{freq[t]=(freq[t]||0)+1;});
+      const wcTokens=Object.entries(freq).sort((a,b)=>b[1]-a[1]).slice(0,50);
+
+      let evalObj=null;
+      try{evalObj=JSON.parse(evRes.content.replace(/```json|```/g,'').trim());}catch{}
+
+      const runData={
+        ts:Date.now(),query,
+        history:[...State.history],
+        evalRaw:evRes.content,evalObj,wcTokens,
+        seats:State.seats.map(s=>({...s})),
+        settings:{...State.s}
+      };
+
+      await State.saveRun(runData);
+      UI.renderEval(evRes.content,evalObj);
+      UI.renderMatrix();
+      UI.renderWC(wcTokens);
+      UI.renderTendency(evalObj);
       UI.log('✓ Lauf abgeschlossen!');
       Toast.show('Diskussion beendet! 🎉','ok');
       UI.switchView('vDash');
+
     }catch(e){
       Toast.show('Fehler: '+e.message,'err',8000);
       UI.log('Abbruch: '+e.message);
+      console.error(e);
     }finally{UI.setRunning(false);}
   }
 }
 
-/* ── PICKER ─────────────────────────────────────────────────────────── */
+/* ── PICKER ──────────────────────────────────────────────────────── */
 const Picker={
-  activeTags:new Set(),sq:'',cb:null,cur:'',
+  activeTags:new Set(),activeFam:null,sq:'',cb:null,cur:'',
   open(cur,cb){
-    this.cur=cur;this.cb=cb;this.activeTags.clear();this.sq='';
+    this.cur=cur;this.cb=cb;this.activeTags.clear();this.activeFam=null;this.sq='';
     q('mpSearch').value='';
-    this.renderTags();this.renderList();
+    this.renderFamilies();
+    this.renderTags();
+    this.renderList();
     q('dlgPicker').showModal();
     setTimeout(()=>q('mpSearch').focus(),150);
   },
   select(id){this.cb?.(id);q('dlgPicker').close();},
+
+  renderFamilies(){
+    const row=q('famRow');row.innerHTML='';
+    // "Alle" chip
+    const all=document.createElement('button');
+    all.className=`fam-chip${!this.activeFam?' sel':''}`;all.textContent='Alle';
+    all.addEventListener('click',()=>{this.activeFam=null;this.renderFamilies();this.renderList();});
+    row.append(all);
+    FAMILIES.forEach(fam=>{
+      const chip=document.createElement('button');
+      chip.className=`fam-chip${this.activeFam===fam?' sel':''}`;
+      chip.textContent=fam;
+      chip.addEventListener('click',()=>{
+        this.activeFam=this.activeFam===fam?null:fam;
+        this.renderFamilies();this.renderList();
+      });
+      row.append(chip);
+    });
+  },
+
   renderTags(){
     const cont=q('mpTags');cont.innerHTML='';
     ALL_TAGS.forEach(t=>{
@@ -690,13 +1432,14 @@ const Picker={
       cont.append(el);
     });
   },
+
   renderList(){
-    const list=q('mpList');
-    const sq=this.sq.toLowerCase();
+    const list=q('mpList');const sq=this.sq.toLowerCase();
     let filtered=CAT.filter(m=>{
-      const ms=!sq||m.name.toLowerCase().includes(sq)||m.id.toLowerCase().includes(sq)||m.provider.toLowerCase().includes(sq)||m.str.toLowerCase().includes(sq);
+      const ms=!sq||m.name.toLowerCase().includes(sq)||m.id.toLowerCase().includes(sq)||m.provider.toLowerCase().includes(sq)||m.str.toLowerCase().includes(sq)||m.family.toLowerCase().includes(sq);
       const mt=this.activeTags.size===0||[...this.activeTags].every(t=>m.tags.includes(t));
-      return ms&&mt;
+      const mf=!this.activeFam||m.family===this.activeFam;
+      return ms&&mt&&mf;
     });
     const groups={};
     filtered.forEach(m=>{(groups[m.provider]=groups[m.provider]||[]).push(m);});
@@ -710,10 +1453,12 @@ const Picker={
         card.className=`mp-card${m.id===this.cur?' selected':''}`;
         const init=m.name.substring(0,2).toUpperCase();
         const tagHtml=m.tags.map(t=>`<span class="mtag ${t}">${t}</span>`).join('');
+        const priceInfo=fmtPrice(m);
+        const priceBadge=priceInfo?`<span class="mp-price ${priceInfo.cls}">${esc(priceInfo.label)}</span>`:'';
         card.innerHTML=`
           <div class="mp-av" style="background:${m.color}20;color:${m.color};border:1px solid ${m.color}30">${esc(init)}</div>
           <div class="mp-info">
-            <div class="mp-name"><span>${esc(m.name)}</span><span class="mp-tier">${m.tier}</span></div>
+            <div class="mp-name"><span>${esc(m.name)}</span><span class="mp-tier">${m.tier}</span>${priceBadge}</div>
             <div class="mp-id">${esc(m.id)}</div>
             <div class="mp-str">💪 ${esc(m.str)}</div>
             <div class="mp-wk">⚡ ${esc(m.wk)}</div>
@@ -727,51 +1472,134 @@ const Picker={
   }
 };
 
-/* ── UI ─────────────────────────────────────────────────────────────── */
+/* ── UI ──────────────────────────────────────────────────────────── */
 const UI={
+  _listMode:false,
+  _readerListMode:false,
+  _readerItems:null,
+
   init(){
+    // Sync inputs
     q('inpD').addEventListener('input',function(){q('inpM').value=this.value;});
     q('inpM').addEventListener('input',function(){q('inpD').value=this.value;});
+
+    // Navigation
     document.querySelectorAll('[data-view]').forEach(b=>b.addEventListener('click',()=>this.switchView(b.dataset.view)));
-    ['dSettBtn','bSettBtn'].forEach(id=>q(id)?.addEventListener('click',()=>q('dlgSettings').showModal()));
+
+    // Settings
+    ['dSettBtn','bSettBtn'].forEach(id=>q(id)?.addEventListener('click',()=>this.openSettings()));
+
+    // Close dialogs
     document.querySelectorAll('.cdlg').forEach(b=>b.addEventListener('click',()=>b.closest('dialog').close()));
     q('closePicker').addEventListener('click',()=>q('dlgPicker').close());
+
+    // Run
     q('btnD').addEventListener('click',()=>Engine.run());
     q('btnM').addEventListener('click',()=>Engine.run());
+
+    // Save
     q('saveSeatBtn').addEventListener('click',()=>this.saveSeat());
     q('saveSetBtn').addEventListener('click',()=>this.saveSettings());
+
+    // Pickers
     q('openPickerBtn').addEventListener('click',()=>{
       const idx=parseInt(q('seatIdx').value);
-      Picker.open(State.seats[idx]?.model||'',id=>{
-        State.seats[idx]={...State.seats[idx],model:id};
-        q('curMdlName').textContent=mdlName(id);
-        this.renderSeats();
-      });
+      Picker.open(State.seats[idx]?.model||'',id=>{State.seats[idx]={...State.seats[idx],model:id};q('curMdlName').textContent=mdlName(id);this.renderSeats();});
     });
     q('openSumPickerBtn').addEventListener('click',()=>{
-      Picker.open(State.s.summarizer,id=>{
-        State.s.summarizer=id;
-        q('sumMdlName').textContent=mdlName(id);
-      });
+      Picker.open(State.s.summarizer,id=>{State.s.summarizer=id;q('sumMdlName').textContent=mdlName(id);});
     });
     q('mpSearch').addEventListener('input',e=>{Picker.sq=e.target.value;Picker.renderList();});
+
+    // View toggle (grid/list for matrix)
+    q('vtGrid').addEventListener('click',()=>{this._listMode=false;q('vtGrid').classList.add('active');q('vtList').classList.remove('active');const c=q('mxC');c.className='mx-grid';});
+    q('vtList').addEventListener('click',()=>{this._listMode=true;q('vtList').classList.add('active');q('vtGrid').classList.remove('active');const c=q('mxC');c.className='mx-list';});
+
+    // Reader
     q('copyAllBtn').addEventListener('click',()=>{
       const txt=[...document.querySelectorAll('#rBody .rb-body')].map(b=>b.textContent).join('\n\n---\n\n');
       copyText(txt,'Gesamter Output');
     });
+    q('readerToggleList').addEventListener('click',()=>{
+      this._readerListMode=!this._readerListMode;
+      q('readerToggleList').style.background=this._readerListMode?'var(--pd)':'';
+      if(this._readerItems)this._renderReaderContent(this._readerItems);
+    });
+
+    // File inputs
+    q('fileInputM').addEventListener('change',e=>this._handleFiles([...e.target.files],'M'));
+    q('fileInputD').addEventListener('change',e=>this._handleFiles([...e.target.files],'D'));
+
+    // PWA
+    q('pwaInstallBtn').addEventListener('click',async()=>{
+      if(_pwaPrompt){await _pwaPrompt.prompt();_pwaPrompt=null;}
+      q('pwaBanner').classList.remove('show');
+    });
+    q('pwaDismiss').addEventListener('click',()=>{q('pwaBanner').classList.remove('show');localStorage.setItem('pwa_dismissed','1');});
+
+    // Populate settings
     q('setApi').value=State.s.api;
     q('setRounds').value=State.s.rounds;
     q('sumMdlName').textContent=mdlName(State.s.summarizer);
+    q('setMaxWords').value=State.s.maxWords||500;
+    q('setFormat').value=State.s.format||'auto';
+    q('setFocus').value=State.s.focus||'';
+    q('setKeyPoints').value=State.s.keyPoints||5;
+    q('setLang').value=State.s.lang||'de';
+
     this.renderSeats();
     this.log('System bereit • Klicke auf einen Sitz');
     this.setRunning(false);
+    this._initContextAccordion();
   },
+
+  async _handleFiles(files,suffix){
+    if(!files.length)return;
+    Toast.show(`${files.length} Datei(en) wird verarbeitet…`,'info',2000);
+    const processed=await FileHandler.processFiles(files);
+    FileHandler.attachments.push(...processed);
+    this._renderChips(suffix);
+    // Sync to other zone
+    const other=suffix==='M'?'D':'M';
+    this._renderChips(other);
+    Toast.show(`${processed.length} Datei(en) angehängt ✓`,'ok');
+  },
+
+  _renderChips(suffix){
+    const cont=q(`fileChips${suffix}`);if(!cont)return;
+    cont.innerHTML='';
+    FileHandler.attachments.forEach((f,i)=>{
+      const chip=document.createElement('div');chip.className='file-chip';
+      const icon=f.type==='image'?'🖼️':(f.type==='pdf'?'📄':'📎');
+      chip.innerHTML=`<span>${icon} ${esc(f.name)}</span><button title="Entfernen" data-idx="${i}">✕</button>`;
+      chip.querySelector('button').addEventListener('click',e=>{
+        e.stopPropagation();
+        FileHandler.attachments.splice(parseInt(e.target.dataset.idx),1);
+        this._renderChips('M');this._renderChips('D');
+      });
+      cont.append(chip);
+    });
+  },
+
+  openSettings(){
+    q('setApi').value=State.s.api;
+    q('setRounds').value=State.s.rounds;
+    q('sumMdlName').textContent=mdlName(State.s.summarizer);
+    q('setMaxWords').value=State.s.maxWords||500;
+    q('setFormat').value=State.s.format||'auto';
+    q('setFocus').value=State.s.focus||'';
+    q('setKeyPoints').value=State.s.keyPoints||5;
+    q('setLang').value=State.s.lang||'de';
+    q('dlgSettings').showModal();
+  },
+
   switchView(viewId){
     document.querySelectorAll('.view').forEach(v=>v.classList.remove('active'));
     q(viewId)?.classList.add('active');
     document.querySelectorAll('[data-view]').forEach(b=>b.classList.toggle('active',b.dataset.view===viewId));
     if(viewId==='vHist')this.renderHist();
   },
+
   log(msg){['logD','logM'].forEach(id=>{const el=q(id);if(el){el.textContent=msg;el.title=msg;}});},
   setRunning(state){
     ['btnD','btnM'].forEach((id,i)=>{const el=q(id);if(!el)return;el.disabled=state;el.textContent=state?(i===0?'Läuft…':'…'):(i===0?'Starten':'Start');});
@@ -783,49 +1611,140 @@ const UI={
     if(db){db.textContent=text;db.className=`dbadge ${type}`;db.style.display='block';}
     if(perm){q(`sd-${idx}`)?.classList.add('fallback');q(`sc-${idx}`)?.classList.add('fallback');}
   },
+
   renderSeats(){
     const grid=q('seatsGrid'),abs=q('seatsD');
     if(grid)grid.innerHTML='';if(abs)abs.innerHTML='';
     State.seats.forEach((seat,i)=>{
-      const init=seat.role.substring(0,2).toUpperCase();
+      const ctx=seat.ctx||ROLE_DEFAULTS[seat.role]||{};
+      const emoji=ctx.emoji||ROLE_DEFAULTS[seat.role]?.emoji||'';
+      const init=(emoji||seat.role.substring(0,2)).replace(/\s/g,'');
       const mdl=mdlById(seat.model);
       const name=mdl?mdl.name:(seat.model.split('/').pop()||'—');
       const color=mdl?.color||'var(--p)';
+      const sysPreview=(ctx.sys||'').replace(/===.*?===/g,'').trim().slice(0,45)+(ctx.sys?.length>45?'…':'');
+
       if(grid){
         const mc=document.createElement('div');mc.className='scard';mc.id=`sc-${i}`;
-        mc.innerHTML=`<div class="sc-dot"></div><div class="sc-av" style="background:${color}18;color:${color};border-color:${color}28">${init}</div><div class="sc-role" style="color:${color}">${esc(seat.role)}</div><div class="sc-model" title="${esc(seat.model)}">${esc(name)}</div>`;
+        mc.innerHTML=`<div class="sc-dot"></div>
+          <div class="sc-av" style="background:${color}18;color:${color};border-color:${color}28;font-size:${emoji?'.85rem':'.55rem'}">${esc(init)}</div>
+          <div class="sc-role" style="color:${color}">${esc(seat.role)}</div>
+          <div class="sc-model" title="${esc(seat.model)}">${esc(name)}</div>
+          <div class="sc-ctx" title="${esc(ctx.sys||'')}">${esc(sysPreview)}</div>`;
         mc.addEventListener('click',()=>this.openSeat(i));grid.append(mc);
       }
       if(abs){
         const da=document.createElement('div');da.className='seat-d';da.id=`sd-${i}`;
-        da.innerHTML=`<div class="dbadge" id="db-${i}"></div><div class="dav" style="background:${color}18;color:${color};border-color:${color}28">${init}</div><div class="dlabel"><div class="dr" style="color:${color}">${esc(seat.role)}</div><div class="dm" title="${esc(seat.model)}">${esc(name)}</div></div>`;
+        da.innerHTML=`<div class="dbadge" id="db-${i}"></div>
+          <div class="dav" style="background:${color}18;color:${color};border-color:${color}28;font-size:${emoji?'1rem':'.75rem'}">${esc(init)}</div>
+          <div class="dlabel"><div class="dr" style="color:${color}">${esc(seat.role)}</div><div class="dm" title="${esc(seat.model)}">${esc(name)}</div></div>`;
         da.addEventListener('click',()=>this.openSeat(i));abs.append(da);
       }
     });
   },
+
   openSeat(idx){
     const s=State.seats[idx];
-    q('seatIdx').value=idx;q('seatRole').value=s.role;
+    const ctx=s.ctx||ROLE_DEFAULTS[s.role]||{};
+    q('seatIdx').value=idx;
+    q('seatRole').value=s.role;
     q('curMdlName').textContent=mdlName(s.model);
-    q('seatPrompt').value=s.prompt;q('seatCtx').value=s.context;
+    // Fill 5 layers
+    q('ctxSys').value=ctx.sys||'';
+    q('ctxGoal').value=ctx.goal||'';
+    q('ctxKnow').value=ctx.know||'';
+    q('ctxInter').value=ctx.inter||'';
+    q('ctxSit').value=ctx.sit||'';
+    q('seatDlgTitle').textContent=`${ctx.emoji||''} ${s.role} konfigurieren`.trim();
     q('dlgSeat').showModal();
   },
+
   saveSeat(){
     const idx=parseInt(q('seatIdx').value);
-    State.seats[idx]={...State.seats[idx],role:q('seatRole').value,prompt:q('seatPrompt').value,context:q('seatCtx').value};
-    State.save();this.renderSeats();q('dlgSeat').close();Toast.show('Sitz gespeichert ✓','ok');
+    const role=q('seatRole').value;
+    const def=ROLE_DEFAULTS[role]||{};
+    State.seats[idx]={
+      ...State.seats[idx],
+      role,
+      ctx:{
+        emoji: def.emoji||'',
+        sys:  q('ctxSys').value.trim()||def.sys||'',
+        goal: q('ctxGoal').value.trim()||def.goal||'',
+        know: q('ctxKnow').value.trim()||def.know||'',
+        inter:q('ctxInter').value.trim()||def.inter||'',
+        sit:  q('ctxSit').value.trim()||def.sit||'',
+        r2:   def.r2||'',
+        r3:   def.r3||''
+      }
+    };
+    State.save();this.renderSeats();q('dlgSeat').close();
+    Toast.show(`${def.emoji||''} ${role} gespeichert ✓`,'ok');
   },
+
+  // Fill all 5 layers with role defaults
+  _fillCtxDefaults(role){
+    const d=ROLE_DEFAULTS[role];
+    if(!d)return;
+    q('ctxSys').value=d.sys;
+    q('ctxGoal').value=d.goal;
+    q('ctxKnow').value=d.know;
+    q('ctxInter').value=d.inter;
+    q('ctxSit').value=d.sit;
+    q('seatDlgTitle').textContent=`${d.emoji||''} ${role} konfigurieren`.trim();
+  },
+
+  _initContextAccordion(){
+    // Toggle layers on header click
+    document.querySelectorAll('.ctx-layer-hd').forEach(hd=>{
+      hd.addEventListener('click',()=>{
+        const layer=hd.closest('.ctx-layer');
+        layer.classList.toggle('open');
+      });
+    });
+    // Individual default-reset buttons
+    document.querySelectorAll('.ctx-def-btn[data-reset]').forEach(btn=>{
+      btn.addEventListener('click',e=>{
+        e.stopPropagation();
+        const layer=btn.dataset.reset;
+        const role=q('seatRole').value;
+        const d=ROLE_DEFAULTS[role];
+        if(!d)return;
+        const map={sys:q('ctxSys'),goal:q('ctxGoal'),know:q('ctxKnow'),inter:q('ctxInter'),sit:q('ctxSit')};
+        if(map[layer]){map[layer].value=d[layer]||'';Toast.show(`Ebene ${layer} zurückgesetzt`,'ok',1800);}
+      });
+    });
+    // Reload all defaults
+    q('reloadDefaultBtn').addEventListener('click',()=>{
+      this._fillCtxDefaults(q('seatRole').value);
+      Toast.show('Alle Defaults geladen ✓','ok',1800);
+    });
+    // Role change → auto-fill defaults
+    q('seatRole').addEventListener('change',()=>this._fillCtxDefaults(q('seatRole').value));
+  },
+
   saveSettings(){
-    State.s={...State.s,api:q('setApi').value.trim(),rounds:Math.max(1,Math.min(10,parseInt(q('setRounds').value)||3))};
+    State.s={...State.s,
+      api:q('setApi').value.trim(),
+      rounds:Math.max(1,Math.min(10,parseInt(q('setRounds').value)||3)),
+      maxWords:Math.max(100,Math.min(2000,parseInt(q('setMaxWords').value)||500)),
+      format:q('setFormat').value,
+      focus:q('setFocus').value.trim(),
+      keyPoints:Math.max(3,Math.min(10,parseInt(q('setKeyPoints').value)||5)),
+      lang:q('setLang').value
+    };
     State.save();q('dlgSettings').close();Toast.show('Einstellungen gespeichert ✓','ok');
   },
+
   resetDash(){
     q('mxC').innerHTML='<span style="color:var(--mu);font-size:.8rem">Läuft…</span>';
     q('evalB').innerHTML='<span style="color:var(--mu);font-size:.8rem">Wird berechnet…</span>';
     q('wcB').innerHTML='<span style="color:var(--mu);font-size:.8rem">…</span>';
+    q('tendencyWrap').style.display='none';
   },
+
   renderMatrix(){
     const cont=q('mxC');cont.innerHTML='';
+    cont.className=this._listMode?'mx-list':'mx-grid';
     const roles=[...new Set(State.history.filter(h=>h.role!=='Summarizer').map(h=>h.role))];
     if(!roles.length)return;
     roles.forEach(role=>{
@@ -833,41 +1752,82 @@ const UI={
       const last=items[items.length-1];const hasFb=items.some(h=>h.isFallback);
       const mdl=mdlById(last.model);const color=mdl?.color||'var(--p)';
       const card=document.createElement('div');card.className='mx-card';
-      card.innerHTML=`<div class="mxh"><div class="mx-av" style="background:${color}18;color:${color};border:1px solid ${color}22">${role.substring(0,2).toUpperCase()}</div><div><div class="mx-name">${esc(role)} ${hasFb?'⚠':''} <span style="font-size:.52rem;color:var(--mu)">${items.length} Beitrag${items.length!==1?'e':''}</span></div><div class="mx-sub">${esc(mdl?.name||last.model.split('/').pop())}</div></div></div><div class="mx-prev">${esc(last.content)}</div>`;
+      card.innerHTML=`<div class="mxh"><div class="mx-av" style="background:${color}18;color:${color};border:1px solid ${color}22">${role.substring(0,2).toUpperCase()}</div><div><div class="mx-name">${esc(role)} ${hasFb?'⚠':''}</div><div class="mx-sub">${esc(mdl?.name||last.model.split('/').pop())}</div></div></div><div class="mx-prev">${esc(last.content)}</div>`;
       card.addEventListener('click',()=>this.openReader(role,State.history));
       cont.append(card);
     });
   },
-  renderEval(raw){
+
+  renderEval(raw,obj){
     const box=q('evalB');
-    try{
-      const obj=JSON.parse(raw.replace(/```json|```/g,'').trim());
-      const lbl={'Konsens':'🤝 Konsens','Konflikte':'⚡ Konflikte','KeyTakeaways':'💡 Key Takeaways','Stimmung':'🌡 Stimmung'};
-      box.innerHTML='<div class="eval-wrap">'+Object.entries(obj).map(([k,v])=>{
-        const val=Array.isArray(v)?v.map((x,i)=>`${i+1}. ${x}`).join('\n'):String(v);
-        return `<div class="eval-blk"><h4>${esc(lbl[k]||k)}</h4><p>${esc(val)}</p></div>`;
-      }).join('')+'</div>';
-    }catch{
-      box.innerHTML=`<div class="eval-blk"><h4>Ergebnis</h4><p style="white-space:pre-wrap;font-size:.78rem">${esc(raw)}</p></div>`;
+    if(obj){
+      const lbl={'Konsens':'🤝 Konsens','Konflikte':'⚡ Konflikte','KeyTakeaways':'💡 Key Takeaways','Stimmung':'🌡 Stimmung','Tendenz':null};
+      let html='<div class="eval-wrap">';
+      for(const[k,v]of Object.entries(obj)){
+        if(k==='Tendenz')continue; // handled by renderTendency
+        const label=lbl[k]||k;
+        if(k==='KeyTakeaways'&&Array.isArray(v)){
+          html+=`<div class="eval-blk"><h4>${esc(label)}</h4><ul class="kp-list">${v.map(x=>`<li>${esc(x)}</li>`).join('')}</ul></div>`;
+        }else{
+          html+=`<div class="eval-blk"><h4>${esc(label)}</h4><p>${esc(String(v))}</p></div>`;
+        }
+      }
+      html+='</div>';
+      box.innerHTML=html;
+    }else{
+      box.innerHTML=`<div class="eval-blk"><h4>Ergebnis</h4><pre style="white-space:pre-wrap;font-size:.78rem;color:#d8eedb;margin:0">${esc(raw)}</pre></div>`;
     }
+    // Copy button
     const cb=document.createElement('button');cb.className='btn-c';cb.style.marginTop='.5rem';
     cb.innerHTML=`<svg viewBox="0 0 24 24"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg> Evaluation kopieren`;
     cb.addEventListener('click',()=>copyText(raw,'Evaluation'));box.append(cb);
   },
-  renderWC(){
+
+  renderTendency(obj){
+    const wrap=q('tendencyWrap');
+    if(!obj?.Tendenz||typeof obj.Tendenz!=='object'){wrap.style.display='none';return;}
+    wrap.style.display='block';
+    const chart=q('tendencyChart');
+    const entries=Object.entries(obj.Tendenz);
+    if(!entries.length){wrap.style.display='none';return;}
+
+    const stimmungColor=s=>{
+      if(!s)return'var(--mu)';
+      s=s.toLowerCase();
+      if(s.includes('positiv'))return'#0fbe84';
+      if(s.includes('negativ'))return'#f04545';
+      if(s.includes('gemischt'))return'#f0b429';
+      return'#5ba3f5';
+    };
+    const sc=stimmungColor(obj.Stimmung);
+
+    let html=`<div class="tend-title">Tendenz-Score je Rolle (0=kritisch, 100=konstruktiv)</div>`;
+    // Stimmungs-bar
+    html+=`<div class="tend-row"><div class="tend-label" style="color:var(--mu)">Gesamt</div><div class="tend-bar-bg"><div class="tend-bar" style="width:${entries.reduce((s,[,v])=>s+v,0)/entries.length}%;background:${sc}"></div></div><div class="tend-val" style="color:${sc}">${Math.round(entries.reduce((s,[,v])=>s+v,0)/entries.length)}%</div></div>`;
+
+    entries.forEach(([role,val])=>{
+      const norm=Math.max(0,Math.min(100,Number(val)||0));
+      const c=norm>66?'#0fbe84':(norm>33?'#f0b429':'#f04545');
+      html+=`<div class="tend-row"><div class="tend-label">${esc(role)}</div><div class="tend-bar-bg"><div class="tend-bar" style="width:${norm}%;background:${c}"></div></div><div class="tend-val" style="color:${c}">${norm}%</div></div>`;
+    });
+    // Stimmungs-indicator
+    if(obj.Stimmung){
+      html+=`<div class="tend-legend"><div class="tend-dot" style="color:${sc}"><span style="width:.5rem;height:.5rem;border-radius:50%;background:${sc};display:inline-block;margin-right:.25rem"></span>Gesamt-Stimmung: ${esc(obj.Stimmung)}</div></div>`;
+    }
+    chart.innerHTML=html;
+  },
+
+  renderWC(tokens){
     const box=q('wcB');box.innerHTML='';
-    const text=State.history.map(h=>h.content).join(' ').toLowerCase();
-    const tokens=text.split(/\W+/).filter(w=>w.length>3&&isNaN(w));
-    const freq={};tokens.forEach(t=>{if(!STOP.has(t))freq[t]=(freq[t]||0)+1;});
-    const sorted=Object.entries(freq).sort((a,b)=>b[1]-a[1]).slice(0,40);
-    if(!sorted.length)return;
-    const top=new Set(sorted.slice(0,10).map(x=>x[0]));
-    sorted.sort(()=>Math.random()-.5).forEach(([w])=>{
+    if(!tokens||!tokens.length){box.innerHTML='<span style="color:var(--mu);font-size:.8rem">Keine Tokens.</span>';return;}
+    const top=new Set(tokens.slice(0,10).map(x=>x[0]));
+    [...tokens].sort(()=>Math.random()-.5).forEach(([w])=>{
       const sp=document.createElement('span');sp.className='wc-word';sp.textContent=w;
       sp.style.cssText=top.has(w)?`font-size:${1.7+Math.random()*.7}rem;color:var(--p);font-weight:800`:`font-size:${.8+Math.random()*.5}rem;color:var(--mu);font-weight:500`;
       box.append(sp);
     });
   },
+
   _buildReader(items){
     const rounds=[...new Set(items.map(h=>h.round))];
     let html='';
@@ -881,36 +1841,93 @@ const UI={
     });
     return html;
   },
+
+  _buildReaderList(items){
+    // Parse all content into list items (split by newlines/bullets)
+    let html='<div class="list-output">';
+    items.filter(h=>h.role!=='Summarizer').forEach(h=>{
+      const mdl=mdlById(h.model);const color=mdl?.color||'var(--p)';
+      html+=`<div style="margin-bottom:.75rem"><div style="font-size:.6rem;font-weight:700;color:${color};text-transform:uppercase;letter-spacing:.06em;margin-bottom:.35rem">${esc(h.role)} – R${h.round}</div>`;
+      const lines=h.content.split(/\n+/).map(l=>l.trim()).filter(l=>l.length>1);
+      lines.forEach((line,i)=>{
+        const clean=line.replace(/^[-*•→]\s*/,'').replace(/^\d+\.\s*/,'');
+        html+=`<div class="list-item"><div class="list-item-num">${i+1}</div><div class="list-item-text">${esc(clean)}</div></div>`;
+      });
+      html+='</div>';
+    });
+    html+='</div>';
+    return html;
+  },
+
+  _renderReaderContent(items){
+    const body=q('rBody');
+    body.innerHTML=this._readerListMode?this._buildReaderList(items):this._buildReader(items);
+    if(!this._readerListMode)this._wireReader(body);
+  },
+
   _wireReader(body){
     body.querySelectorAll('[data-cid]').forEach(btn=>{
       btn.addEventListener('click',()=>{
         const text=q(btn.dataset.cid)?.textContent||'';
         const role=btn.closest('.rb')?.querySelector('.rb-role')?.textContent||'Antwort';
-        copyText(text,role);btn.textContent='✓ Kopiert';
-        setTimeout(()=>{btn.innerHTML='<svg viewBox="0 0 24 24"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>Kopieren';},1800);
+        copyText(text,role);
+        const orig=btn.innerHTML;btn.textContent='✓ Kopiert';
+        setTimeout(()=>{btn.innerHTML=orig;},1800);
       });
     });
   },
+
   openReader(filterRole,history){
     const items=filterRole==='__all__'?history.filter(h=>h.role!=='Summarizer'):history.filter(h=>h.role===filterRole);
     q('rTitle').textContent=filterRole==='__all__'?'Gesamte Diskussion':`Akte: ${filterRole}`;
-    const body=q('rBody');body.innerHTML=this._buildReader(items);this._wireReader(body);
+    this._readerItems=items;
+    this._readerListMode=false;
+    q('readerToggleList').style.background='';
+    this._renderReaderContent(items);
     q('dlgReader').showModal();
   },
+
   async renderHist(){
-    const list=q('histL');list.innerHTML='<div class="hist-empty" style="opacity:.5">Lade…</div>';
-    const runs=await State.loadRuns(10);
+    const list=q('histL');
+    list.innerHTML='<div class="hist-empty" style="opacity:.5">Lade…</div>';
+    const runs=await State.loadRuns(25);
     if(!runs.length){list.innerHTML='<div class="hist-empty">Noch keine Läufe gespeichert.</div>';return;}
-    list.innerHTML='<div style="padding:.25rem 0 .75rem;font-size:.72rem;font-weight:700;color:var(--p)">Letzte '+runs.length+' Läufe</div>';
+    list.innerHTML=`<div style="padding:.25rem 0 .75rem;display:flex;align-items:center;justify-content:space-between"><span style="font-size:.72rem;font-weight:700;color:var(--p)">Letzte ${runs.length} Läufe</span><span style="font-size:.58rem;color:var(--mu)">Tippe für Details</span></div>`;
     runs.forEach(run=>{
       const roles=[...new Set((run.history||[]).filter(h=>h.role!=='Summarizer').map(h=>h.role))];
       const rns=[...new Set((run.history||[]).map(h=>h.round).filter(r=>r!=='Sys'))];
+      const evalObj=run.evalObj;
+      const stimmung=evalObj?.Stimmung||'';
+      const sc=!stimmung?'var(--mu)':(stimmung.toLowerCase().includes('positiv')?'#0fbe84':(stimmung.toLowerCase().includes('negativ')?'#f04545':'#f0b429'));
+      const evalPreview=evalObj?.Konsens?evalObj.Konsens.slice(0,120)+(evalObj.Konsens.length>120?'…':''):'';
+
       const card=document.createElement('div');card.className='run-card';
-      card.innerHTML=`<div class="run-ico"><svg viewBox="0 0 24 24"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg></div><div class="run-meta"><div class="run-q" title="${esc(run.query)}">${esc(run.query)}</div><div class="run-d">${fmtDate(run.ts)}</div></div><div class="run-bd"><span class="rbg">R${rns.length}</span><span class="rbg">${roles.length} KIs</span></div>`;
+      card.innerHTML=`
+        <div class="run-ico"><svg viewBox="0 0 24 24"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg></div>
+        <div class="run-meta">
+          <div class="run-q" title="${esc(run.query)}">${esc(run.query)}</div>
+          <div class="run-d">${fmtDate(run.ts)}</div>
+          ${evalPreview?`<div class="run-eval-preview">Konsens: ${esc(evalPreview)}</div>`:''}
+        </div>
+        <div class="run-bd">
+          <span class="rbg">R${rns.length}</span>
+          <span class="rbg">${roles.length} KIs</span>
+          ${stimmung?`<span class="rbg" style="background:${sc}18;border-color:${sc}30;color:${sc}">${esc(stimmung)}</span>`:''}
+          <div class="run-sentiment" style="background:${sc}" title="${esc(stimmung||'Keine Stimmung')}"></div>
+        </div>`;
+
       card.addEventListener('click',()=>{
         const items=(run.history||[]).filter(h=>h.role!=='Summarizer');
         q('rTitle').textContent=run.query.slice(0,60)+(run.query.length>60?'…':'');
-        const body=q('rBody');body.innerHTML=this._buildReader(items);this._wireReader(body);
+        this._readerItems=items;
+        this._readerListMode=false;
+        q('readerToggleList').style.background='';
+        this._renderReaderContent(items);
+
+        // Also restore dashboard view for this run
+        if(run.evalObj){this.renderEval(run.evalRaw||'',run.evalObj);this.renderTendency(run.evalObj);}
+        if(run.wcTokens?.length)this.renderWC(run.wcTokens);
+
         q('dlgReader').showModal();
       });
       list.append(card);
@@ -918,13 +1935,27 @@ const UI={
   }
 };
 
-/* ── BOOTSTRAP ──────────────────────────────────────────────────────── */
+/* ── BOOTSTRAP ───────────────────────────────────────────────────── */
 document.addEventListener('DOMContentLoaded',async()=>{
   await State.init();
   UI.init();
   if(!State.s.api)setTimeout(()=>Toast.show('API-Key in ⚙ Settings eintragen','info',5000),800);
 });
-if('serviceWorker'in navigator)navigator.serviceWorker.register('sw.js').catch(()=>{});
+
+if('serviceWorker'in navigator){
+  navigator.serviceWorker.register('sw.js',{scope:'./'})
+    .then(reg=>{
+      reg.addEventListener('updatefound',()=>{
+        const nw=reg.installing;
+        nw?.addEventListener('statechange',()=>{
+          if(nw.state==='installed'&&navigator.serviceWorker.controller){
+            Toast.show('Update verfügbar – Seite neu laden für neue Version','info',8000);
+          }
+        });
+      });
+    })
+    .catch(()=>{});
+}
 </script>
 </body>
 </html>
