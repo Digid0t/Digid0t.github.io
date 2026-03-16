@@ -65,6 +65,59 @@ body{margin:0;height:100%;background:var(--bg);color:var(--txt);font-family:var(
 .scard:active{transform:scale(.96)}
 .scard.running{border-color:var(--p);box-shadow:0 0 10px var(--pg)}
 .scard.fallback{border-color:var(--warn)}
+.scard.disabled{opacity:.38;border-style:dashed}
+.scard.disabled .sc-av{opacity:.5}
+/* Seat toggle button */
+.sc-toggle{position:absolute;bottom:.4rem;right:.45rem;background:none;border:none;padding:0;cursor:pointer;-webkit-tap-highlight-color:transparent;line-height:1;font-size:.6rem;color:var(--mu2);transition:color .15s}
+.sc-toggle:hover{color:var(--warn)}
+.scard.disabled .sc-toggle{color:var(--p)}
+.scard.disabled .sc-toggle::after{content:'off'}
+.scard:not(.disabled) .sc-toggle::after{content:'ein'}
+/* Desktop disabled seat */
+.seat-d.disabled .dav{opacity:.35;border-style:dashed}
+.seat-d.disabled .dlabel{opacity:.35}
+.seat-d.disabled{cursor:default}
+/* Live run panel */
+#livePanel{position:absolute;inset:0;z-index:30;background:rgba(8,13,11,.97);display:none;flex-direction:column;overflow:hidden;backdrop-filter:blur(8px)}
+#livePanel.active{display:flex}
+.lp-hdr{flex-shrink:0;padding:.625rem 1rem;border-bottom:1px solid var(--b);display:flex;align-items:center;gap:.625rem}
+.lp-title{font-size:.75rem;font-weight:700;color:var(--p);flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.lp-round{font-size:.58rem;color:var(--mu);font-family:monospace}
+/* Live seat cards – responsive grid */
+.lp-seats{flex:1;overflow-y:auto;padding:.75rem;display:grid;grid-template-columns:repeat(auto-fill,minmax(min(100%,280px),1fr));gap:.6rem;align-content:start}
+.lp-seats::-webkit-scrollbar{width:3px}
+.lp-seat{background:var(--s1);border:1px solid var(--b);border-radius:var(--r3);padding:.75rem;display:flex;flex-direction:column;gap:.4rem;transition:border-color .25s,box-shadow .25s;min-height:7rem}
+.lp-seat.thinking{border-color:var(--p);box-shadow:0 0 14px var(--pg)}
+.lp-seat.done{border-color:rgba(15,190,132,.25);background:rgba(15,190,132,.04)}
+.lp-seat.waiting{opacity:.5}
+.lp-seat.skipped{opacity:.2;border-style:dashed}
+.lp-seat-hdr{display:flex;align-items:center;gap:.5rem}
+.lp-av{width:2rem;height:2rem;border-radius:.4rem;display:flex;align-items:center;justify-content:center;font-size:.75rem;flex-shrink:0;font-weight:800;transition:all .25s}
+.lp-seat.thinking .lp-av{animation:lpPulse 1.4s infinite}
+@keyframes lpPulse{0%,100%{box-shadow:0 0 0 0 var(--pg)}50%{box-shadow:0 0 0 6px rgba(15,190,132,0)}}
+.lp-role{flex:1;min-width:0}
+.lp-rname{font-size:.65rem;font-weight:700;text-transform:uppercase;letter-spacing:.05em}
+.lp-mname{font-size:.52rem;color:var(--mu);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.lp-state{font-size:.6rem;padding:.12rem .4rem;border-radius:.25rem;font-weight:700;flex-shrink:0;white-space:nowrap}
+.lp-state.s-wait{background:rgba(122,158,140,.08);color:var(--mu2)}
+.lp-state.s-think{background:var(--pg);color:var(--p)}
+.lp-state.s-done{background:rgba(15,190,132,.12);color:var(--p)}
+.lp-state.s-err{background:rgba(240,69,69,.1);color:var(--err)}
+.lp-state.s-skip{background:rgba(122,158,140,.06);color:var(--mu2)}
+/* Thinking dots animation */
+.lp-dots{display:flex;gap:.2rem;align-items:center;height:1rem}
+.lp-dot{width:.3rem;height:.3rem;border-radius:50%;background:var(--p);animation:lpDot 1.2s infinite both}
+.lp-dot:nth-child(2){animation-delay:.2s}
+.lp-dot:nth-child(3){animation-delay:.4s}
+@keyframes lpDot{0%,80%,100%{transform:scale(.5);opacity:.3}40%{transform:scale(1);opacity:1}}
+/* Streaming text preview */
+.lp-preview{font-size:.7rem;color:var(--mu);line-height:1.5;display:-webkit-box;-webkit-line-clamp:3;-webkit-box-orient:vertical;overflow:hidden;min-height:1rem;flex:1}
+.lp-preview.has-text{color:#b0d4bc}
+/* Progress bar */
+.lp-progress{height:.2rem;background:var(--s3);border-radius:.1rem;overflow:hidden;margin-top:.25rem}
+.lp-prog-fill{height:100%;background:linear-gradient(90deg,var(--p),#0a9966);border-radius:.1rem;transition:width .6s ease;width:0}
+/* Log strip at bottom of live panel */
+.lp-log{flex-shrink:0;padding:.45rem 1rem;border-top:1px solid var(--b);font-size:.6rem;color:var(--p);font-family:monospace;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;opacity:.8}
 .sc-av{width:1.625rem;height:1.625rem;border-radius:.35rem;background:var(--pd);border:1px solid rgba(15,190,132,.15);display:flex;align-items:center;justify-content:center;font-weight:800;font-size:.55rem;color:var(--p);flex-shrink:0}
 .scard.running .sc-av{border-color:var(--p);animation:blink 1.4s infinite}
 @keyframes blink{0%,100%{box-shadow:0 0 0 0 var(--pg)}50%{box-shadow:0 0 0 5px transparent}}
@@ -383,6 +436,16 @@ optgroup{background:#14231c;color:var(--mu);font-weight:700}
             <button class="btn" id="btnM" disabled>Start</button>
           </div>
         </div>
+        <!-- LIVE PANEL (mobile) -->
+        <div id="livePanelM" style="display:none;position:absolute;inset:0;z-index:30;background:rgba(8,13,11,.97);flex-direction:column;overflow:hidden">
+          <div class="lp-hdr">
+            <span class="lp-title" id="lpTitleM">Diskussion läuft…</span>
+            <span class="lp-round" id="lpRoundM">Runde 1</span>
+          </div>
+          <div class="lp-seats" id="lpSeatsM"></div>
+          <div class="lp-progress"><div class="lp-prog-fill" id="lpProgM"></div></div>
+          <div class="lp-log" id="lpLogM">Starte…</div>
+        </div>
       </div>
       <!-- Desktop -->
       <div class="tbl-d">
@@ -403,6 +466,16 @@ optgroup{background:#14231c;color:var(--mu);font-weight:700}
             <span class="syslog" id="logD">Lade Modelle…</span>
             <button class="btn" id="btnD" disabled>Starten</button>
           </div>
+        </div>
+        <!-- LIVE PANEL (desktop overlay) -->
+        <div id="livePanelD" style="display:none;position:absolute;inset:0;z-index:30;background:rgba(8,13,11,.92);flex-direction:column;overflow:hidden;backdrop-filter:blur(10px)">
+          <div class="lp-hdr">
+            <span class="lp-title" id="lpTitleD">Diskussion läuft…</span>
+            <span class="lp-round" id="lpRoundD">Runde 1</span>
+          </div>
+          <div class="lp-seats" id="lpSeatsD"></div>
+          <div class="lp-progress"><div class="lp-prog-fill" id="lpProgD"></div></div>
+          <div class="lp-log" id="lpLogD">Starte…</div>
         </div>
       </div>
     </section>
@@ -644,6 +717,14 @@ optgroup{background:#14231c;color:var(--mu);font-weight:700}
     </div>
     <div class="fg"><label>Fokus-Bereich (optional, z.B. "Nachhaltigkeit, Kosten")</label><input type="text" id="setFocus" placeholder="Komma-getrennte Schwerpunkte…"></div>
     <div class="fg"><label>Key-Points-Anzahl in Evaluation (3–10)</label><input type="number" id="setKeyPoints" min="3" max="10" value="5"></div>
+    <div class="set-section">Kontext-Modus</div>
+    <div style="display:flex;align-items:flex-start;gap:.75rem;padding:.5rem .7rem;background:var(--pd);border:1px solid rgba(15,190,132,.15);border-radius:var(--r2);margin-bottom:.875rem">
+      <input type="checkbox" id="setFullCtx" style="margin-top:.15rem;accent-color:var(--p);width:1rem;height:1rem;flex-shrink:0">
+      <div>
+        <div style="font-size:.72rem;font-weight:700;color:var(--txt)">5-Ebenen Context Engineering</div>
+        <div style="font-size:.6rem;color:var(--mu);margin-top:.15rem">Aktiviert den vollständigen strukturierten Kontext-Rahmen (Identität, Ziel, Wissen, Format, Situation) pro Rolle. Deaktivieren = einzelne Zeile Kontext – schneller, weniger präzise.</div>
+      </div>
+    </div>
     <div class="set-section">Sprache & Darstellung</div>
     <div class="fg"><label>Antwort-Sprache</label>
       <select id="setLang">
@@ -718,6 +799,9 @@ const CAT=[
   {id:'microsoft/wizardlm-2-8x22b',name:'WizardLM 2 8×22B',provider:'Microsoft',family:'Microsoft',color:'#00adef',tags:['reasoning','coding'],tier:'⭐',str:'Starkes MoE für komplexe Instructionfolge und Coding.',wk:'Älter; überholt von neueren Modellen in Top-Tier.',inputPer1M:0.50,outputPer1M:0.50},
   {id:'nousresearch/hermes-4-405b',name:'Hermes 4 405B',provider:'Nous Research',family:'Nous Research',color:'#d32f2f',tags:['reasoning','coding','creative'],tier:'⭐',str:'Hybrid-Reasoning (Think-Tags), starke Schema-Adherenz – top für strukturierte Outputs.',wk:'Massiv; hohe Latenz und Kosten.',inputPer1M:1.5,outputPer1M:4.5},
   {id:'prime-intellect/intellect-3',name:'Intellect-3',provider:'Prime Intellect',family:'Prime Intellect',color:'#7b1fa2',tags:['reasoning'],tier:'🔬',str:'Community-trainiertes Modell mit dezentralem Trainingsansatz.',wk:'Weniger etabliert; schwächere Top-Tier-Performance.',inputPer1M:0,outputPer1M:0},
+  {id:'ai21/jamba-large-1.7',name:'Jamba Large 1.7',provider:'AI21 Labs',family:'AI21',color:'#ff6f00',tags:['long','reasoning','fast'],tier:'⭐',str:'Hybrides SSM+Attention-Modell – exzellent bei langen Kontexten mit 256K Fenster; schnell und kosteneffizient.',wk:'Weniger bekannt als Frontier-Modelle; Nischenanwendung bei sehr langen Dokumenten.',inputPer1M:0.20,outputPer1M:0.40},
+  {id:'cohere/command-r-plus',name:'Command R+',provider:'Cohere',family:'Cohere',color:'#39a0ed',tags:['reasoning','long'],tier:'⭐',str:'Enterprise-fokussiert mit RAG-Optimierung – herausragend bei Dokumentenanalyse und agentenbasiertem Tool-Use.',wk:'Weniger stark bei reinen Kreativ-Tasks ohne strukturierten Kontext.',inputPer1M:2.5,outputPer1M:10.0},
+  {id:'amazon/nova-premier-v1',name:'Nova Premier',provider:'Amazon',family:'Amazon',color:'#ff9900',tags:['reasoning','long','coding'],tier:'🏆',str:'Amazons stärkstes Modell – Enterprise-ready mit 1M Kontext, stark bei Agenten und multimodalem Reasoning.',wk:'Kostenpflichtig; noch wenig Community-Feedback außerhalb AWS-Ökosystem.',inputPer1M:2.5,outputPer1M:12.5},
   {id:'allenai/olmo-3.1-32b-instruct',name:'OLMo 3.1 32B',provider:'AllenAI',family:'AllenAI',color:'#2196f3',tags:['reasoning','free'],tier:'🔓',str:'Vollständig Open-Source (Daten, Gewichte, Training) – wissenschaftlich transparent.',wk:'Leistungsrückstand gegenüber proprietären Modellen.',inputPer1M:0.15,outputPer1M:0.50},
   {id:'writer/palmyra-x5',name:'Palmyra X5',provider:'Writer',family:'Writer',color:'#ff6b35',tags:['creative','coding'],tier:'⭐',str:'Enterprise-fokussiert mit starker Genauigkeit für Business-Content.',wk:'Weniger bekannt außerhalb Business-Anwendungen.',inputPer1M:0.50,outputPer1M:2.0},
   {id:'xiaomi/minicpm-o-2.6',name:'MiniCPM-o 2.6',provider:'Xiaomi',family:'Xiaomi',color:'#ff6900',tags:['fast','free'],tier:'⚡',str:'Extrem kompaktes Multimodal-Modell für Edge-Inference und On-Device.',wk:'Kleine Parameterzahl; limitiert bei komplexen Tasks.',inputPer1M:0,outputPer1M:0},
@@ -1088,13 +1172,13 @@ const ROLE_DEFAULTS={
 
 /* ── STATE ───────────────────────────────────────────────────────── */
 class State{
-  static s={api:'',rounds:3,summarizer:'meta-llama/llama-3.3-70b-instruct',maxWords:500,format:'auto',focus:'',keyPoints:5,lang:'de'};
+  static s={api:'',rounds:3,summarizer:'meta-llama/llama-3.3-70b-instruct',maxWords:500,format:'auto',focus:'',keyPoints:5,lang:'de',fullCtx:true};
   static seats=[
-    {role:'Analyst',model:'google/gemini-2.5-flash',ctx:{...ROLE_DEFAULTS['Analyst']}},
-    {role:'Kritiker',model:'anthropic/claude-sonnet-4.6',ctx:{...ROLE_DEFAULTS['Kritiker']}},
-    {role:'Visionär',model:'openai/gpt-5',ctx:{...ROLE_DEFAULTS['Visionär']}},
-    {role:'Synthetisierer',model:'deepseek/deepseek-v3.2',ctx:{...ROLE_DEFAULTS['Synthetisierer']}},
-    {role:'Risikoprüfer',model:'mistralai/mistral-large',ctx:{...ROLE_DEFAULTS['Risikoprüfer']}}
+    {role:'Analyst',model:'google/gemini-2.5-flash',disabled:false,ctx:{...ROLE_DEFAULTS['Analyst']}},
+    {role:'Kritiker',model:'anthropic/claude-sonnet-4.6',disabled:false,ctx:{...ROLE_DEFAULTS['Kritiker']}},
+    {role:'Visionär',model:'openai/gpt-5',disabled:false,ctx:{...ROLE_DEFAULTS['Visionär']}},
+    {role:'Synthetisierer',model:'deepseek/deepseek-v3.2',disabled:false,ctx:{...ROLE_DEFAULTS['Synthetisierer']}},
+    {role:'Risikoprüfer',model:'mistralai/mistral-large',disabled:false,ctx:{...ROLE_DEFAULTS['Risikoprüfer']}}
   ];
   static history=[];
   static db=null;
@@ -1184,7 +1268,7 @@ class State{
 /* ── ENGINE ──────────────────────────────────────────────────────── */
 class Engine{
 
-  // Build system prompt from 5-layer context
+  // Build system prompt from 5-layer context (or simple 1-line mode)
   static _buildSysPrompt(seat, globals){
     const c=seat.ctx||{};
     const {lang,fmt,focus,maxWords}=globals;
@@ -1192,6 +1276,12 @@ class Engine{
     const focI=focus?`\nFokussiere besonders auf: ${focus}.`:'';
     const fmtMap={prose:'Schreibe in zusammenhängendem Fließtext.',bullets:'Strukturiere in prägnanten Bullet-Points.',list:'Gib eine nummerierte Liste.',structured:'Gliedere mit kurzen Überschriften und Absätzen.',auto:''};
     const fmtI=fmtMap[fmt]||'';
+
+    // Simple mode: use only first line of sys as single-line prompt
+    if(!State.s.fullCtx){
+      const simpleBase=(c.sys||`Du bist ${seat.role}. Antworte prägnant und hilfreich aus deiner Rolle.`).split('\n')[0].trim();
+      return `${simpleBase} Rolle: ${seat.role}. Max ${maxWords} Wörter. ${langI} ${fmtI}${focI}`.trim();
+    }
 
     const layers=[
       `=== EBENE 1 – SYSTEMKONTEXT: DEINE IDENTITÄT & LEITPLANKEN ===\n${c.sys||'Du bist ein hilfreicher Experte.'}`,
@@ -1269,6 +1359,10 @@ Fokussiere auf das, was aus deiner spezifischen Rollenperspektive noch fehlt ode
     Api._failedModels.clear();
     UI.setRunning(true);UI.resetDash();State.history=[];let summary='';
 
+    // Only active seats participate
+    const activeSeats=State.seats.map((s,i)=>({...s,_idx:i})).filter(s=>!s.disabled);
+    if(!activeSeats.length){Toast.show('Mindestens ein Sitz muss aktiv sein!','err');UI.setRunning(false);return;}
+
     const globals={
       lang:State.s.lang||'de',
       fmt:State.s.format||'auto',
@@ -1278,9 +1372,15 @@ Fokussiere auf das, was aus deiner spezifischen Rollenperspektive noch fehlt ode
       summary
     };
 
+    // Init live panel
+    const totalSteps=State.s.rounds*activeSeats.length;
+    let stepDone=0;
+    UI.liveStart(query,activeSeats,State.s.rounds);
+
     try{
       for(let r=1;r<=State.s.rounds;r++){
         globals.allHistory=State.history;
+        UI.liveRound(r);
 
         // Build rolling summary from round 3 onward
         if(r>=3&&State.history.length){
@@ -1300,18 +1400,16 @@ Fokussiere auf das, was aus deiner spezifischen Rollenperspektive noch fehlt ode
           await pause(1200);
         }
 
-        for(let i=0;i<State.seats.length;i++){
-          const seat=State.seats[i];
-          UI.setSeat(i,true);
+        for(let ii=0;ii<activeSeats.length;ii++){
+          const seat=activeSeats[ii];
+          const origIdx=seat._idx;
+          UI.setSeat(origIdx,true);
+          UI.liveSetState(origIdx,'thinking');
           UI.log(`[R${r}] ${seat.role} (${mdlName(seat.model)})…`);
 
-          // Build 5-layer system prompt
           const sysPart=this._buildSysPrompt(seat,globals);
-
-          // Build user message with cross-round context
           const rawUserMsg=this._buildCrossRoundMsg(r,seat,query,{...globals,allHistory:State.history,summary});
 
-          // Add file context to Round 1
           let messages;
           if(r===1&&FileHandler.attachments.length>0){
             messages=FileHandler.buildMessages(sysPart,rawUserMsg);
@@ -1319,16 +1417,15 @@ Fokussiere auf das, was aus deiner spezifischen Rollenperspektive noch fehlt ode
             messages=[{role:'system',content:sysPart},{role:'user',content:rawUserMsg}];
           }
 
-          const res=await Api.call(seat.model,messages,{seatIdx:i});
+          const res=await Api.call(seat.model,messages,{seatIdx:origIdx});
           State.history.push({
-            round:r,
-            role:seat.role,
-            content:res.content,
-            model:res.usedModel,
-            isFallback:res.isFallback,
+            round:r,role:seat.role,content:res.content,
+            model:res.usedModel,isFallback:res.isFallback,
             ctxSnapshot:{sys:seat.ctx?.sys?.slice(0,80),goal:seat.ctx?.goal?.slice(0,60)}
           });
-          UI.setSeat(i,false);
+          stepDone++;
+          UI.setSeat(origIdx,false);
+          UI.liveSetState(origIdx,'done',res.content,stepDone/totalSteps);
           await pause(600+Math.random()*500);
         }
       }
@@ -1382,7 +1479,7 @@ ${langI}`},
       Toast.show('Fehler: '+e.message,'err',8000);
       UI.log('Abbruch: '+e.message);
       console.error(e);
-    }finally{UI.setRunning(false);}
+    }finally{UI.setRunning(false);UI.liveEnd();}
   }
 }
 
@@ -1546,6 +1643,7 @@ const UI={
     q('setFocus').value=State.s.focus||'';
     q('setKeyPoints').value=State.s.keyPoints||5;
     q('setLang').value=State.s.lang||'de';
+    q('setFullCtx').checked=State.s.fullCtx!==false;
 
     this.renderSeats();
     this.log('System bereit • Klicke auf einen Sitz');
@@ -1590,6 +1688,7 @@ const UI={
     q('setFocus').value=State.s.focus||'';
     q('setKeyPoints').value=State.s.keyPoints||5;
     q('setLang').value=State.s.lang||'de';
+    q('setFullCtx').checked=State.s.fullCtx!==false;
     q('dlgSettings').showModal();
   },
 
@@ -1623,25 +1722,143 @@ const UI={
       const name=mdl?mdl.name:(seat.model.split('/').pop()||'—');
       const color=mdl?.color||'var(--p)';
       const sysPreview=(ctx.sys||'').replace(/===.*?===/g,'').trim().slice(0,45)+(ctx.sys?.length>45?'…':'');
+      const disabled=!!seat.disabled;
 
       if(grid){
-        const mc=document.createElement('div');mc.className='scard';mc.id=`sc-${i}`;
+        const mc=document.createElement('div');
+        mc.className='scard'+(disabled?' disabled':'');mc.id=`sc-${i}`;
         mc.innerHTML=`<div class="sc-dot"></div>
           <div class="sc-av" style="background:${color}18;color:${color};border-color:${color}28;font-size:${emoji?'.85rem':'.55rem'}">${esc(init)}</div>
-          <div class="sc-role" style="color:${color}">${esc(seat.role)}</div>
+          <div class="sc-role" style="color:${disabled?'var(--mu2)':color}">${esc(seat.role)}</div>
           <div class="sc-model" title="${esc(seat.model)}">${esc(name)}</div>
-          <div class="sc-ctx" title="${esc(ctx.sys||'')}">${esc(sysPreview)}</div>`;
-        mc.addEventListener('click',()=>this.openSeat(i));grid.append(mc);
+          <div class="sc-ctx" title="${esc(ctx.sys||'')}">${esc(sysPreview)}</div>
+          <button class="sc-toggle" data-idx="${i}" title="${disabled?'Aktivieren':'Deaktivieren'}"></button>`;
+        mc.addEventListener('click',e=>{if(!e.target.classList.contains('sc-toggle'))this.openSeat(i);});
+        mc.querySelector('.sc-toggle').addEventListener('click',e=>{e.stopPropagation();this.toggleSeat(i);});
+        grid.append(mc);
       }
       if(abs){
-        const da=document.createElement('div');da.className='seat-d';da.id=`sd-${i}`;
+        const da=document.createElement('div');
+        da.className='seat-d'+(disabled?' disabled':'');da.id=`sd-${i}`;
         da.innerHTML=`<div class="dbadge" id="db-${i}"></div>
-          <div class="dav" style="background:${color}18;color:${color};border-color:${color}28;font-size:${emoji?'1rem':'.75rem'}">${esc(init)}</div>
-          <div class="dlabel"><div class="dr" style="color:${color}">${esc(seat.role)}</div><div class="dm" title="${esc(seat.model)}">${esc(name)}</div></div>`;
-        da.addEventListener('click',()=>this.openSeat(i));abs.append(da);
+          <div class="dav" style="background:${color}18;color:${disabled?'var(--mu2)':color};border-color:${color}28;font-size:${emoji?'1rem':'.75rem'}">${esc(init)}</div>
+          <div class="dlabel"><div class="dr" style="color:${disabled?'var(--mu2)':color}">${esc(seat.role)}</div><div class="dm" title="${esc(seat.model)}">${esc(name)}</div></div>`;
+        if(!disabled)da.addEventListener('click',()=>this.openSeat(i));
+        abs.append(da);
       }
     });
   },
+
+  toggleSeat(idx){
+    const activeCount=State.seats.filter(s=>!s.disabled).length;
+    if(!State.seats[idx].disabled&&activeCount<=1){
+      Toast.show('Mindestens ein Sitz muss aktiv bleiben!','info');return;
+    }
+    State.seats[idx].disabled=!State.seats[idx].disabled;
+    State.save();
+    this.renderSeats();
+    const seat=State.seats[idx];
+    Toast.show(`${seat.disabled?'⏸ Deaktiviert':'▶ Aktiviert'}: ${seat.role}`,'ok',1800);
+  },
+
+  // ── LIVE PANEL ──────────────────────────────────────────────────
+  _liveSeats:[],
+  _lpPanels:['M','D'],
+
+  liveStart(query,activeSeats,rounds){
+    this._liveSeats=activeSeats;
+    this._lpPanels.forEach(s=>{
+      const panel=q(`livePanel${s}`);
+      if(!panel)return;
+      panel.style.display='flex';
+      q(`lpTitle${s}`).textContent=query.slice(0,60)+(query.length>60?'…':'');
+      q(`lpRound${s}`).textContent=`Runde 1 / ${rounds}`;
+      q(`lpProg${s}`).style.width='0%';
+      // Build seat cards
+      const seatsC=q(`lpSeats${s}`);seatsC.innerHTML='';
+      activeSeats.forEach(seat=>{
+        const mdl=mdlById(seat.model);
+        const color=mdl?.color||'var(--p)';
+        const ctx=seat.ctx||ROLE_DEFAULTS[seat.role]||{};
+        const emoji=ctx.emoji||'';
+        const init=(emoji||seat.role.substring(0,2)).replace(/\s/g,'');
+        const card=document.createElement('div');
+        card.className='lp-seat waiting';card.id=`lpc-${s}-${seat._idx}`;
+        card.innerHTML=`
+          <div class="lp-seat-hdr">
+            <div class="lp-av" style="background:${color}18;color:${color};border:1.5px solid ${color}30">${esc(init)}</div>
+            <div class="lp-role">
+              <div class="lp-rname" style="color:${color}">${esc(seat.role)}</div>
+              <div class="lp-mname">${esc(mdl?.name||seat.model.split('/').pop())}</div>
+            </div>
+            <span class="lp-state s-wait" id="lpst-${s}-${seat._idx}">Wartet</span>
+          </div>
+          <div class="lp-preview" id="lpprev-${s}-${seat._idx}">—</div>`;
+        seatsC.append(card);
+      });
+    });
+  },
+
+  liveRound(r){
+    this._lpPanels.forEach(s=>{
+      const el=q(`lpRound${s}`);
+      if(el)el.textContent=`Runde ${r} / ${State.s.rounds}`;
+    });
+    // Reset all waiting
+    this._liveSeats.forEach(seat=>{
+      this._lpPanels.forEach(s=>{
+        const card=q(`lpc-${s}-${seat._idx}`);
+        if(card){card.className='lp-seat waiting';}
+        const st=q(`lpst-${s}-${seat._idx}`);
+        if(st){st.className='lp-state s-wait';st.textContent='Wartet';}
+        const prev=q(`lpprev-${s}-${seat._idx}`);
+        if(prev){prev.className='lp-preview';prev.textContent='—';}
+      });
+    });
+  },
+
+  liveSetState(idx,state,content,progress){
+    const stateMap={
+      thinking:{cls:'lp-seat thinking',stCls:'lp-state s-think',stTxt:'Denkt…'},
+      done:{cls:'lp-seat done',stCls:'lp-state s-done',stTxt:'✓ Fertig'},
+      error:{cls:'lp-seat',stCls:'lp-state s-err',stTxt:'Fehler'},
+    };
+    const cfg=stateMap[state]||{};
+    this._lpPanels.forEach(s=>{
+      const card=q(`lpc-${s}-${idx}`);
+      if(card&&cfg.cls)card.className=cfg.cls;
+      const st=q(`lpst-${s}-${idx}`);
+      if(st&&cfg.stCls){st.className=cfg.stCls;st.textContent=cfg.stTxt;}
+      const prev=q(`lpprev-${s}-${idx}`);
+      if(prev&&content){
+        const preview=content.slice(0,120)+(content.length>120?'…':'');
+        prev.className='lp-preview has-text';prev.textContent=preview;
+      }
+      if(state==='thinking'&&prev){
+        prev.innerHTML='<div class="lp-dots"><div class="lp-dot"></div><div class="lp-dot"></div><div class="lp-dot"></div></div>';
+      }
+      if(progress!==undefined){
+        const prog=q(`lpProg${s}`);
+        if(prog)prog.style.width=`${Math.round(progress*100)}%`;
+      }
+    });
+    // Update syslog
+    if(state==='thinking'){
+      const seat=State.seats[idx];
+      this.log(`[${state}] ${seat?.role||'?'} (${mdlName(seat?.model||'')})…`);
+      this._lpPanels.forEach(s=>{const el=q(`lpLog${s}`);if(el)el.textContent=`${seat?.role||''}: ${mdlName(seat?.model||'')} denkt…`;});
+    }
+  },
+
+  liveEnd(){
+    // Small delay so user can see 100% completion
+    setTimeout(()=>{
+      this._lpPanels.forEach(s=>{
+        const panel=q(`livePanel${s}`);if(panel)panel.style.display='none';
+      });
+    },900);
+  },
+  // ── END LIVE PANEL ────────────────────────────────────────────────
 
   openSeat(idx){
     const s=State.seats[idx];
@@ -1730,7 +1947,8 @@ const UI={
       format:q('setFormat').value,
       focus:q('setFocus').value.trim(),
       keyPoints:Math.max(3,Math.min(10,parseInt(q('setKeyPoints').value)||5)),
-      lang:q('setLang').value
+      lang:q('setLang').value,
+      fullCtx:q('setFullCtx').checked
     };
     State.save();q('dlgSettings').close();Toast.show('Einstellungen gespeichert ✓','ok');
   },
